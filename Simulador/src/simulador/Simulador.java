@@ -27,7 +27,7 @@ public class Simulador {
     public static void main(String[] args) throws JSimInvalidParametersException, JSimMethodNotSupportedException {
         try
         {
-            File arquivo = new File("C:/Users/Eduardo/Documents/NetBeansProjects/JavaProject2/arquivo.txt");
+            File arquivo = new File("../arquivo.txt");
             
             if(!arquivo.exists())
             {
