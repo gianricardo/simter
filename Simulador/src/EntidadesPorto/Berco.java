@@ -2,10 +2,10 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package DemaisObjetos;
+package EntidadesPorto;
 
-import Filas.FilaNavios;
-import Transportadores.Navio;
+import EntidadesPorto.FilaNavios;
+import EntidadesPorto.Navio;
 import cz.zcu.fav.kiv.jsim.JSimException;
 import cz.zcu.fav.kiv.jsim.JSimInvalidParametersException;
 import cz.zcu.fav.kiv.jsim.JSimLink;

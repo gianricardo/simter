@@ -4,9 +4,9 @@
  */
 package simulador;
 
-import DemaisObjetos.Berco;
-import Filas.FilaNavios;
-import Transportadores.GeradorNavios;
+import EntidadesPorto.Berco;
+import EntidadesPorto.FilaNavios;
+import EntidadesPorto.GeradorNavios;
 import cz.zcu.fav.kiv.jsim.JSimException;
 import cz.zcu.fav.kiv.jsim.JSimInvalidParametersException;
 import cz.zcu.fav.kiv.jsim.JSimMethodNotSupportedException;
