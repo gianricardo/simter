@@ -29,6 +29,10 @@ public class Simulador {
         {
             File arquivo = new File("../arquivo.txt");
             
+            if(arquivo.delete()==true){            
+                arquivo = new File("../arquivo.txt");
+            }
+            
             if(!arquivo.exists())
             {
                 arquivo.createNewFile();
@@ -72,7 +76,7 @@ public class Simulador {
                 simulation.message("Executando a simulação.");
                 bw.write("Executando a simulação.\r\n");
 
-                while ((simulation.getCurrentTime() < 10000.0) && (simulation.step() == true))
+                while ((simulation.getCurrentTime() < 1000.0) && (simulation.step() == true))
                 {
                     continue;
                 }

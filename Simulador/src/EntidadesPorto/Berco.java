@@ -4,8 +4,7 @@
  */
 package EntidadesPorto;
 
-import EntidadesPorto.FilaNavios;
-import EntidadesPorto.Navio;
+
 import cz.zcu.fav.kiv.jsim.JSimException;
 import cz.zcu.fav.kiv.jsim.JSimInvalidParametersException;
 import cz.zcu.fav.kiv.jsim.JSimLink;
@@ -14,6 +13,7 @@ import cz.zcu.fav.kiv.jsim.JSimSimulation;
 import cz.zcu.fav.kiv.jsim.JSimSimulationAlreadyTerminatedException;
 import cz.zcu.fav.kiv.jsim.JSimSystem;
 import cz.zcu.fav.kiv.jsim.JSimTooManyProcessesException;
+import java.io.IOException;
 
 /**
  *
@@ -33,7 +33,7 @@ public class Berco extends JSimProcess{
     private double transTq;
     
     public Berco(String name, JSimSimulation sim, double parMu, double parP, FilaNavios parQueueIn, FilaNavios parQueueOut)
-            throws JSimSimulationAlreadyTerminatedException, JSimInvalidParametersException, JSimTooManyProcessesException
+            throws JSimSimulationAlreadyTerminatedException, JSimInvalidParametersException, JSimTooManyProcessesException, IOException
 	{
             super(name, sim);
             mu = parMu;
