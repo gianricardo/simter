@@ -26,31 +26,14 @@ import java.util.logging.Logger;
 public class GeradorNavios extends JSimProcess {
     private double lambda;
     private FilaNavios queue;
-    private int numeroNavio = 1;
-    private File arquivo;
-    private FileWriter fw;
-    private BufferedWriter bw;
+    private int numeroNavio = 1;    
 
 	public GeradorNavios(String name, JSimSimulation sim, double l, FilaNavios q)
                 throws JSimSimulationAlreadyTerminatedException, JSimInvalidParametersException, JSimTooManyProcessesException, IOException
 	{
             super(name, sim);
             lambda = l;
-            queue = q;
-            
-            arquivo = new File("../arquivoNavios"+ name +".txt");
-            
-            if(arquivo.delete()==true){            
-                arquivo = new File("../arquivoNavios"+ name +".txt");
-            }
-            
-            if(!arquivo.exists())
-            {
-                arquivo.createNewFile();
-            }
-            fw = new FileWriter(arquivo, true);
-            bw = new BufferedWriter(fw);
-            
+            queue = q;            
 	} // constructor
 
     @Override
@@ -62,19 +45,16 @@ public class GeradorNavios extends JSimProcess {
                 while (true)
                 {                    
                     // Periodically creating new navios and putting them into the queue.
-                    link = new JSimLink(new Navio(myParent.getCurrentTime()));                    
+                    link = new JSimLink(new Navio(myParent.getCurrentTime(), String.valueOf(numeroNavio), super.getName()));                    
                     link.into(queue);
                     if (queue.getBerco().isIdle())
                     {
                         queue.getBerco().activate(myParent.getCurrentTime());
-                    }
-                    try {
-                        bw.write("\r\nNavio " + numeroNavio + " Criado e colocado na fila " + queue.getHeadName() + " no momento " + link.getEnterTime() +"\r\n");
-                    } catch (IOException ex) {
-                        Logger.getLogger(GeradorNavios.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-                    hold(JSimSystem.negExp(lambda));
-                    numeroNavio++ ;
+                    }                    
+                    
+                    hold(JSimSystem.uniform(0, 10));                    
+                    
+                    numeroNavio++;
                 } // while
             } // try
             catch (JSimException e)

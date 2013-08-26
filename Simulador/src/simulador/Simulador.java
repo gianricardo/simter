@@ -100,6 +100,8 @@ public class Simulador {
                 bw.write("\r\nTempo de resposta Médio = " + ((berco1.getTransTq() + berco2.getTransTq()) / (berco1.getCounter() + berco2.getCounter()))+ "\r\n");
                 
                 simulation.shutdown();
+                berco1.closeBw();
+                berco2.closeBw();
                 bw.close();
             }
         }        

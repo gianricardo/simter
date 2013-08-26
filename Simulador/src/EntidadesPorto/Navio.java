@@ -13,6 +13,7 @@ import java.util.List;
  * @author Eduardo
  */
 public class Navio {
+    public String idNavio;
     public float Calado;
     public float Comprimento;
     public Date HoraChegadaPorto;
@@ -24,9 +25,14 @@ public class Navio {
     public float TempoAtendimento;
     public double timeOfCreation;
     
-    public Navio(double time)
+    public Navio(double time, String id, String gerador)
     {
             timeOfCreation = time;
+            idNavio = new StringBuilder()
+                    .append(id)
+                    .append(" ")
+                    .append(gerador)
+                    .toString();
     } // constructor
 
     public double getCreationTime()
