@@ -9,6 +9,7 @@ import cz.zcu.fav.kiv.jsim.JSimInvalidParametersException;
 import cz.zcu.fav.kiv.jsim.JSimProcess;
 import cz.zcu.fav.kiv.jsim.JSimSimulation;
 import cz.zcu.fav.kiv.jsim.JSimTooManyHeadsException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,7 +22,7 @@ public class FilaNavios extends JSimHead {
     private JSimProcess berco;
     
     public FilaNavios(String name, JSimSimulation sim, JSimProcess b)
-            throws JSimInvalidParametersException, JSimTooManyHeadsException
+            throws JSimInvalidParametersException, JSimTooManyHeadsException, IOException
     {
         super(name, sim);
 	berco = b;

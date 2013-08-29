@@ -37,6 +37,8 @@ public class Berco extends JSimProcess{
 
     private int counter;
     private double transTq;
+    private double horaSaida;
+    private double tempoTotalAtendimento;
     
     private File arquivo;
     private FileWriter fw;
@@ -87,7 +89,7 @@ public class Berco extends JSimProcess{
                     else
                     {
                         // Simulating hard work here...
-                        hold(JSimSystem.uniform(0, 10));
+                        hold(JSimSystem.uniform(10, 10));
                         link = queueIn.first();
 
                         // Now we must decide whether to throw the transaction away or to insert it into another queue.
@@ -95,11 +97,15 @@ public class Berco extends JSimProcess{
                         {
                             n = (Navio) link.getData();
                             counter++;
-                            transTq += myParent.getCurrentTime() - n.getCreationTime();
+                            horaSaida = myParent.getCurrentTime();
+                            tempoTotalAtendimento = horaSaida - link.getEnterTime();
+                            transTq += horaSaida - n.getCreationTime();
                              try {
                                 bw.write("\r\nNavio " + n.idNavio + " Criado no momento " + df.format(n.getCreationTime()) +
                                         " e colocado na fila " + queueIn.getHeadName() +
-                                        " no momento " + df.format(link.getEnterTime()) + "\r\n");
+                                        " no momento " + df.format(link.getEnterTime()) + 
+                                        " e deixou o berço no momento " + df.format(horaSaida) +
+                                        " ficando no berço por " + tempoTotalAtendimento + " \r\n");
                             } catch (IOException ex) {
                                 Logger.getLogger(GeradorNavios.class.getName()).log(Level.SEVERE, null, ex);
                             }
