@@ -4,6 +4,7 @@
  */
 package EntidadesPorto;
 
+import cz.zcu.fav.kiv.jsim.JSimSystem;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -24,6 +25,7 @@ public class Navio {
     int idPratico;
     public float TempoAtendimento;
     public double timeOfCreation;
+    public int NumeroContainersDescarregar = 0;
     
     public Navio(double time, String id, String gerador)
     {
@@ -33,6 +35,7 @@ public class Navio {
                     .append(" ")
                     .append(gerador)
                     .toString();
+            NumeroContainersDescarregar = (int) JSimSystem.uniform(50, 50);
     } // constructor
 
     public double getCreationTime()

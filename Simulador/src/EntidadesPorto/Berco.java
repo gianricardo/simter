@@ -39,6 +39,7 @@ public class Berco extends JSimProcess{
     private double transTq;
     private double horaSaida;
     private double tempoTotalAtendimento;
+    private double horaAtracacao;
     
     private File arquivo;
     private FileWriter fw;
@@ -75,7 +76,7 @@ public class Berco extends JSimProcess{
     protected void life()
 	{
             Navio n;
-            JSimLink link;
+            JSimLink navio;
 
             try
             {
@@ -89,33 +90,38 @@ public class Berco extends JSimProcess{
                     else
                     {
                         // Simulating hard work here...
-                        hold(JSimSystem.uniform(10, 10));
-                        link = queueIn.first();
+                        //Tempo de atendimento no BERÇO = SOMA DE TODOS OS CARREGAMENTOS E DESCARREGAMENTOS DE CONTAINERS
+                        horaAtracacao = myParent.getCurrentTime();
+                        hold(JSimSystem.uniform(15, 15));
+                        navio = queueIn.first();
 
                         // Now we must decide whether to throw the transaction away or to insert it into another queue.
-                        if (JSimSystem.uniform(0.0, 1.0) > p)
+                        if (JSimSystem.uniform(0.0, 1.0) > p || queueOut == null)
                         {
-                            n = (Navio) link.getData();
+                            n = (Navio) navio.getData();
                             counter++;
                             horaSaida = myParent.getCurrentTime();
-                            tempoTotalAtendimento = horaSaida - link.getEnterTime();
+                            tempoTotalAtendimento = horaSaida - horaAtracacao;
                             transTq += horaSaida - n.getCreationTime();
                              try {
                                 bw.write("\r\nNavio " + n.idNavio + " Criado no momento " + df.format(n.getCreationTime()) +
-                                        " e colocado na fila " + queueIn.getHeadName() +
-                                        " no momento " + df.format(link.getEnterTime()) + 
+                                        " com " + n.NumeroContainersDescarregar + " Containers a descarregar" +
+                                        " e colocado na fila " + queueIn.getHeadName() +                                        
+                                        " no momento " + df.format(navio.getEnterTime()) +
+                                        " ficando na fila por " +  df.format(horaAtracacao - navio.getEnterTime()) +
+                                        " atracando no momento " + df.format(horaAtracacao) +                                        
                                         " e deixou o berço no momento " + df.format(horaSaida) +
                                         " ficando no berço por " + tempoTotalAtendimento + " \r\n");
                             } catch (IOException ex) {
                                 Logger.getLogger(GeradorNavios.class.getName()).log(Level.SEVERE, null, ex);
                             }
-                            link.out();                           
-                            link = null;                           
+                            navio.out();                           
+                            navio = null;                           
                         }
                         else
                         {
-                            link.out();
-                            link.into(queueOut);
+                            navio.out();
+                            navio.into(queueOut);
                             if (queueOut.getBerco().isIdle())
                             {
                                 queueOut.getBerco().activate(myParent.getCurrentTime());

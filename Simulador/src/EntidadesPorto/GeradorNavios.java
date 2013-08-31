@@ -27,13 +27,14 @@ public class GeradorNavios extends JSimProcess {
     private double lambda;
     private FilaNavios queue;
     private int numeroNavio = 1;    
+    private int numeroContainersDescarregar = 0;
 
-	public GeradorNavios(String name, JSimSimulation sim, double l, FilaNavios q)
+	public GeradorNavios(String name, JSimSimulation sim, double l, FilaNavios q, int NumeroContainersDescarregar)
                 throws JSimSimulationAlreadyTerminatedException, JSimInvalidParametersException, JSimTooManyProcessesException, IOException
 	{
             super(name, sim);
             lambda = l;
-            queue = q;            
+            queue = q;
 	} // constructor
 
     @Override
@@ -52,8 +53,7 @@ public class GeradorNavios extends JSimProcess {
                         queue.getBerco().activate(myParent.getCurrentTime());
                     }                    
                     
-                    hold(JSimSystem.uniform(0, 10));                    
-                    
+                    hold(JSimSystem.uniform(10, 10));                    
                     numeroNavio++;
                 } // while
             } // try
