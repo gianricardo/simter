@@ -12,12 +12,7 @@ import cz.zcu.fav.kiv.jsim.JSimSimulation;
 import cz.zcu.fav.kiv.jsim.JSimSimulationAlreadyTerminatedException;
 import cz.zcu.fav.kiv.jsim.JSimSystem;
 import cz.zcu.fav.kiv.jsim.JSimTooManyProcessesException;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -26,8 +21,7 @@ import java.util.logging.Logger;
 public class GeradorNavios extends JSimProcess {
     private double lambda;
     private FilaNavios queue;
-    private int numeroNavio = 1;    
-    private int numeroContainersDescarregar = 0;
+    private int numeroNavio = 1;
 
 	public GeradorNavios(String name, JSimSimulation sim, double l, FilaNavios q, int NumeroContainersDescarregar)
                 throws JSimSimulationAlreadyTerminatedException, JSimInvalidParametersException, JSimTooManyProcessesException, IOException
