@@ -46,13 +46,12 @@ public class Portainer extends JSimProcess {
     //BercosAtende
     //IdentificadoresNavios
 
-    public Portainer(String name, JSimSimulation sim, double parMu, double parP, FilaContainers parQueueIn, FilaContainers parQueueOut)
+    public Portainer(String name, JSimSimulation sim, double parMu, double parP)
             throws JSimSimulationAlreadyTerminatedException, JSimInvalidParametersException, JSimTooManyProcessesException, IOException {
         super(name, sim);
         mu = parMu;
         p = parP;
-        queueIn = parQueueIn;
-        queueOut = parQueueOut;
+        
         counter = 0;
         transTq = 0.0;
         arquivo = new File("../arquivoContainers" + name + ".txt");
@@ -69,8 +68,7 @@ public class Portainer extends JSimProcess {
     } // constructor
 
     protected void life() {
-        queueIn.setHoraFinalAtendimento(0);
-        queueIn.setHoraInicioAtendimento(myParent.getCurrentTime());
+        queueIn.setHoraFinalAtendimento(0);        
         Container c;
         JSimLink container;
 
@@ -84,7 +82,7 @@ public class Portainer extends JSimProcess {
                     horaMovimentacao = myParent.getCurrentTime();
                     c = (Container) container.getData();
                     
-                    hold(JSimSystem.uniform(1, 1));
+                    hold(JSimSystem.uniform(10, 10));
 
                     // Now we must decide whether to throw the transaction away or to insert it into another queue.
                     if (JSimSystem.uniform(0.0, 1.0) > p || queueOut == null) {
@@ -106,11 +104,7 @@ public class Portainer extends JSimProcess {
                         if(queueIn.empty())
                         {
                             queueIn.setHoraFinalAtendimento(horaSaida);
-                        }
-                        else
-                        {
-                            queueIn.setHoraFinalAtendimento(0);
-                        }
+                        }                        
                         container = null;                        
                     } else {
                         container.out();
@@ -127,6 +121,13 @@ public class Portainer extends JSimProcess {
             e.printComment(System.err);
         }
     } // life
+    
+    public void setFilas(FilaContainers parQueueIn, FilaContainers parQueueOut)
+    {
+        queueIn = parQueueIn;
+        queueIn.setHoraInicioAtendimento(myParent.getCurrentTime());
+        queueOut = parQueueOut;
+    }
 
     public int getCounter() {
         return counter;

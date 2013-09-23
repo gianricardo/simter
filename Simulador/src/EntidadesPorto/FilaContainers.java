@@ -18,48 +18,40 @@ import java.util.List;
  * @author Eduardo
  */
 public class FilaContainers extends JSimHead {
-    
+
     private JSimProcess portainer;
     private double horaFinalAtendimento;
     private double horaInicioAtendimento;
-    
+
     public FilaContainers(String name, JSimSimulation sim, JSimProcess p)
-            throws JSimInvalidParametersException, JSimTooManyHeadsException, IOException
-    {
+            throws JSimInvalidParametersException, JSimTooManyHeadsException, IOException {
         super(name, sim);
-	portainer = p;
+        portainer = p;
     } // constructor
-    
-    public JSimProcess getPortainer()
-    {
-            return portainer;
+
+    public JSimProcess getPortainer() {
+        return portainer;
     }
 
-    public void setPortainer(JSimProcess p)
-    {
-            portainer = p;
+    public void setPortainer(JSimProcess p) {
+        portainer = p;
     }
-    
-    public double getHoraFinalAtendimento()
-    {
+
+    public double getHoraFinalAtendimento() {
         return horaFinalAtendimento;
     }
-    
-     public void setHoraFinalAtendimento(double h)
-    {
-            horaFinalAtendimento = h;
+
+    public void setHoraFinalAtendimento(double h) {
+        horaFinalAtendimento = h;
     }
-     
-    public double getHoraInicioAtendimento()
-    {
+
+    public double getHoraInicioAtendimento() {
         return horaInicioAtendimento;
     }
-    
-    public void setHoraInicioAtendimento(double h)
-    {
-            horaInicioAtendimento = h;
+
+    public void setHoraInicioAtendimento(double h) {
+        horaInicioAtendimento = h;
     }
-     
     public int IdPortainer;
-    public List listaContainers = new ArrayList();    
+    public List listaContainers = new ArrayList();
 }

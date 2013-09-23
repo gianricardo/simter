@@ -8,6 +8,7 @@ import cz.zcu.fav.kiv.jsim.JSimException;
 import cz.zcu.fav.kiv.jsim.JSimInvalidParametersException;
 import cz.zcu.fav.kiv.jsim.JSimLink;
 import cz.zcu.fav.kiv.jsim.JSimProcess;
+import cz.zcu.fav.kiv.jsim.JSimSecurityException;
 import cz.zcu.fav.kiv.jsim.JSimSimulation;
 import cz.zcu.fav.kiv.jsim.JSimSimulationAlreadyTerminatedException;
 import cz.zcu.fav.kiv.jsim.JSimSystem;
@@ -29,33 +30,34 @@ import java.util.logging.Logger;
  */
 public class Berco extends JSimProcess {
 
-    private FilaContainers queueContainer1;
-    private JSimSimulation simulation;
-    private Portainer portainerBerco;
-    
-    
-    public double teste;
-    public int IdBerco;
-    public Navio IdNavioAtracado;
-    private double mu;
-    private double p;
-    private FilaNavios queueIn;
-    private FilaNavios queueOut;
-    private int counter;
-    private double transTq;
+    private FilaContainers queueContainer1, queueContainer2;
+    private Portainer portainerBerco1, portainerBerco2;
+    private Portainer portainerBercoAdicional1;
+    private int numeroPortainers = 0;
     private double horaSaida;
     private double tempoTotalAtendimento;
     private double tempoAtendimentoPortainers;
     private double tempoMovimentacao;
     private double horaInicioMovimentacao;
     private double horaAtracacao;
+    private int numeroRegioesBerco;
+    
+    private JSimSimulation simulation;
+    private double mu;
+    private double p;
+    private int counter;
+    private double transTq;
+    private FilaNavios queueIn;
+    private FilaNavios queueOut;
+    
+    public int IdBerco;
+    
     private File arquivo;
     private FileWriter fw;
     private BufferedWriter bw;
     private DecimalFormat df = new DecimalFormat("#0.##");
-    private List<FilaContainers> listaPortainer = new ArrayList<>();
 
-    public Berco(String name, JSimSimulation sim, double parMu, double parP, FilaNavios parQueueIn, FilaNavios parQueueOut)
+    public Berco(String name, JSimSimulation sim, double parMu, double parP, FilaNavios parQueueIn, FilaNavios parQueueOut, int NumeroRegioesBerco)
             throws JSimSimulationAlreadyTerminatedException, JSimInvalidParametersException, JSimTooManyProcessesException, IOException {
         super(name, sim);
         simulation = sim;
@@ -63,9 +65,22 @@ public class Berco extends JSimProcess {
         p = parP;
         queueIn = parQueueIn;
         queueOut = parQueueOut;
+        numeroRegioesBerco = NumeroRegioesBerco;
 
         counter = 0;
         transTq = 0.0;
+        
+        try {
+            portainerBerco1 = new Portainer("Portainer 1", simulation, 0, 0);
+        } catch (JSimSimulationAlreadyTerminatedException | JSimInvalidParametersException | JSimTooManyProcessesException | IOException ex) {
+            Logger.getLogger(Berco.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        try {
+            portainerBerco2 = new Portainer("Portainer 2", simulation, 0, 0);
+        } catch (JSimSimulationAlreadyTerminatedException | JSimInvalidParametersException | JSimTooManyProcessesException | IOException ex) {
+            Logger.getLogger(Berco.class.getName()).log(Level.SEVERE, null, ex);
+        }
 
         arquivo = new File("../arquivoNavios" + name + ".txt");
 
@@ -83,38 +98,34 @@ public class Berco extends JSimProcess {
     protected void life() {
         Navio n;
         JSimLink navio;
-        JSimLink container;        
+        JSimLink container;
 
         try {
             while (true) {
                 if (queueIn.empty()) {
                     // If we have nothing to do, we sleep.
                     passivate();
-                } else {
-                    
-                    
+                } else {                    
                     try {
-                        queueContainer1 = new FilaContainers("Fila de Containers de um navio", simulation, null);
-                    } catch (JSimInvalidParametersException ex) {
-                        Logger.getLogger(Berco.class.getName()).log(Level.SEVERE, null, ex);
-                    } catch (JSimTooManyHeadsException ex) {
-                        Logger.getLogger(Berco.class.getName()).log(Level.SEVERE, null, ex);
-                    } catch (IOException ex) {
+                        queueContainer1 = new FilaContainers("Fila de Containers 1 navio", simulation, null);
+                    } catch (JSimInvalidParametersException | JSimTooManyHeadsException | IOException ex) {
                         Logger.getLogger(Berco.class.getName()).log(Level.SEVERE, null, ex);
                     }
-                    try {
-                        portainerBerco = new Portainer("Portainer 1", simulation, 0, 0, queueContainer1, null);
-                    } catch (JSimSimulationAlreadyTerminatedException ex) {
-                        Logger.getLogger(Berco.class.getName()).log(Level.SEVERE, null, ex);
-                    } catch (JSimInvalidParametersException ex) {
-                        Logger.getLogger(Berco.class.getName()).log(Level.SEVERE, null, ex);
-                    } catch (JSimTooManyProcessesException ex) {
-                        Logger.getLogger(Berco.class.getName()).log(Level.SEVERE, null, ex);
-                    } catch (IOException ex) {
-                        Logger.getLogger(Berco.class.getName()).log(Level.SEVERE, null, ex);
-                    }        
-                    queueContainer1.setPortainer(portainerBerco);                   
                     
+                    portainerBerco1.setFilas(queueContainer1, null);
+                    
+                    queueContainer1.setPortainer(portainerBerco1);
+                    
+                    try {
+                        queueContainer2 = new FilaContainers("Fila de Containers 2 navio", simulation, null);
+                    } catch (JSimInvalidParametersException | JSimTooManyHeadsException | IOException ex) {
+                        Logger.getLogger(Berco.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                    
+                    portainerBerco2.setFilas(queueContainer2, null);
+                    
+                    queueContainer2.setPortainer(portainerBerco2);
+
                     //Simulating hard work here...
                     //Tempo de atendimento no BERÇO = SOMA DE TODOS OS CARREGAMENTOS E DESCARREGAMENTOS DE CONTAINERS
                     navio = queueIn.first();
@@ -123,53 +134,67 @@ public class Berco extends JSimProcess {
                     horaAtracacao = myParent.getCurrentTime();
                     tempoMovimentacao = horaAtracacao - horaInicioMovimentacao;
                     n = (Navio) navio.getData();
-
+                    
                     for (int i = 1; i <= n.NumeroContainersDescarregar; i++) {
                         container = new JSimLink(new Container(myParent.getCurrentTime(), String.valueOf(i)));
-                        container.into(queueContainer1);
+                        if(n.NumeroRegioesNavio > 1){
+                            if(i<=(n.NumeroContainersDescarregar/numeroRegioesBerco)){
+                                container.into(queueContainer1);
+                            }
+                            else{
+                                container.into(queueContainer2);
+                            }
+                        }
+                        else{
+                            container.into(queueContainer1);
+                        }
 
                         if (queueContainer1.getPortainer().isIdle()) {
                             queueContainer1.getPortainer().activate(myParent.getCurrentTime());
-                        }                        
-                    }                   
-                    
+                        }
+                        
+                        if (queueContainer2.getPortainer().isIdle()) {
+                            queueContainer2.getPortainer().activate(myParent.getCurrentTime());
+                        }
+                    }
+
                     while (true) {
                         tempoAtendimentoPortainers = 0;
                         
-                        if(queueContainer1.getHoraFinalAtendimento() == 0){
-                            // If we have nothing to do, we sleep.
+                        double horaFimAtendPort1 = queueContainer1.getHoraFinalAtendimento();
+                        double horaFimAtendPort2 = queueContainer2.getHoraFinalAtendimento();
+
+                        if (queueContainer1.getHoraFinalAtendimento() == 0 || queueContainer2.getHoraFinalAtendimento() == 0 ) {
+                            // If we have nothing to do, we sleep.                            
                             passivate();
-                        }
-                        else
-                        {
-                            tempoAtendimentoPortainers = queueContainer1.getHoraFinalAtendimento() - queueContainer1.getHoraInicioAtendimento();
+                        } else {                            
+                            tempoAtendimentoPortainers = Math.max(queueContainer1.getHoraFinalAtendimento(), queueContainer2.getHoraFinalAtendimento()) -
+                                                        Math.min(queueContainer1.getHoraInicioAtendimento(), queueContainer2.getHoraInicioAtendimento());
                             break;
                         }
                     }
                     
-                    //hold(JSimSystem.uniform(tempoAtendimentoPortainers, tempoAtendimentoPortainers));
-
                     // Now we must decide whether to throw the transaction away or to insert it into another queue.
                     if (JSimSystem.uniform(0.0, 1.0) > p || queueOut == null) {
                         counter++;
                         horaSaida = tempoMovimentacao + tempoAtendimentoPortainers + horaInicioMovimentacao;
                         transTq += horaSaida - n.getCreationTime();
-                        
+
                         try {
                             bw.write("\r\nNavio " + n.idNavio + ":\r\n -Criado no momento " + df.format(n.getCreationTime())
                                     + "\r\n -" + n.NumeroContainersDescarregar + " Containers a descarregar"
                                     + "\r\n -Colocado na fila " + queueIn.getHeadName()
                                     + " no momento " + df.format(navio.getEnterTime())
                                     + "\r\n -Tempo de espera na fila " + df.format((horaAtracacao - tempoMovimentacao) - navio.getEnterTime())
-                                    + "\r\n -Hora Inicio Movimentacao ao Berco " + df.format(horaInicioMovimentacao)
+                                    + "\r\n -Hora Inicio Movimentacao até o Berco " + df.format(horaInicioMovimentacao)
                                     + "\r\n -Hora de Atracação " + df.format(horaAtracacao)
-                                    + "\r\n -Tempo de Movimentacao " + df.format(tempoMovimentacao)
-                                    + "\r\n -Hora de Saída " + df.format(horaSaida)
-                                    + "\r\n -Tempo de Atendimento " + tempoAtendimentoPortainers + " \r\n");
+                                    + "\r\n -Tempo de Movimentacao da Fila até o Berço " + df.format(tempoMovimentacao)
+                                    + "\r\n -Hora de Saída do Porto " + df.format(horaSaida)
+                                    + "\r\n -Tempo de Atendimento pelo Portainer " + tempoAtendimentoPortainers + " \r\n");
                         } catch (IOException ex) {
                             Logger.getLogger(GeradorNavios.class.getName()).log(Level.SEVERE, null, ex);
                         }
-                        navio.out();
+                        navio.out();                        
                         navio = null;
                     } else {
                         navio.out();
@@ -184,8 +209,8 @@ public class Berco extends JSimProcess {
         catch (JSimException e) {
             e.printStackTrace();
             e.printComment(System.err);
-        } 
-        
+        }
+
     } // life
 
     public int getCounter() {

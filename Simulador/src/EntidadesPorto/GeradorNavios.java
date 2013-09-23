@@ -40,14 +40,14 @@ public class GeradorNavios extends JSimProcess {
                 while (true)
                 {                    
                     // Periodically creating new navios and putting them into the queue.
-                    link = new JSimLink(new Navio(myParent.getCurrentTime(), String.valueOf(numeroNavio), super.getName()));                    
+                    link = new JSimLink(new Navio(myParent.getCurrentTime(), String.valueOf(numeroNavio), super.getName(), 2));                    
                     link.into(queue);
                     if (queue.getBerco().isIdle())
                     {
                         queue.getBerco().activate(myParent.getCurrentTime());
                     }                    
                     
-                    hold(JSimSystem.uniform(10, 10));                    
+                    hold(JSimSystem.uniform(500,500));                    
                     numeroNavio++;
                 } // while
             } // try
