@@ -7,6 +7,7 @@ package simulador;
 import EntidadesPorto.Berco;
 import EntidadesPorto.FilaNavios;
 import EntidadesPorto.GeradorNavios;
+import Negocio.BercoBusiness;
 import cz.zcu.fav.kiv.jsim.JSimException;
 import cz.zcu.fav.kiv.jsim.JSimInvalidParametersException;
 import cz.zcu.fav.kiv.jsim.JSimMethodNotSupportedException;
@@ -41,7 +42,7 @@ public class Simulador {
 
                 JSimSimulation simulation;
                 FilaNavios queueNavio1/*, queue2*/;
-                Berco berco1/*, berco2*/;
+                BercoBusiness berco1/*, berco2*/;
                 GeradorNavios generator1/*, generator2*/;
                 double mu1 = 1.0/*, mu2 = 1.0*/;
                 double lambda1 = 0.4/*, lambda2 = 0.4*/;
@@ -56,7 +57,7 @@ public class Simulador {
 
                 queueNavio1 = new FilaNavios("Fila Entrada de Navios no Porto", simulation, null);
                 
-                berco1 = new Berco("Berco 1", simulation, mu1, p1, queueNavio1, null,2);            
+                berco1 = new BercoBusiness("Berco 1", simulation, mu1, p1, queueNavio1, null,2);            
 
                 generator1 = new GeradorNavios("Gerador 1", simulation, lambda1, queueNavio1, containersDescarregar);
 
@@ -71,7 +72,7 @@ public class Simulador {
                 simulation.message("Executando a simulação.");
                 bw.write("Executando a simulação.\r\n");
 
-                while ((simulation.getCurrentTime() < 10000.0) && (simulation.step() == true)) {
+                while ((simulation.getCurrentTime() < 1000.0) && (simulation.step() == true)) {
                     continue;
                 }
 

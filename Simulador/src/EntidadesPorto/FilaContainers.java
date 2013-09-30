@@ -22,11 +22,13 @@ public class FilaContainers extends JSimHead {
     private JSimProcess portainer;
     private double horaFinalAtendimento;
     private double horaInicioAtendimento;
+    public String nomeFila;
 
     public FilaContainers(String name, JSimSimulation sim, JSimProcess p)
             throws JSimInvalidParametersException, JSimTooManyHeadsException, IOException {
         super(name, sim);
         portainer = p;
+        nomeFila = name;
     } // constructor
 
     public JSimProcess getPortainer() {

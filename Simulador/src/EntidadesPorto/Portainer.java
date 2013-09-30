@@ -4,6 +4,7 @@
  */
 package EntidadesPorto;
 
+import Negocio.BercoBusiness;
 import cz.zcu.fav.kiv.jsim.JSimException;
 import cz.zcu.fav.kiv.jsim.JSimInvalidParametersException;
 import cz.zcu.fav.kiv.jsim.JSimLink;
@@ -41,36 +42,49 @@ public class Portainer extends JSimProcess {
     private File arquivo;
     private FileWriter fw;
     private BufferedWriter bw;
+    private String NomePortainer;
     private DecimalFormat df = new DecimalFormat("#0.##");
+    private JSimProcess Berco;
     //CaminhoesPatio
     //BercosAtende
     //IdentificadoresNavios
 
-    public Portainer(String name, JSimSimulation sim, double parMu, double parP)
+    public Portainer(String name, JSimSimulation sim, double parMu, double parP, JSimProcess berco)
             throws JSimSimulationAlreadyTerminatedException, JSimInvalidParametersException, JSimTooManyProcessesException, IOException {
         super(name, sim);
         mu = parMu;
         p = parP;
-        
+        NomePortainer = name;
+        Berco = berco;
+
         counter = 0;
         transTq = 0.0;
-        arquivo = new File("../arquivoContainers" + name + ".txt");
-
-        if (arquivo.delete() == true) {
-            arquivo = new File("../arquivoContainers" + name + ".txt");
-        }
-
-        if (!arquivo.exists()) {
-            arquivo.createNewFile();
-        }
-        fw = new FileWriter(arquivo, true);
-        bw = new BufferedWriter(fw);
     } // constructor
 
     protected void life() {
-        queueIn.setHoraFinalAtendimento(0);        
+        queueIn.setHoraFinalAtendimento(0);
         Container c;
         JSimLink container;
+
+        arquivo = new File("../arquivoContainers" + NomePortainer + " " + queueIn.nomeFila + ".txt");
+
+        if (arquivo.delete() == true) {
+            arquivo = new File("../arquivoContainers" + NomePortainer + " " + queueIn.nomeFila + ".txt");
+        }
+
+        if (!arquivo.exists()) {
+            try {
+                arquivo.createNewFile();
+            } catch (IOException ex) {
+                Logger.getLogger(Portainer.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        try {
+            fw = new FileWriter(arquivo, true);
+        } catch (IOException ex) {
+            Logger.getLogger(Portainer.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        bw = new BufferedWriter(fw);
 
         try {
             while (true) {
@@ -80,8 +94,8 @@ public class Portainer extends JSimProcess {
                 } else {
                     container = queueIn.first();
                     horaMovimentacao = myParent.getCurrentTime();
-                    c = (Container) container.getData();
-                    
+                    c = (Container)container.getData();
+
                     hold(JSimSystem.uniform(10, 10));
 
                     // Now we must decide whether to throw the transaction away or to insert it into another queue.
@@ -101,11 +115,11 @@ public class Portainer extends JSimProcess {
                             Logger.getLogger(GeradorNavios.class.getName()).log(Level.SEVERE, null, ex);
                         }
                         container.out();
-                        if(queueIn.empty())
-                        {
+                        if (queueIn.empty()) {
                             queueIn.setHoraFinalAtendimento(horaSaida);
-                        }                        
-                        container = null;                        
+                            Berco.activate(horaSaida);
+                        }
+                        container = null;
                     } else {
                         container.out();
                         container.into(queueOut);
@@ -114,16 +128,21 @@ public class Portainer extends JSimProcess {
                         }
                     } // else throw away / insert
                 } // else queue is empty / not empty
-            } // while                
+            } // while            
         } // try
         catch (JSimException e) {
             e.printStackTrace();
             e.printComment(System.err);
+        } finally {
+            try {
+                closeBw();
+            } catch (IOException ex) {
+                Logger.getLogger(Portainer.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
     } // life
-    
-    public void setFilas(FilaContainers parQueueIn, FilaContainers parQueueOut)
-    {
+
+    public void setFilas(FilaContainers parQueueIn, FilaContainers parQueueOut) {
         queueIn = parQueueIn;
         queueIn.setHoraInicioAtendimento(myParent.getCurrentTime());
         queueOut = parQueueOut;
