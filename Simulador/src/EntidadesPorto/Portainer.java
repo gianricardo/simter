@@ -84,12 +84,12 @@ public class Portainer extends JSimProcess {
                         PosicaoCargaDescarga.activate(myParent.getCurrentTime());
                     }
 
-                    if (PosicaoCargaDescarga.caminhao == null) {
+                    if (PosicaoCargaDescarga.getCaminhao() == null) {
                         passivate();
                     } else {                        
                         hold(JSimSystem.uniform(10, 10));
-                        PosicaoCargaDescarga.caminhao.container = c;
-                        PosicaoCargaDescarga.caminhao.HoraRecebimentoContainer = myParent.getCurrentTime();
+                        PosicaoCargaDescarga.getCaminhao().container = c;
+                        PosicaoCargaDescarga.getCaminhao().HoraRecebimentoContainer = myParent.getCurrentTime();
                         PosicaoCargaDescarga.activateNow();
 
                         //hold(JSimSystem.uniform(10, 10));

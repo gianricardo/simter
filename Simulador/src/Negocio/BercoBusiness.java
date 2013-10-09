@@ -162,8 +162,8 @@ public class BercoBusiness extends JSimProcess {
     }
     
     private void EscreverArquivo() throws IOException {
-        Berco.bw.write("\r\nNavio " + n.idNavio + ":\r\n -Criado no momento " + Berco.df.format(n.getCreationTime())
-                + "\r\n -" + n.NumeroContainersDescarregar + " Containers a descarregar"
+        Berco.bw.write("\r\nNavio " + n.getIdNavio() + ":\r\n -Criado no momento " + Berco.df.format(n.getCreationTime())
+                + "\r\n -" + n.getNumeroContainersDescarregar() + " Containers a descarregar"
                 + "\r\n -Colocado na fila " + Berco.queueIn.getHeadName()
                 + " no momento " + Berco.df.format(navio.getEnterTime())
                 + "\r\n -Tempo de espera na fila " + Berco.df.format((Berco.horaAtracacao - Berco.tempoMovimentacao) - navio.getEnterTime())
@@ -179,13 +179,13 @@ public class BercoBusiness extends JSimProcess {
     }
 
     private void SetarFilasPortainers() throws JSimSecurityException, JSimInvalidParametersException {
-        int numeroFilasPortainer = Math.round(n.FilasContainers.size() / FilaPortainers.size());
+        int numeroFilasPortainer = Math.round(n.getFilasContainers().size() / FilaPortainers.size());
         int auxFila = 0;
         int nfila = 0;
 
         for (int portainer = 0; portainer < FilaPortainers.size(); portainer++) {
             for (nfila = auxFila; nfila < numeroFilasPortainer + auxFila; nfila++) {
-                filaBerco = (FilaContainers) n.FilasContainers.get(nfila);
+                filaBerco = (FilaContainers) n.getFilasContainers().get(nfila);
 
                 portainerBerco = (Portainer) FilaPortainers.get(portainer);
 
@@ -199,9 +199,9 @@ public class BercoBusiness extends JSimProcess {
             }
 
             if (portainer == FilaPortainers.size() - 1) {
-                int auxiliarResto = n.FilasContainers.size() - nfila;
+                int auxiliarResto = n.getFilasContainers().size() - nfila;
                 for (int z = nfila; z < nfila + auxiliarResto; z++) {
-                    filaBerco = (FilaContainers) n.FilasContainers.get(z);
+                    filaBerco = (FilaContainers) n.getFilasContainers().get(z);
 
                     portainerBerco = (Portainer) FilaPortainers.get(portainer);
 
@@ -224,10 +224,10 @@ public class BercoBusiness extends JSimProcess {
         while (true) {
             Berco.tempoAtendimentoPortainers = 0;
             FilaContainers fila;
-            double[] ArrayHoraFimAten = new double[n.FilasContainers.size()];
-            double[] ArrayHoraIniAten = new double[n.FilasContainers.size()];
-            for (int i = 0; i < n.FilasContainers.size(); i++) {
-                fila = (FilaContainers) n.FilasContainers.get(i);
+            double[] ArrayHoraFimAten = new double[n.getFilasContainers().size()];
+            double[] ArrayHoraIniAten = new double[n.getFilasContainers().size()];
+            for (int i = 0; i < n.getFilasContainers().size(); i++) {
+                fila = (FilaContainers) n.getFilasContainers().get(i);
                 ArrayHoraFimAten[i] = fila.getHoraFinalAtendimento();
                 ArrayHoraIniAten[i] = fila.getHoraInicioAtendimento();
             }
@@ -248,7 +248,7 @@ public class BercoBusiness extends JSimProcess {
             } else {
                 double MaiorHoraFimAtendimento = 0;
                 double MenorHoraInicioAtendimento = 0;
-                for (int i = 0; i < n.FilasContainers.size(); i++) {
+                for (int i = 0; i < n.getFilasContainers().size(); i++) {
                     if (ArrayHoraFimAten[i] > MaiorHoraFimAtendimento) {
                         MaiorHoraFimAtendimento = ArrayHoraFimAten[i];
                     }
