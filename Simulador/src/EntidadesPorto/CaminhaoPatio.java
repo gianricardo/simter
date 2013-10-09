@@ -4,19 +4,30 @@
  */
 package EntidadesPorto;
 
-import java.util.Date;
+import cz.zcu.fav.kiv.jsim.JSimSecurityException;
+import cz.zcu.fav.kiv.jsim.JSimSimulation;
 
 /**
  *
  * @author Eduardo
  */
-public class CaminhaoPatio {
-    private int IdentificadorTransportador;
-    private int CapacidadeTotal;    
-    private int QuantidadeCargaMovimentar;  
-    public Date HoraRetornoBase;
-    public Date HoraSolicitacao;
-    //List EstacoesAtendidas
-    //IdEstacaoBase
-    //Rotas
+public class CaminhaoPatio {   
+    private int Capacidade;
+    private String EstacaoCaminhoesInternos;
+    public Container container;
+    public double timeOfCreation;
+    public String idCaminhao;
+    public boolean carregado;
+    public double HoraRecebimentoContainer;
+    
+     public CaminhaoPatio(double time, String id, String nomeEstacaoCaminhoesInternos, JSimSimulation simulation, int capacidade) throws JSimSecurityException
+    {
+            timeOfCreation = time;
+            idCaminhao = new StringBuilder()
+                    .append(id)
+                    .append(" ")
+                    .append(nomeEstacaoCaminhoesInternos)
+                    .toString();            
+            Capacidade = capacidade;
+    } // constructor
 }

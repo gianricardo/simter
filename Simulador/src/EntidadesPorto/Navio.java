@@ -48,10 +48,9 @@ public class Navio {
             idNavio = new StringBuilder()
                     .append(id)
                     .append(" ")
-                    .append(gerador)
                     .toString();
             
-            NumeroContainersDescarregar = (int) JSimSystem.uniform(50, 50);
+            NumeroContainersDescarregar = (int) JSimSystem.uniform(10, 10);
             
             NumeroRegioesNavio = numeroRegioesNavio;
             int aux = 1;
@@ -59,7 +58,7 @@ public class Navio {
             
             for(int i = 1; i <= NumeroRegioesNavio; i++){
                    try {
-                       FilaContainer = new FilaContainers("Fila de Containers " + i + " navio" + idNavio, simulation, null);
+                       FilaContainer = new FilaContainers("Fila de Containers " + i + " navio " + idNavio, simulation, null);
                     } catch (JSimInvalidParametersException | JSimTooManyHeadsException | IOException ex) {
                         Logger.getLogger(EntidadesPorto.Berco.class.getName()).log(Level.SEVERE, null, ex);
                     }                   
@@ -70,6 +69,15 @@ public class Navio {
                        container.into(FilaContainer);
                    }
                    
+                   if(i==NumeroRegioesNavio)
+                   {
+                       int auxiliarResto = NumeroContainersDescarregar - j;
+                       for(int z = j; z<=j+auxiliarResto; z++)
+                       {
+                           container = new JSimLink(new Container(time, String.valueOf(z)));                       
+                           container.into(FilaContainer);
+                       }
+                   }
                    aux = j;
                    
                    FilasContainers.add(FilaContainer);

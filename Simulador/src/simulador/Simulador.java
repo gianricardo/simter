@@ -4,7 +4,7 @@
  */
 package simulador;
 
-import EntidadesPorto.Berco;
+import EntidadesPorto.EstacaoCaminhoesInternos;
 import EntidadesPorto.FilaNavios;
 import EntidadesPorto.GeradorNavios;
 import Negocio.BercoBusiness;
@@ -41,13 +41,13 @@ public class Simulador {
                 BufferedWriter bw = new BufferedWriter(fw);
 
                 JSimSimulation simulation;
-                FilaNavios queueNavio1/*, queue2*/;
-                BercoBusiness berco1/*, berco2*/;
-                GeradorNavios generator1/*, generator2*/;
+                FilaNavios queueNavio1;
+                BercoBusiness berco1;
+                GeradorNavios generator1;
+                EstacaoCaminhoesInternos estacao1;
                 double mu1 = 1.0/*, mu2 = 1.0*/;
                 double lambda1 = 0.4/*, lambda2 = 0.4*/;
                 double p1 = 0.5/*, p2 = 0.5*/;
-                int containersDescarregar = 10;
 
                 System.out.println("Iniciado a simulação\r\n");
                 bw.write("Iniciado a simulação\r\n");
@@ -57,9 +57,11 @@ public class Simulador {
 
                 queueNavio1 = new FilaNavios("Fila Entrada de Navios no Porto", simulation, null);
                 
-                berco1 = new BercoBusiness("Berco 1", simulation, mu1, p1, queueNavio1, null,2);            
+                estacao1 = new EstacaoCaminhoesInternos("Estação de caminhões do porto", simulation, 0, 10);
+                
+                berco1 = new BercoBusiness("Berco 1", simulation, mu1, p1, queueNavio1, null, estacao1, 1);            
 
-                generator1 = new GeradorNavios("Gerador 1", simulation, lambda1, queueNavio1, containersDescarregar);
+                generator1 = new GeradorNavios("Gerador 1", simulation, lambda1, queueNavio1);
 
                 // We must set the servers now because they didn't exist at the time the queues were created.
                 queueNavio1.setBerco(berco1);
@@ -72,7 +74,7 @@ public class Simulador {
                 simulation.message("Executando a simulação.");
                 bw.write("Executando a simulação.\r\n");
 
-                while ((simulation.getCurrentTime() < 1000.0) && (simulation.step() == true)) {
+                while ((simulation.getCurrentTime() < 210.0) && (simulation.step() == true)) {
                     continue;
                 }
 
@@ -89,7 +91,7 @@ public class Simulador {
                 bw.write("\r\nBerco 1: Número de navios que já saíram do berço = " + berco1.getCounter() + ", sum of Tq (for transactions thrown away by this server) = " + berco1.getTransTq() + "\r\n");
                 
                 simulation.shutdown();
-                berco1.closeBw();
+                berco1.CloseBw();
                 bw.close();
             }
         } catch (IOException ex) {

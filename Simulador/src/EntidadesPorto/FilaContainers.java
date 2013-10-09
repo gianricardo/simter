@@ -54,6 +54,4 @@ public class FilaContainers extends JSimHead {
     public void setHoraInicioAtendimento(double h) {
         horaInicioAtendimento = h;
     }
-    public int IdPortainer;
-    public List listaContainers = new ArrayList();
 }
