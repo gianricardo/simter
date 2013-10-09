@@ -27,33 +27,33 @@ import java.util.logging.Logger;
  */
 public class PosicaoCargaDescargaBerco extends JSimProcess {
 
-    private double _lambda;
+    private double lambda;
     private FilaCaminhoesInternos queueIn;
-    private JSimLink _caminhaoNaPosicao;
-    private CaminhaoPatio _caminhao;
-    private JSimSimulation _simulation;
-    private Portainer _portainer;
-    private EstacaoCaminhoesInternos _estacao;
-    private String _nome;
-    private File _arquivo;
-    private FileWriter _fw;
-    private BufferedWriter _bw;
-    private DecimalFormat _df = new DecimalFormat("#0.##");
+    private JSimLink CaminhaoNaPosicao;
+    public CaminhaoPatio caminhao;
+    private JSimSimulation Simulation;
+    private Portainer Portainer;
+    private EstacaoCaminhoesInternos Estacao;
+    private String nome;
+    private File arquivo;
+    private FileWriter fw;
+    private BufferedWriter bw;
+    private DecimalFormat df = new DecimalFormat("#0.##");
 
     public PosicaoCargaDescargaBerco(String name, JSimSimulation sim, double l, Portainer p, EstacaoCaminhoesInternos estacaoCaminhoes)
             throws JSimSimulationAlreadyTerminatedException, JSimInvalidParametersException, JSimTooManyProcessesException, IOException {
         super(name, sim);
-        _lambda = l;
-        _simulation = sim;
-        _portainer = p;
-        _estacao = estacaoCaminhoes;
-        _nome = name;
+        lambda = l;
+        Simulation = sim;
+        Portainer = p;
+        Estacao = estacaoCaminhoes;
+        nome = name;
     } // constructor
 
     @Override
     protected void life() {
         try {
-            setFila(_estacao.SolicitarEstacao(this));
+            setFila(Estacao.SolicitarEstacao(this));
         } catch (JSimInvalidParametersException | JSimTooManyHeadsException | IOException | JSimSecurityException ex) {
             Logger.getLogger(PosicaoCargaDescargaBerco.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -63,14 +63,14 @@ public class PosicaoCargaDescargaBerco extends JSimProcess {
                     // If we have nothing to do, we sleep.
                     passivate();
                 } else {
-                    _caminhaoNaPosicao = queueIn.first();
-                    _caminhao = (CaminhaoPatio) _caminhaoNaPosicao.getData();
-                    if (_portainer.isIdle()) {
-                        _portainer.activate(myParent.getCurrentTime());
+                    CaminhaoNaPosicao = queueIn.first();
+                    caminhao = (CaminhaoPatio) CaminhaoNaPosicao.getData();
+                    if (Portainer.isIdle()) {
+                        Portainer.activate(myParent.getCurrentTime());
                     }
                     passivate();
                     try {
-                        LiberarCaminhao(_caminhao);
+                        LiberarCaminhao(caminhao);
                     } catch (IOException ex) {
                         Logger.getLogger(PosicaoCargaDescargaBerco.class.getName()).log(Level.SEVERE, null, ex);
                     }
@@ -88,59 +88,11 @@ public class PosicaoCargaDescargaBerco extends JSimProcess {
     }
 
     public void setPortainer(Portainer p) {
-        _portainer = p;
+        Portainer = p;
     }
 
     public void LiberarCaminhao(CaminhaoPatio caminhao) throws IOException {
         caminhao.carregado = false;
-        _estacao.CaminhoesEstacao.add(caminhao);
-    }
-
-    public CaminhaoPatio getCaminhao() {
-        return _caminhao;
-    }
-
-    public double getLambda() {
-        return _lambda;
-    }
-
-    public FilaCaminhoesInternos getQueueIn() {
-        return queueIn;
-    }
-
-    public JSimLink getCaminhaoNaPosicao() {
-        return _caminhaoNaPosicao;
-    }
-
-    public JSimSimulation getSimulation() {
-        return _simulation;
-    }
-
-    public Portainer getPortainer() {
-        return _portainer;
-    }
-
-    public EstacaoCaminhoesInternos getEstacao() {
-        return _estacao;
-    }
-
-    public String getNome() {
-        return _nome;
-    }
-
-    public File getArquivo() {
-        return _arquivo;
-    }
-
-    public FileWriter getFw() {
-        return _fw;
-    }
-
-    public BufferedWriter getBw() {
-        return _bw;
-    }
-
-    public DecimalFormat getDf() {
-        return _df;
+        Estacao.CaminhoesEstacao.add(caminhao);
     }
 }
