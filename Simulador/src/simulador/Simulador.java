@@ -4,18 +4,21 @@
  */
 package simulador;
 
-import EntidadesPorto.EstacaoCaminhoesInternos;
-import EntidadesPorto.FilaNavios;
-import EntidadesPorto.GeradorNavios;
-import Negocio.BercoBusiness;
 import cz.zcu.fav.kiv.jsim.JSimException;
 import cz.zcu.fav.kiv.jsim.JSimInvalidParametersException;
 import cz.zcu.fav.kiv.jsim.JSimMethodNotSupportedException;
 import cz.zcu.fav.kiv.jsim.JSimSimulation;
+import cz.zcu.fav.kiv.jsim.random.JSimUniformStream;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import shipyard.land.staticplace.Berco;
+import shipyard.land.staticplace.EstacaoCaminhoesInternos;
+import simulador.generators.GeradorNavios;
+import simulador.queues.FilaNavios;
+import simulador.random.GaussianDistributionStream;
+import simulador.random.UniformDistributionStream;
 
 /**
  *
@@ -42,7 +45,7 @@ public class Simulador {
 
                 JSimSimulation simulation;
                 FilaNavios queueNavio1;
-                BercoBusiness berco1;
+                Berco berco1;
                 GeradorNavios generator1;
                 EstacaoCaminhoesInternos estacao1;
                 double mu1 = 1.0/*, mu2 = 1.0*/;
@@ -59,12 +62,14 @@ public class Simulador {
                 
                 estacao1 = new EstacaoCaminhoesInternos("Estação de caminhões do porto", simulation, 0, 10);
                 
-                berco1 = new BercoBusiness("Berco 1", simulation, mu1, p1, queueNavio1, null, estacao1, 1);            
+                berco1 = new Berco(simulation,1,2, estacao1);            
 
-                generator1 = new GeradorNavios("Gerador 1", simulation, lambda1, queueNavio1);
+                generator1 = new GeradorNavios("Gerador 1", simulation, 
+                    new UniformDistributionStream(new JSimUniformStream(29.5, 29.6)), queueNavio1);
 
                 // We must set the servers now because they didn't exist at the time the queues were created.
                 queueNavio1.setBerco(berco1);
+                berco1.setQueueIn(queueNavio1);
 
                 simulation.message("Ativando os Geradores");
                 bw.write("Ativando os Geradores\r\n");
@@ -74,7 +79,7 @@ public class Simulador {
                 simulation.message("Executando a simulação.");
                 bw.write("Executando a simulação.\r\n");
 
-                while ((simulation.getCurrentTime() < 210.0) && (simulation.step() == true)) {
+                while ((simulation.getCurrentTime() < 1000.0) && (simulation.step() == true)) {
                     continue;
                 }
 
@@ -91,11 +96,11 @@ public class Simulador {
                 bw.write("\r\nBerco 1: Número de navios que já saíram do berço = " + berco1.getCounter() + ", sum of Tq (for transactions thrown away by this server) = " + berco1.getTransTq() + "\r\n");
                 
                 simulation.shutdown();
-                berco1.CloseBw();
+                berco1.getBw().close();
                 bw.close();
             }
         } catch (IOException ex) {
-            ex.printStackTrace();
+            ex.printStackTrace(System.err);
         } catch (JSimException e) {
             e.printComment(System.err.append("erro"));
         }

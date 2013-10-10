@@ -2,8 +2,10 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package EntidadesPorto;
+package shipyard.land.staticplace;
 
+import simulador.queues.FilaCaminhoesInternos;
+import shipyard.land.staticplace.PosicaoCargaDescargaBerco;
 import cz.zcu.fav.kiv.jsim.JSimException;
 import cz.zcu.fav.kiv.jsim.JSimInvalidParametersException;
 import cz.zcu.fav.kiv.jsim.JSimLink;
@@ -16,48 +18,57 @@ import cz.zcu.fav.kiv.jsim.JSimTooManyProcessesException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import shipyard.land.move.CaminhaoPatio;
 
 /**
  *
  * @author Eduardo
  */
 public class EstacaoCaminhoesInternos extends JSimProcess {
-    private double lambda;
-    public List CaminhoesEstacao = new ArrayList();
-    private List FilasEstacaoPosicoesCargaDescarga = new ArrayList();
-    private int numeroCaminhao = 1;
-    private JSimSimulation simulation;
-    private String NomeEstacao;
+    private double _lambda;
+    private List<CaminhaoPatio> _caminhoesEstacao = new ArrayList();
+    private List<FilaCaminhoesInternos> _filasEstacaoPosicoesCargaDescarga = new ArrayList();
+    private int _numeroCaminhao = 1;
+    private JSimSimulation _simulation;
+    private String _nomeEstacao;
 
     public EstacaoCaminhoesInternos(String name, JSimSimulation sim, double l, int NumeroCaminhoes)
             throws JSimSimulationAlreadyTerminatedException, JSimInvalidParametersException, JSimTooManyProcessesException, IOException, JSimSecurityException {
         super(name, sim);
-        lambda = l;
-        simulation = sim;
-        NomeEstacao = name;
+        _lambda = l;
+        _simulation = sim;
+        _nomeEstacao = name;
         
         for (int i = 0; i < NumeroCaminhoes; i++){
-            CaminhaoPatio caminhao = new CaminhaoPatio(myParent.getCurrentTime(), String.valueOf(numeroCaminhao), super.getName(), simulation, 1);
+            CaminhaoPatio caminhao = new CaminhaoPatio(myParent.getCurrentTime(), String.valueOf(_numeroCaminhao), super.getName(), _simulation, 1);
             caminhao.carregado = false;
-            CaminhoesEstacao.add(caminhao);
-            numeroCaminhao++;
+            _caminhoesEstacao.add(caminhao);
+            _numeroCaminhao++;
         }
     } // constructor    
+
+    public List getFilasEstacaoPosicoesCargaDescarga() {
+        return _filasEstacaoPosicoesCargaDescarga;
+    }
+
+    public List<CaminhaoPatio> getCaminhoesEstacao() {
+        return _caminhoesEstacao;
+    }    
     
     public FilaCaminhoesInternos SolicitarEstacao(PosicaoCargaDescargaBerco posicaoCargaDescarga) throws JSimInvalidParametersException, JSimTooManyHeadsException, IOException, JSimSecurityException
     {
-        FilaCaminhoesInternos filaCaminhoes = new FilaCaminhoesInternos("Fila de Caminhões " + this.NomeEstacao + " " + posicaoCargaDescarga.getName(), simulation, posicaoCargaDescarga);
+        FilaCaminhoesInternos filaCaminhoes = new FilaCaminhoesInternos("Fila de Caminhões " + this._nomeEstacao + " " + posicaoCargaDescarga.getName(), _simulation, posicaoCargaDescarga);
         filaCaminhoes.setPosicaoCargaDescarga(posicaoCargaDescarga);
-        FilasEstacaoPosicoesCargaDescarga.add(filaCaminhoes);
+        _filasEstacaoPosicoesCargaDescarga.add(filaCaminhoes);
         VerificaCaminhoesVaziosInsereFila(filaCaminhoes);
         
         return filaCaminhoes;
     }
     
     public void VerificaCaminhoesVaziosInsereFila(FilaCaminhoesInternos fila) throws JSimSecurityException{
-        for(int i = 0; i<CaminhoesEstacao.size(); i++)        
+        for(int i = 0; i<_caminhoesEstacao.size(); i++)        
         {
-            CaminhaoPatio caminhaoPatio = (CaminhaoPatio)CaminhoesEstacao.get(i);
+            CaminhaoPatio caminhaoPatio = (CaminhaoPatio)_caminhoesEstacao.get(i);
             JSimLink NoCaminhao = new JSimLink(caminhaoPatio);
             NoCaminhao.into(fila);
         }

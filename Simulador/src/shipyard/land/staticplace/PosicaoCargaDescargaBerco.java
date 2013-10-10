@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package EntidadesPorto;
+package shipyard.land.staticplace;
 
 import cz.zcu.fav.kiv.jsim.JSimException;
 import cz.zcu.fav.kiv.jsim.JSimInvalidParametersException;
@@ -20,6 +20,9 @@ import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import shipyard.land.move.CaminhaoPatio;
+import simulador.queues.FilaCaminhoesInternos;
+import shipyard.land.move.Portainer;
 
 /**
  *
@@ -27,50 +30,46 @@ import java.util.logging.Logger;
  */
 public class PosicaoCargaDescargaBerco extends JSimProcess {
 
-    private double lambda;
-    private FilaCaminhoesInternos queueIn;
-    private JSimLink CaminhaoNaPosicao;
-    public CaminhaoPatio caminhao;
-    private JSimSimulation Simulation;
-    private Portainer Portainer;
-    private EstacaoCaminhoesInternos Estacao;
-    private String nome;
-    private File arquivo;
-    private FileWriter fw;
-    private BufferedWriter bw;
-    private DecimalFormat df = new DecimalFormat("#0.##");
+    private double _lambda;
+    private FilaCaminhoesInternos _queueIn;
+    private JSimLink _caminhaoNaPosicao;
+    public CaminhaoPatio _caminhao;
+    private JSimSimulation _simulation;
+    private Portainer _portainer;
+    private EstacaoCaminhoesInternos _estacao;
+    private String _nome;
 
     public PosicaoCargaDescargaBerco(String name, JSimSimulation sim, double l, Portainer p, EstacaoCaminhoesInternos estacaoCaminhoes)
             throws JSimSimulationAlreadyTerminatedException, JSimInvalidParametersException, JSimTooManyProcessesException, IOException {
         super(name, sim);
-        lambda = l;
-        Simulation = sim;
-        Portainer = p;
-        Estacao = estacaoCaminhoes;
-        nome = name;
+        _lambda = l;
+        _simulation = sim;
+        _portainer = p;
+        _estacao = estacaoCaminhoes;
+        _nome = name;
     } // constructor
 
     @Override
     protected void life() {
         try {
-            setFila(Estacao.SolicitarEstacao(this));
+            setFila(_estacao.SolicitarEstacao(this));
         } catch (JSimInvalidParametersException | JSimTooManyHeadsException | IOException | JSimSecurityException ex) {
             Logger.getLogger(PosicaoCargaDescargaBerco.class.getName()).log(Level.SEVERE, null, ex);
         }
         try {
             while (true) {
-                if (queueIn.empty()) {
+                if (_queueIn.empty()) {
                     // If we have nothing to do, we sleep.
                     passivate();
                 } else {
-                    CaminhaoNaPosicao = queueIn.first();
-                    caminhao = (CaminhaoPatio) CaminhaoNaPosicao.getData();
-                    if (Portainer.isIdle()) {
-                        Portainer.activate(myParent.getCurrentTime());
+                    _caminhaoNaPosicao = _queueIn.first();
+                    _caminhao = (CaminhaoPatio) _caminhaoNaPosicao.getData();
+                    if (_portainer.isIdle()) {
+                        _portainer.activate(myParent.getCurrentTime());
                     }
                     passivate();
                     try {
-                        LiberarCaminhao(caminhao);
+                        LiberarCaminhao(_caminhao);
                     } catch (IOException ex) {
                         Logger.getLogger(PosicaoCargaDescargaBerco.class.getName()).log(Level.SEVERE, null, ex);
                     }
@@ -84,15 +83,15 @@ public class PosicaoCargaDescargaBerco extends JSimProcess {
     }
 
     public void setFila(FilaCaminhoesInternos QueueIn) {
-        queueIn = QueueIn;
+        _queueIn = QueueIn;
     }
 
     public void setPortainer(Portainer p) {
-        Portainer = p;
+        _portainer = p;
     }
 
     public void LiberarCaminhao(CaminhaoPatio caminhao) throws IOException {
         caminhao.carregado = false;
-        Estacao.CaminhoesEstacao.add(caminhao);
+        _estacao.getCaminhoesEstacao().add(caminhao);
     }
 }

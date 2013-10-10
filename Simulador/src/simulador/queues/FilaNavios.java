@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package EntidadesPorto;
+package simulador.queues;
 
 import cz.zcu.fav.kiv.jsim.JSimHead;
 import cz.zcu.fav.kiv.jsim.JSimInvalidParametersException;
@@ -15,23 +15,24 @@ import java.io.IOException;
  *
  * @author Eduardo
  */
-public class FilaCaminhoesInternos extends JSimHead {
-   private JSimProcess posicaoCargaDescarga;
+public class FilaNavios extends JSimHead {
     
-    public FilaCaminhoesInternos(String name, JSimSimulation sim, JSimProcess p)
+    private JSimProcess berco;
+    
+    public FilaNavios(String name, JSimSimulation sim, JSimProcess b)
             throws JSimInvalidParametersException, JSimTooManyHeadsException, IOException
     {
         super(name, sim);
-	posicaoCargaDescarga = p;
+	berco = b;
     } // constructor
     
-    public JSimProcess getPosicaoCargaDescarga()
+    public JSimProcess getBerco()
     {
-        return posicaoCargaDescarga;
+            return berco;
     } // getServer
 
-    public void setPosicaoCargaDescarga(JSimProcess p)
+    public void setBerco(JSimProcess b)
     {
-        posicaoCargaDescarga = p;
-    } // setServer  
+            berco = b;
+    } // setServer         
 }
