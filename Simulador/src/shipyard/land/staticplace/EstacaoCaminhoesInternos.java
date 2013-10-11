@@ -17,6 +17,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import shipyard.land.move.CaminhaoPatio;
 import simulador.queues.FilaCaminhoesInternos;
 
@@ -27,7 +29,7 @@ import simulador.queues.FilaCaminhoesInternos;
 public class EstacaoCaminhoesInternos extends JSimProcess {
 
     private List<CaminhaoPatio> _caminhoesEstacao = new ArrayList();
-    private List<FilaCaminhoesInternos> _filasEstacaoPosicoesCargaDescarga = new ArrayList();
+    private FilaCaminhoesInternos _filaCaminhoesEstacao;
     private JSimSimulation _simulation;
     private String _nomeEstacao;
     private double _lambda;
@@ -39,32 +41,33 @@ public class EstacaoCaminhoesInternos extends JSimProcess {
     public EstacaoCaminhoesInternos(String name, JSimSimulation sim, double l, int NumeroCaminhoes)
             throws JSimSimulationAlreadyTerminatedException, JSimInvalidParametersException, JSimTooManyProcessesException, IOException, JSimSecurityException {
         super(name, sim);
-        _lambda = l;
-        _simulation = sim;
-        _nomeEstacao = name;
+        try {
+            _lambda = l;
+            _simulation = sim;
+            _nomeEstacao = name;
+            _filaCaminhoesEstacao = new FilaCaminhoesInternos("Fila de Caminhões " + this._nomeEstacao, _simulation);
+            
+            criarArquivo();
 
-        for (int i = 0; i < NumeroCaminhoes; i++) {
-            _caminhaoPatio = new CaminhaoPatio(myParent.getCurrentTime(), String.valueOf(i), super.getName(), _simulation, 1);
-            _caminhaoPatio.setCarregado(false);
-            _caminhoesEstacao.add(_caminhaoPatio);
+            for (int i = 0; i < NumeroCaminhoes; i++) {
+                _caminhaoPatio = new CaminhaoPatio(myParent.getCurrentTime(), String.valueOf(i), super.getName(), _simulation, 1);
+                _caminhaoPatio.setCarregado(false);
+                _caminhoesEstacao.add(_caminhaoPatio);
+                _caminhaoPatio.into(_filaCaminhoesEstacao);
+                escreverArquivo(_filaCaminhoesEstacao);
+            }            
+        } catch (JSimTooManyHeadsException ex) {
+            Logger.getLogger(EstacaoCaminhoesInternos.class.getName()).log(Level.SEVERE, null, ex);
         }
-
-        criarArquivo();
-    } // constructor    
-
-    public List getFilasEstacaoPosicoesCargaDescarga() {
-        return _filasEstacaoPosicoesCargaDescarga;
-    }
-
+    } // constructor
+    
     public List<CaminhaoPatio> getCaminhoesEstacao() {
         return _caminhoesEstacao;
     }
 
-    public FilaCaminhoesInternos solicitarEstacao(PosicaoCargaDescargaBerco posicaoCargaDescarga, int NumeroCaminhoes)
+    /*public FilaCaminhoesInternos solicitarEstacao(PosicaoCargaDescargaBerco posicaoCargaDescarga, int NumeroCaminhoes)
             throws JSimInvalidParametersException, JSimTooManyHeadsException, IOException, JSimSecurityException {
-        FilaCaminhoesInternos filaCaminhoes = new FilaCaminhoesInternos("Fila de Caminhões " + this._nomeEstacao + " " + posicaoCargaDescarga.getName(), _simulation, posicaoCargaDescarga);
-        filaCaminhoes.setPosicaoCargaDescarga(posicaoCargaDescarga);
-        _filasEstacaoPosicoesCargaDescarga.add(filaCaminhoes);
+        FilaCaminhoesInternos filaCaminhoes = new FilaCaminhoesInternos("Fila de Caminhões " + this._nomeEstacao, _simulation);        
         verificaCaminhoesVaziosInsereFila(filaCaminhoes, NumeroCaminhoes);
 
         return filaCaminhoes;
@@ -80,7 +83,7 @@ public class EstacaoCaminhoesInternos extends JSimProcess {
                 escreverArquivo(fila);
             }
         }
-    }
+    }*/
 
     private void criarArquivo() {
         if (_arquivo == null) {
@@ -108,5 +111,9 @@ public class EstacaoCaminhoesInternos extends JSimProcess {
 
     public void closeBw() throws IOException {
         _bw.close();
+    }
+
+    public FilaCaminhoesInternos getFilaCaminhoesEstacao() {
+        return _filaCaminhoesEstacao;
     }
 }

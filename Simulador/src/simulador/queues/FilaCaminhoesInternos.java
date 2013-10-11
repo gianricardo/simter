@@ -16,22 +16,10 @@ import java.io.IOException;
  * @author Eduardo
  */
 public class FilaCaminhoesInternos extends JSimHead {
-   private JSimProcess posicaoCargaDescarga;
     
-    public FilaCaminhoesInternos(String name, JSimSimulation sim, JSimProcess p)
+    public FilaCaminhoesInternos(String name, JSimSimulation sim)
             throws JSimInvalidParametersException, JSimTooManyHeadsException, IOException
     {
         super(name, sim);
-	posicaoCargaDescarga = p;
     } // constructor
-    
-    public JSimProcess getPosicaoCargaDescarga()
-    {
-        return posicaoCargaDescarga;
-    } // getServer
-
-    public void setPosicaoCargaDescarga(JSimProcess p)
-    {
-        posicaoCargaDescarga = p;
-    } // setServer  
 }

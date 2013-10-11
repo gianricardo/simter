@@ -41,13 +41,13 @@ public class PosicaoCargaDescargaBerco extends JSimProcess {
         _simulation = sim;
         _portainer = p;
         _estacao = estacaoCaminhoes;
-        _nome = name;        
+        _nome = name;
     } // constructor
 
     @Override
     protected void life() {
         setFila();
-        
+
         try {
             while (true) {
                 if (_queueIn.empty()) {
@@ -55,6 +55,7 @@ public class PosicaoCargaDescargaBerco extends JSimProcess {
                     passivate();
                 } else {
                     _caminhao = getNextCaminhao();
+                    _caminhao.out();
                     if (_portainer.isIdle()) {
                         _portainer.activate(myParent.getCurrentTime());
                     }
@@ -75,29 +76,24 @@ public class PosicaoCargaDescargaBerco extends JSimProcess {
     }
 
     public void setFila() {
-        try {        
-            _queueIn = _estacao.solicitarEstacao(this, _portainer.getNumeroContainersDescarregar());
-        } catch (JSimInvalidParametersException | JSimTooManyHeadsException | IOException | JSimSecurityException ex) {
-            Logger.getLogger(PosicaoCargaDescargaBerco.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        _queueIn = _estacao.getFilaCaminhoesEstacao();
     }
 
     public void setPortainer(Portainer p) {
         _portainer = p;
     }
 
-    public void liberarCaminhao(CaminhaoPatio caminhao) throws IOException {
+    public void liberarCaminhao(CaminhaoPatio caminhao) throws IOException {       
         try {
             caminhao.setCarregado(false);
-            caminhao.out();
-            _estacao.getCaminhoesEstacao().add(caminhao);            
+            caminhao.into(_estacao.getFilaCaminhoesEstacao());
         } catch (JSimSecurityException ex) {
             Logger.getLogger(PosicaoCargaDescargaBerco.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
-    public CaminhaoPatio getNextCaminhao(){
-         JSimLink jsl =_queueIn.first();
+
+    public CaminhaoPatio getNextCaminhao() {
+        JSimLink jsl = _queueIn.first();
         if (jsl instanceof CaminhaoPatio) {
             CaminhaoPatio novoCaminhao = (CaminhaoPatio) jsl;
             _caminhao = novoCaminhao;
