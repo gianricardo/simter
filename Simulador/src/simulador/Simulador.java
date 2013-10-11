@@ -17,7 +17,6 @@ import shipyard.land.staticplace.Berco;
 import shipyard.land.staticplace.EstacaoCaminhoesInternos;
 import simulador.generators.GeradorNavios;
 import simulador.queues.FilaNavios;
-import simulador.random.GaussianDistributionStream;
 import simulador.random.UniformDistributionStream;
 
 /**
@@ -60,7 +59,7 @@ public class Simulador {
 
                 queueNavio1 = new FilaNavios("Fila Entrada de Navios no Porto", simulation, null);
                 
-                estacao1 = new EstacaoCaminhoesInternos("Estação de caminhões do porto", simulation, 0, 10);
+                estacao1 = new EstacaoCaminhoesInternos("Estação de caminhões do porto", simulation, 0, 50);
                 
                 berco1 = new Berco(simulation,1,2, estacao1);            
 
@@ -79,7 +78,7 @@ public class Simulador {
                 simulation.message("Executando a simulação.");
                 bw.write("Executando a simulação.\r\n");
 
-                while ((simulation.getCurrentTime() < 1000.0) && (simulation.step() == true)) {
+                while ((simulation.getCurrentTime() < 305.0) && (simulation.step() == true)) {
                     continue;
                 }
 

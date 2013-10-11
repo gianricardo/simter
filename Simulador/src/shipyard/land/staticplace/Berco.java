@@ -31,34 +31,34 @@ import simulador.queues.FilaNavios;
 public class Berco extends JSimProcess {
 
     private int _numeroPortainers = 0;
-    private double horaSaida;
-    private double tempoTotalAtendimento;
-    private double tempoAtendimentoPortainers;
-    private double tempoMovimentacao;
-    private double horaInicioMovimentacao;
-    private double horaAtracacao;
-    private int numeroRegioesBerco;
+    private double _horaSaida;
+    private double _tempoTotalAtendimento;
+    private double _tempoAtendimentoPortainers;
+    private double _tempoMovimentacao;
+    private double _horaInicioMovimentacao;
+    private double _horaAtracacao;
+    private int _numeroRegioesBerco;
     private List<Portainer> _listaPortainers = new ArrayList<>();
     private List<PosicaoCargaDescargaBerco> _listaPosicoes = new ArrayList<>();
     private EstacaoCaminhoesInternos _estacaoCaminhoes;
-    private JSimSimulation simulation;
-    private double mu;
-    private double p;
-    private int counter;
-    private double transTq;
-    private FilaNavios queueIn;
-    private FilaNavios queueOut;
+    private JSimSimulation _simulation;
+    private double _mu;
+    private double _p;
+    private int _counter;
+    private double _transTq;
+    private FilaNavios _queueIn;
+    private FilaNavios _queueOut;
     private int _idBerco;
-    private File arquivo;
-    private FileWriter fw;
-    private BufferedWriter bw;
+    private File _arquivo;
+    private FileWriter _fw;
+    private BufferedWriter _bw;
     private BercoBusiness _bercoNegocio;
     private Navio _ship;
 
     public Berco(JSimSimulation simulation, int idBerco, int numeroPortainers, EstacaoCaminhoesInternos estacao)
             throws JSimSimulationAlreadyTerminatedException, JSimInvalidParametersException, JSimTooManyProcessesException {
         super(Integer.toString(idBerco), simulation);
-        this.simulation = simulation;
+        this._simulation = simulation;
         this._idBerco = idBerco;
         this._numeroPortainers = numeroPortainers;
         this._estacaoCaminhoes = estacao;
@@ -86,59 +86,59 @@ public class Berco extends JSimProcess {
     }
 
     public double getHoraSaida() {
-        return horaSaida;
+        return _horaSaida;
     }
 
     public void setHoraSaida(double horaSaida) {
-        this.horaSaida = horaSaida;
+        this._horaSaida = horaSaida;
     }
 
     public double getTempoTotalAtendimento() {
-        return tempoTotalAtendimento;
+        return _tempoTotalAtendimento;
     }
 
     public void setTempoTotalAtendimento(double tempoTotalAtendimento) {
-        this.tempoTotalAtendimento = tempoTotalAtendimento;
+        this._tempoTotalAtendimento = tempoTotalAtendimento;
     }
 
     public double getTempoAtendimentoPortainers() {
-        return tempoAtendimentoPortainers;
+        return _tempoAtendimentoPortainers;
     }
 
     public void setTempoAtendimentoPortainers(double tempoAtendimentoPortainers) {
-        this.tempoAtendimentoPortainers = tempoAtendimentoPortainers;
+        this._tempoAtendimentoPortainers = tempoAtendimentoPortainers;
     }
 
     public double getTempoMovimentacao() {
-        return tempoMovimentacao;
+        return _tempoMovimentacao;
     }
 
     public void setTempoMovimentacao(double tempoMovimentacao) {
-        this.tempoMovimentacao = tempoMovimentacao;
+        this._tempoMovimentacao = tempoMovimentacao;
     }
 
     public double getHoraInicioMovimentacao() {
-        return horaInicioMovimentacao;
+        return _horaInicioMovimentacao;
     }
 
     public void setHoraInicioMovimentacao(double horaInicioMovimentacao) {
-        this.horaInicioMovimentacao = horaInicioMovimentacao;
+        this._horaInicioMovimentacao = horaInicioMovimentacao;
     }
 
     public double getHoraAtracacao() {
-        return horaAtracacao;
+        return _horaAtracacao;
     }
 
     public void setHoraAtracacao(double horaAtracacao) {
-        this.horaAtracacao = horaAtracacao;
+        this._horaAtracacao = horaAtracacao;
     }
 
     public int getNumeroRegioesBerco() {
-        return numeroRegioesBerco;
+        return _numeroRegioesBerco;
     }
 
     public void setNumeroRegioesBerco(int numeroRegioesBerco) {
-        this.numeroRegioesBerco = numeroRegioesBerco;
+        this._numeroRegioesBerco = numeroRegioesBerco;
     }
 
     public List<Portainer> getListaPortainers() {
@@ -150,55 +150,55 @@ public class Berco extends JSimProcess {
     }
 
     public JSimSimulation getSimulation() {
-        return simulation;
+        return _simulation;
     }
 
     public double getMu() {
-        return mu;
+        return _mu;
     }
 
     public void setMu(double mu) {
-        this.mu = mu;
+        this._mu = mu;
     }
 
     public double getP() {
-        return p;
+        return _p;
     }
 
     public void setP(double p) {
-        this.p = p;
+        this._p = p;
     }
 
     public int getCounter() {
-        return counter;
+        return _counter;
     }
 
     public void setCounter(int counter) {
-        this.counter = counter;
+        this._counter = counter;
     }
 
     public double getTransTq() {
-        return transTq;
+        return _transTq;
     }
 
     public void setTransTq(double transTq) {
-        this.transTq = transTq;
+        this._transTq = transTq;
     }
 
     public FilaNavios getQueueIn() {
-        return queueIn;
+        return _queueIn;
     }
 
     public void setQueueIn(FilaNavios queueIn) {
-        this.queueIn = queueIn;
+        this._queueIn = queueIn;
     }
 
     public FilaNavios getQueueOut() {
-        return queueOut;
+        return _queueOut;
     }
 
     public void setQueueOut(FilaNavios queueOut) {
-        this.queueOut = queueOut;
+        this._queueOut = queueOut;
     }
 
     public int getIdBerco() {
@@ -206,13 +206,13 @@ public class Berco extends JSimProcess {
     }
 
     public File getArquivo() {
-        return arquivo;
+        return _arquivo;
     }
 
     public void setArquivo(File arquivo) {
         try {
-            this.arquivo = arquivo;
-            this.setFw(new FileWriter(this.arquivo, false));
+            this._arquivo = arquivo;
+            this.setFw(new FileWriter(this._arquivo, false));
             this.setBw(new BufferedWriter(this.getFw()));
         } catch (IOException ex) {
             Logger.getLogger(Berco.class.getName()).log(Level.SEVERE, null, ex);
@@ -220,19 +220,19 @@ public class Berco extends JSimProcess {
     }
 
     public FileWriter getFw() {
-        return fw;
+        return _fw;
     }
 
     private void setFw(FileWriter fw) {
-        this.fw = fw;
+        this._fw = fw;
     }
 
     public BufferedWriter getBw() {
-        return bw;
+        return _bw;
     }
 
     private void setBw(BufferedWriter bw) {
-        this.bw = bw;
+        this._bw = bw;
     }
 
     @Override

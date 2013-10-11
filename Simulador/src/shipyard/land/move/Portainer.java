@@ -5,15 +5,12 @@
 package shipyard.land.move;
 
 import Negocio.PortainerBusiness;
-import shipyard.land.staticplace.PosicaoCargaDescargaBerco;
-import cz.zcu.fav.kiv.jsim.JSimException;
 import cz.zcu.fav.kiv.jsim.JSimInvalidParametersException;
 import cz.zcu.fav.kiv.jsim.JSimLink;
 import cz.zcu.fav.kiv.jsim.JSimProcess;
 import cz.zcu.fav.kiv.jsim.JSimSecurityException;
 import cz.zcu.fav.kiv.jsim.JSimSimulation;
 import cz.zcu.fav.kiv.jsim.JSimSimulationAlreadyTerminatedException;
-import cz.zcu.fav.kiv.jsim.JSimSystem;
 import cz.zcu.fav.kiv.jsim.JSimTooManyProcessesException;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -24,6 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import shipyard.land.staticplace.PosicaoCargaDescargaBerco;
 import shipyard.load.Container;
 import simulador.queues.FilaContainers;
 
@@ -37,23 +35,26 @@ public class Portainer extends JSimProcess {
     PosicaoCargaDescargaBerco _posicaoCargaDescarga;
     private double mu;
     private double p;
-    private FilaContainers _queueIn;
-    private FilaContainers _queueOut;
+    
     private int _counter;
     private double _transTq;
     private double _horaSaidaContainer;
     private double _tempoTotalAtendimento;
-    private double _horaMovimentacao;
+    private double _horaMovimentacao;    
     
     private File _arquivo;
     private FileWriter _fw;
     private BufferedWriter _bw;
     private DecimalFormat df = new DecimalFormat("#0.##");
     
+    private FilaContainers _queueIn;
+    private FilaContainers _queueOut;
     private String _nomePortainer;
     private JSimProcess _berco;
     private JSimSimulation _simulation;
-    private Container _container;    
+    private int _numeroContainersDescarregar;
+    private int _numeroContainersCarregar;
+    private Container _container;
     private PortainerBusiness _portainerNegocio;
 
     //CaminhoesPatio
@@ -230,7 +231,23 @@ public class Portainer extends JSimProcess {
         _queueIn.setHoraInicioAtendimento(myParent.getCurrentTime());
         _filasContainers.add(_queueIn);
         _queueOut = parQueueOut;
-    } 
+    }
+
+    public int getNumeroContainersDescarregar() {
+        return _numeroContainersDescarregar;
+    }
+
+    public void setNumeroContainersDescarregar(int _numeroContainersDescarregar) {
+        this._numeroContainersDescarregar = _numeroContainersDescarregar;
+    }
+
+    public int getNumeroContainersCarregar() {
+        return _numeroContainersCarregar;
+    }
+
+    public void setNumeroContainersCarregar(int _numeroContainersCarregar) {
+        this._numeroContainersCarregar = _numeroContainersCarregar;
+    }
     
     @Override
     protected void life() {

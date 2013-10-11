@@ -17,39 +17,52 @@ import java.io.IOException;
  */
 public class FilaContainers extends JSimHead {
 
-    private JSimProcess portainer;
-    private double horaFinalAtendimento;
-    private double horaInicioAtendimento;
-    public String nomeFila;
+    private JSimProcess _portainer;
+    private double _horaFinalAtendimento;
+    private double _horaInicioAtendimento;
+    private String _nomeFila;
+    private int _numeroContainers;
 
     public FilaContainers(String name, JSimSimulation sim, JSimProcess p)
             throws JSimInvalidParametersException, JSimTooManyHeadsException, IOException {
         super(name, sim);
-        portainer = p;
-        nomeFila = name;
+        _portainer = p;
+        _nomeFila = name;
     } // constructor
 
     public JSimProcess getPortainer() {
-        return portainer;
+        return _portainer;
     }
 
     public void setPortainer(JSimProcess p) {
-        portainer = p;
+        _portainer = p;
     }
 
     public double getHoraFinalAtendimento() {
-        return horaFinalAtendimento;
+        return _horaFinalAtendimento;
     }
 
     public void setHoraFinalAtendimento(double h) {
-        horaFinalAtendimento = h;
+        _horaFinalAtendimento = h;
     }
 
     public double getHoraInicioAtendimento() {
-        return horaInicioAtendimento;
+        return _horaInicioAtendimento;
     }
 
     public void setHoraInicioAtendimento(double h) {
-        horaInicioAtendimento = h;
+        _horaInicioAtendimento = h;
+    }
+
+    public int getNumeroContainers() {
+        return _numeroContainers;
+    }
+
+    public void setNumeroContainers(int _numeroContainers) {
+        this._numeroContainers = _numeroContainers;
+    }    
+
+    public String getNomeFila() {
+        return _nomeFila;
     }
 }

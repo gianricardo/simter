@@ -9,7 +9,7 @@ package shipyard.land.staticplace;
  * @author Eduardo
  */
 public class EstacaoArmazenamento {
-    public int IdEstacaoArmazenamento;
-    public int QuantidadeCargaMomento;
-    public int CapacidadeTotalCarga;
+    private int _idEstacaoArmazenamento;
+    private int _quantidadeCargaMomento;
+    private int _capacidadeTotalCarga;
 }

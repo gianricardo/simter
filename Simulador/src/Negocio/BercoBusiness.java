@@ -4,11 +4,6 @@
  */
 package negocio;
 
-import shipyard.land.staticplace.Berco;
-import simulador.queues.FilaContainers;
-import shipyard.sea.Navio;
-import shipyard.land.move.Portainer;
-import shipyard.land.staticplace.PosicaoCargaDescargaBerco;
 import cz.zcu.fav.kiv.jsim.JSimException;
 import cz.zcu.fav.kiv.jsim.JSimInvalidParametersException;
 import cz.zcu.fav.kiv.jsim.JSimSecurityException;
@@ -18,6 +13,11 @@ import cz.zcu.fav.kiv.jsim.JSimTooManyProcessesException;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import shipyard.land.move.Portainer;
+import shipyard.land.staticplace.Berco;
+import shipyard.land.staticplace.PosicaoCargaDescargaBerco;
+import shipyard.sea.Navio;
+import simulador.queues.FilaContainers;
 import utils.Formatters;
 
 /**
@@ -84,7 +84,7 @@ public class BercoBusiness {
 
     } // life
 
-    public double VerificarHoraSaidaNavio(List<FilaContainers> lista) {
+    public double verificarHoraSaidaNavio(List<FilaContainers> lista) {
         double tempoPortainers = 0;
         for (int i = 0; i < lista.size(); i++) {
             if (lista.get(i).getHoraFinalAtendimento() > tempoPortainers) {
@@ -151,16 +151,16 @@ public class BercoBusiness {
         int auxFila = 0;
         int nfila;
         FilaContainers filaBerco; 
-        Portainer portainerBerco = null;
+        Portainer portainerBerco;
         
         for (int portainer = 0; portainer < _berco.getNumeroPortainers(); portainer++) {
             for (nfila = auxFila; nfila < numeroFilasPortainer + auxFila; nfila++) {
-                filaBerco = (FilaContainers) _berco.getShip().getFilasContainers().get(nfila);
+                filaBerco = (FilaContainers) _berco.getShip().getFilasContainers().get(nfila);                
 
                 portainerBerco = _berco.getListaPortainers().get(portainer);
 
                 portainerBerco.setFilas(filaBerco, null);
-
+                
                 filaBerco.setPortainer(portainerBerco);
 
                 if (portainerBerco.isIdle()) {
@@ -202,17 +202,17 @@ public class BercoBusiness {
                 ArrayHoraIniAten[i] = fila.getHoraInicioAtendimento();
             }
 
-            boolean Finalizado = false;
+            boolean finalizado = false;
             for (int j = 0; j < ArrayHoraFimAten.length; j++) {
                 if (ArrayHoraFimAten[j] > 0) {
-                    Finalizado = true;
+                    finalizado = true;
                 } else {
-                    Finalizado = false;
+                    finalizado = false;
                     break;
                 }
             }
 
-            if (!Finalizado) {
+            if (!finalizado) {
                 // If we have nothing to do, we sleep.
                 this._berco.passivo();
             } else {

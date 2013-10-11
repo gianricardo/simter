@@ -4,18 +4,16 @@
  */
 package simulador.generators;
 
-import shipyard.sea.Navio;
 import cz.zcu.fav.kiv.jsim.JSimException;
 import cz.zcu.fav.kiv.jsim.JSimInvalidParametersException;
-import cz.zcu.fav.kiv.jsim.JSimLink;
 import cz.zcu.fav.kiv.jsim.JSimProcess;
 import cz.zcu.fav.kiv.jsim.JSimSimulation;
 import cz.zcu.fav.kiv.jsim.JSimSimulationAlreadyTerminatedException;
 import cz.zcu.fav.kiv.jsim.JSimTooManyProcessesException;
 import java.io.IOException;
+import shipyard.sea.Navio;
 import simulador.queues.FilaNavios;
 import simulador.random.DistributionFunctionStream;
-import simulador.random.UniformDistributionStream;
 
 /**
  *
