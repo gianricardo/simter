@@ -41,19 +41,21 @@ public class BercoBusiness {
     public void life() {
         try {
             while (true) {
-                if (_berco.getQueueIn().empty()) {
+                if (_berco.getShip() == null) {
                     // If we have nothing to do, we sleep.
                     _berco.passivo();
                 } else {
                     //Simulating hard work here...
                     //Tempo de atendimento no BERÇO = SOMA DE TODOS OS CARREGAMENTOS E DESCARREGAMENTOS DE CONTAINERS
                     Navio navio;
-                    navio = _berco.getNextShip();
+                    navio = _berco.getShip();                    
 
                     _berco.setHoraInicioMovimentacao(_berco.getSimulation().getCurrentTime());
                     //hold(JSimSystem.uniform(1, 1));                    
                     _berco.setHoraAtracacao(_berco.getSimulation().getCurrentTime());
                     _berco.setTempoMovimentacao(_berco.getHoraAtracacao() - _berco.getHoraInicioMovimentacao());
+                    
+                    navio.escreverArquivo("\r\n iniciando as atividades no berço " + _berco.getName() +" no momento " + _berco.getSimulation().getCurrentTime());
 
                     updateFilasPortainers();
 
@@ -65,16 +67,18 @@ public class BercoBusiness {
                         _berco.setHoraSaida(_berco.getTempoMovimentacao() + _berco.getTempoAtendimentoPortainers() + _berco.getHoraInicioMovimentacao());
                         _berco.setTransTq(_berco.getTransTq() + _berco.getHoraSaida() - _berco.getShip().getCreationTime());
 
-                        escreverArquivo();
+                        escreverArquivo();                        
 
-                        navio.out();
-                    } else {
+                        _berco.getRotaPraticoToBerco().activate(_berco.getSimulation().getCurrentTime());
+                        _berco.setShip(null);
+                        _berco.setOcupado(false);
+                    } /*else {
                         navio.out();
                         navio.into(_berco.getQueueOut());
                         if (_berco.getQueueOut().getBerco().isIdle()) {
                             _berco.getQueueOut().getBerco().activate(_berco.getSimulation().getCurrentTime());
                         }
-                    } // else throw away / insert
+                    } // else throw away / insert*/
                 } // else queue is empty / not empty
             } // while                
         } // try
@@ -112,7 +116,7 @@ public class BercoBusiness {
     }
 
     private void criarArquivo(String name) {
-        this._berco.setArquivo(new File("../arquivoNavios" + name + ".txt"));
+        this._berco.setArquivo(new File("../arquivo Navios Berço " + name + ".txt"));
 
         if (!this._berco.getArquivo().exists()) {
             try {
@@ -128,8 +132,6 @@ public class BercoBusiness {
             this._berco.getBw().write("\r\nNavio " + this._berco.getShip().getIdNavio() 
                 + ":\r\n -Criado no momento " + Formatters.df.format(this._berco.getShip().getCreationTime())
                 + "\r\n -" + this._berco.getShip().getNumeroContainersDescarregar() + " Containers a descarregar"
-                + "\r\n -Colocado na fila " + this._berco.getQueueIn().getHeadName()
-                + " no momento " + Formatters.df.format(this._berco.getShip().getEnterTime())
                 + "\r\n -Tempo de espera na fila " + Formatters.df.format((this._berco.getHoraAtracacao() - this._berco.getTempoMovimentacao()) - this._berco.getShip().getEnterTime())
                 + "\r\n -Hora Inicio Movimentacao até o Berco " + Formatters.df.format(this._berco.getHoraInicioMovimentacao())
                 + "\r\n -Hora de Atracação " + Formatters.df.format(this._berco.getHoraAtracacao())
@@ -192,18 +194,22 @@ public class BercoBusiness {
     private void verificaFinalizacaoAtendimentoNavio() throws JSimSecurityException {
         
         while (true) {
-            this._berco.setTempoAtendimentoPortainers(0);
+            
             FilaContainers fila;
-            double[] ArrayHoraFimAten = new double[_berco.getShip().getFilasContainers().size()];
-            double[] ArrayHoraIniAten = new double[_berco.getShip().getFilasContainers().size()];
+            boolean finalizado = true;
+            
             for (int i = 0; i < _berco.getShip().getFilasContainers().size(); i++) {
                 fila = (FilaContainers) _berco.getShip().getFilasContainers().get(i);
-                ArrayHoraFimAten[i] = fila.getHoraFinalAtendimento();
-                ArrayHoraIniAten[i] = fila.getHoraInicioAtendimento();
-            }
+                
+                if(fila.getNumeroContainers() != 0){
+                    finalizado = false;
+                }
+            }           
+            
+            this._berco.setTempoAtendimentoPortainers(0);            
 
-            boolean finalizado = false;
-            for (int j = 0; j < ArrayHoraFimAten.length; j++) {
+            //boolean finalizado = false;
+            /*for (int j = 0; j < ArrayHoraFimAten.length; j++) {
                 
                 if (ArrayHoraFimAten[j] > 0) {
                     finalizado = true;
@@ -212,12 +218,21 @@ public class BercoBusiness {
                     break;
                 }
                 
-            }
+            }*/
 
             if (!finalizado) {
                 // If we have nothing to do, we sleep.
                 this._berco.passivo();
             } else {
+                
+                double[] ArrayHoraFimAten = new double[_berco.getShip().getFilasContainers().size()];
+                double[] ArrayHoraIniAten = new double[_berco.getShip().getFilasContainers().size()];
+                for (int i = 0; i < _berco.getShip().getFilasContainers().size(); i++) {
+                    fila = (FilaContainers) _berco.getShip().getFilasContainers().get(i);
+                    ArrayHoraFimAten[i] = fila.getHoraFinalAtendimento();
+                    ArrayHoraIniAten[i] = fila.getHoraInicioAtendimento();
+                }
+                
                 double MaiorHoraFimAtendimento = 0;
                 double MenorHoraInicioAtendimento = 0;
                 for (int i = 0; i < _berco.getShip().getFilasContainers().size(); i++) {

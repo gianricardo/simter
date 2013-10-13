@@ -10,10 +10,12 @@ import cz.zcu.fav.kiv.jsim.JSimProcess;
 import cz.zcu.fav.kiv.jsim.JSimSimulation;
 import cz.zcu.fav.kiv.jsim.JSimSimulationAlreadyTerminatedException;
 import cz.zcu.fav.kiv.jsim.JSimTooManyProcessesException;
+import cz.zcu.fav.kiv.jsim.random.JSimUniformStream;
 import java.io.IOException;
 import shipyard.sea.Navio;
 import simulador.queues.FilaNavios;
 import simulador.random.DistributionFunctionStream;
+import simulador.random.UniformDistributionStream;
 
 /**
  *
@@ -45,10 +47,10 @@ public class GeradorNavios extends JSimProcess {
             while (true) {
                 // Periodically creating new navios and putting them into the queue.
                 Navio novo = new Navio(myParent.getCurrentTime(), String.valueOf(_numeroNavio), 2, _simulation);
-                novo.setNumeroContainersDescarregar((int)Math.ceil(_quantidadeContainerNavio.getNext()));
+                novo.setNumeroContainersDescarregar((int)(new UniformDistributionStream(new JSimUniformStream(100, 100.1)).getNext()));
                 novo.into(_queue);
-                if (_queue.getBerco().isIdle()) {
-                    _queue.getBerco().activate(myParent.getCurrentTime());
+                if (_queue.getRotaEntradaPratico().isIdle()) {
+                    _queue.getRotaEntradaPratico().activate(myParent.getCurrentTime());
                 }
                 _numeroNavio++;
                 hold(this._tempoEntreNavios.getNext());

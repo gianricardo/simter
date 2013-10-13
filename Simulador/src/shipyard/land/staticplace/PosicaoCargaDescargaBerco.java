@@ -12,6 +12,9 @@ import cz.zcu.fav.kiv.jsim.JSimSecurityException;
 import cz.zcu.fav.kiv.jsim.JSimSimulation;
 import cz.zcu.fav.kiv.jsim.JSimSimulationAlreadyTerminatedException;
 import cz.zcu.fav.kiv.jsim.JSimTooManyProcessesException;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -31,8 +34,12 @@ public class PosicaoCargaDescargaBerco extends JSimProcess {
     private JSimSimulation _simulation;
     private Portainer _portainer;
     private EstacaoCaminhoesInternos _estacao;
-    private String _nome;
-
+    private String _nome;    
+    private File _arquivo;
+    private FileWriter _fw;
+    private BufferedWriter _bw;
+    private boolean _navioOcupandoPosicao;
+            
     public PosicaoCargaDescargaBerco(String name, JSimSimulation sim, double l, Portainer p, EstacaoCaminhoesInternos estacaoCaminhoes)
             throws JSimSimulationAlreadyTerminatedException, JSimInvalidParametersException, JSimTooManyProcessesException, IOException {
         super(name, sim);
@@ -106,4 +113,40 @@ public class PosicaoCargaDescargaBerco extends JSimProcess {
     public CaminhaoPatio getCaminhao() {
         return _caminhao;
     }
+    
+    private void criarArquivo() {
+        if (_arquivo == null) {
+            try {
+                _arquivo = new File("../ArquivoPosicaoCargaDescargaBerco" + _nome + ".txt");
+                _fw = new FileWriter(_arquivo, false);
+                _bw = new BufferedWriter(_fw);
+            } catch (IOException ex) {
+                ex.printStackTrace(System.err);
+            }
+        }
+    }
+
+    private void escreverArquivo(FilaCaminhoesInternos fila) {
+        try {
+            _bw.write("\r\nCaminhao " + _caminhao.getIdCaminhao()
+                    + "\r\n colocado na posicao " + _nome
+                    + "\r\n -Colocado na fila " + fila.getHeadName()
+                    + " \r\n");
+            _bw.flush();
+        } catch (IOException ex) {
+            ex.printStackTrace(System.err);
+        }
+    }
+
+    public void closeBw() throws IOException {
+        _bw.close();
+    }
+
+    public boolean isNavioOcupandoPosicao() {
+        return _navioOcupandoPosicao;
+    }
+    
+    public void setNavioOcupandoPosicao(boolean _navioPosicao) {
+        this._navioOcupandoPosicao = _navioPosicao;
+    }    
 }

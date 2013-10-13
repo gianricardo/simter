@@ -6,33 +6,31 @@ package simulador.queues;
 
 import cz.zcu.fav.kiv.jsim.JSimHead;
 import cz.zcu.fav.kiv.jsim.JSimInvalidParametersException;
-import cz.zcu.fav.kiv.jsim.JSimProcess;
 import cz.zcu.fav.kiv.jsim.JSimSimulation;
 import cz.zcu.fav.kiv.jsim.JSimTooManyHeadsException;
 import java.io.IOException;
+import simulador.rotas.FilaNaviosEntradaToPraticoRt;
 
 /**
  *
  * @author Eduardo
  */
-public class FilaNavios extends JSimHead {
+public class FilaNavios extends JSimHead {   
     
-    private JSimProcess berco;
+    private FilaNaviosEntradaToPraticoRt _rotaEntradaPratico;
     
-    public FilaNavios(String name, JSimSimulation sim, JSimProcess b)
+    public FilaNavios(String name, JSimSimulation sim, FilaNaviosEntradaToPraticoRt rt)
             throws JSimInvalidParametersException, JSimTooManyHeadsException, IOException
     {
         super(name, sim);
-	berco = b;
+	_rotaEntradaPratico = rt;
     } // constructor
-    
-    public JSimProcess getBerco()
-    {
-            return berco;
-    } // getServer
 
-    public void setBerco(JSimProcess b)
-    {
-            berco = b;
-    } // setServer         
+    public FilaNaviosEntradaToPraticoRt getRotaEntradaPratico() {
+        return _rotaEntradaPratico;
+    }    
+
+    public void setRotaEntradaPratico(FilaNaviosEntradaToPraticoRt _rotaEntradaPratico) {
+        this._rotaEntradaPratico = _rotaEntradaPratico;
+    }
 }

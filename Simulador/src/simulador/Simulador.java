@@ -15,9 +15,12 @@ import java.io.FileWriter;
 import java.io.IOException;
 import shipyard.land.staticplace.Berco;
 import shipyard.land.staticplace.EstacaoCaminhoesInternos;
+import shipyard.sea.Pratico;
 import simulador.generators.GeradorNavios;
 import simulador.queues.FilaNavios;
 import simulador.random.UniformDistributionStream;
+import simulador.rotas.FilaNaviosEntradaToPraticoRt;
+import simulador.rotas.PraticoToBercoRt;
 
 /**
  *
@@ -29,7 +32,7 @@ public class Simulador {
      * @param args the command line arguments
      */
     public static void main(String[] args) throws JSimInvalidParametersException, JSimMethodNotSupportedException {
-        try {
+        try {            
             File arquivo = new File("../arquivo.txt");
 
             if (arquivo.delete() == true) {
@@ -41,11 +44,16 @@ public class Simulador {
             }
             try (FileWriter fw = new FileWriter(arquivo, true)) {
                 BufferedWriter bw = new BufferedWriter(fw);
-
+                
                 JSimSimulation simulation;
-                FilaNavios queueNavio1;
-                Berco berco1;
+    
                 GeradorNavios generator1;
+                FilaNavios queueNavio1;
+                FilaNaviosEntradaToPraticoRt rotaEntradaToPratico;
+                Pratico pratico;
+                PraticoToBercoRt rotaPraticoBerco1, rotaPraticoBerco2;    
+                Berco berco1, berco2;
+
                 EstacaoCaminhoesInternos estacao1;
                 double mu1 = 1.0/*, mu2 = 1.0*/;
                 double lambda1 = 0.4/*, lambda2 = 0.4*/;
@@ -55,30 +63,52 @@ public class Simulador {
                 bw.write("Iniciado a simulação\r\n");
 
                 simulation = new JSimSimulation("Enfileirando Navios\r\n");
-                bw.write("Enfileirando Navios\r\n");
+                bw.write("Enfileirando Navios\r\n");                
 
                 queueNavio1 = new FilaNavios("Fila Entrada de Navios no Porto", simulation, null);
                 
+                generator1 = new GeradorNavios("Gerador 1", simulation,
+                        new UniformDistributionStream(new JSimUniformStream(500, 500.1)), queueNavio1);
+                
+                pratico = new Pratico("pratico1", simulation);
+
+                rotaEntradaToPratico =
+                        new FilaNaviosEntradaToPraticoRt("rotaEntradaNaviosAtePratico", simulation,
+                        1, queueNavio1, pratico, new UniformDistributionStream(new JSimUniformStream(200, 200.1)));
+                
+                pratico.setRotaNavioPratico(rotaEntradaToPratico);
+
+                queueNavio1.setRotaEntradaPratico(rotaEntradaToPratico);                
+                
                 estacao1 = new EstacaoCaminhoesInternos("Estação de caminhões do porto", simulation, 0, 50);
                 
-                berco1 = new Berco(simulation,1,2, estacao1);            
-
-                generator1 = new GeradorNavios("Gerador 1", simulation, 
-                    new UniformDistributionStream(new JSimUniformStream(29.5, 29.6)), queueNavio1);
-
-                // We must set the servers now because they didn't exist at the time the queues were created.
-                queueNavio1.setBerco(berco1);
-                berco1.setQueueIn(queueNavio1);
+                berco1 = new Berco(simulation, 1, 2, estacao1);
+                
+                berco2 = new Berco(simulation, 2, 2, estacao1);
+                
+                rotaPraticoBerco1 = new PraticoToBercoRt("rotaPraticoBerco1", simulation, 1, berco1, pratico,
+                                                          new UniformDistributionStream(new JSimUniformStream(1, 1.1)));
+                
+                rotaPraticoBerco2 = new PraticoToBercoRt("rotaPraticoBerco2", simulation, 1, berco2, pratico,
+                                                          new UniformDistributionStream(new JSimUniformStream(1, 1.1)));
+                
+                pratico.addListaRotasBerco(rotaPraticoBerco1);
+                
+                pratico.addListaRotasBerco(rotaPraticoBerco2);
+                
+                berco1.setRotaPraticoToBerco(rotaPraticoBerco1);
+                
+                berco2.setRotaPraticoToBerco(rotaPraticoBerco2);
 
                 simulation.message("Ativando os Geradores");
-                bw.write("Ativando os Geradores\r\n");
-
+                bw.write("Ativando os Geradores\r\n");  
+                
                 generator1.activate(0.0);
 
                 simulation.message("Executando a simulação.");
                 bw.write("Executando a simulação.\r\n");
 
-                while ((simulation.getCurrentTime() < 305.0) && (simulation.step() == true)) {
+                while ((simulation.getCurrentTime() < 5000.0) && (simulation.step() == true)) {
                     continue;
                 }
 
@@ -93,9 +123,10 @@ public class Simulador {
                 bw.write("\r\nEstatísticas dos Berços: ");
                 simulation.message("Berco 1: Número de navios que já saíram do berço = " + berco1.getCounter() + ", sum of Tq (for transactions thrown away by this server) = " + berco1.getTransTq());
                 bw.write("\r\nBerco 1: Número de navios que já saíram do berço = " + berco1.getCounter() + ", sum of Tq (for transactions thrown away by this server) = " + berco1.getTransTq() + "\r\n");
-                
+
                 simulation.shutdown();
                 berco1.getBw().close();
+                berco2.getBw().close();
                 bw.close();
             }
         } catch (IOException ex) {

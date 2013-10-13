@@ -9,6 +9,9 @@ import cz.zcu.fav.kiv.jsim.JSimLink;
 import cz.zcu.fav.kiv.jsim.JSimSecurityException;
 import cz.zcu.fav.kiv.jsim.JSimSimulation;
 import cz.zcu.fav.kiv.jsim.JSimTooManyHeadsException;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -40,8 +43,11 @@ public class Navio extends JSimLink {
     private List _filasContainers = new ArrayList();
     private List _idBercosPossiveis = new ArrayList();
     private int _idPratico;
-    private float _calado;
-    private float _comprimento;
+    private int _comprimentoEmPosicoesCargaDescarga;
+    
+    private File _arquivo;
+    private FileWriter _fw;
+    private BufferedWriter _bw;
 
     public void setNumeroContainersDescarregar(int _numeroContainersDescarregar) {
         this._numeroContainersDescarregar = _numeroContainersDescarregar;
@@ -54,6 +60,10 @@ public class Navio extends JSimLink {
         //_numeroContainersDescarregar = (int) JSimSystem.uniform(10, 10);
         _simulation = simulation;
         _numeroRegioesNavio = numeroRegioesNavio;
+        _comprimentoEmPosicoesCargaDescarga = 1;
+        
+        criarArquivo();
+        escreverArquivo("Navio " + _idNavio + "\r\n Criado no momento " + _timeOfCreation);        
     } // constructor
 
     private void updateShip() {
@@ -81,8 +91,8 @@ public class Navio extends JSimLink {
                     for (int z = j; z <= j + auxiliarResto; z++) {
                         _container = new JSimLink(new Container(_timeOfCreation, String.valueOf(z)));
                         _container.into(_filaContainer);
-                    }
-                    contadorContainers++;
+                        contadorContainers++;
+                    }                    
                 }
                 aux = j;
                 _filaContainer.setNumeroContainers(contadorContainers);
@@ -157,11 +167,32 @@ public class Navio extends JSimLink {
         return _idPratico;
     }
 
-    public float getCalado() {
-        return _calado;
+    public int getComprimentoEmPosicoesCargaDescarga() {
+        return _comprimentoEmPosicoesCargaDescarga;
+    }
+    
+    private void criarArquivo() {
+        if (_arquivo == null) {
+            try {
+                _arquivo = new File("../arquivoNavio" + _idNavio + ".txt");
+                _fw = new FileWriter(_arquivo, false);
+                _bw = new BufferedWriter(_fw);
+            } catch (IOException ex) {
+                ex.printStackTrace(System.err);
+            }
+        }
     }
 
-    public float getComprimento() {
-        return _comprimento;
+    public void escreverArquivo(String texto) {
+        try {
+            _bw.write("\r\n " + texto);
+            _bw.flush();
+        } catch (IOException ex) {
+            ex.printStackTrace(System.err);
+        }
+    }
+
+    public void closeBw() throws IOException {
+        _bw.close();
     }
 }

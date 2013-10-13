@@ -20,7 +20,7 @@ public class UniformDistributionStream implements DistributionFunctionStream{
         
     @Override
     public double getNext() {
-        return _aleatorio.getNext();
+        return (int)_aleatorio.getNext();
     }
     
 }
