@@ -19,11 +19,10 @@ public class FilaNavios extends JSimHead {
     
     private FilaNaviosEntradaToPraticoRt _rotaEntradaPratico;
     
-    public FilaNavios(String name, JSimSimulation sim, FilaNaviosEntradaToPraticoRt rt)
+    public FilaNavios(String name, JSimSimulation sim)
             throws JSimInvalidParametersException, JSimTooManyHeadsException, IOException
     {
         super(name, sim);
-	_rotaEntradaPratico = rt;
     } // constructor
 
     public FilaNaviosEntradaToPraticoRt getRotaEntradaPratico() {

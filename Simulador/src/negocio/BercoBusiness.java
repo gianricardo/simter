@@ -13,6 +13,8 @@ import cz.zcu.fav.kiv.jsim.JSimTooManyProcessesException;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import shipyard.land.move.Portainer;
 import shipyard.land.staticplace.Berco;
 import shipyard.land.staticplace.PosicaoCargaDescargaBerco;
@@ -67,18 +69,19 @@ public class BercoBusiness {
                         _berco.setHoraSaida(_berco.getTempoMovimentacao() + _berco.getTempoAtendimentoPortainers() + _berco.getHoraInicioMovimentacao());
                         _berco.setTransTq(_berco.getTransTq() + _berco.getHoraSaida() - _berco.getShip().getCreationTime());
 
-                        escreverArquivo();                        
-
-                        _berco.getRotaPraticoToBerco().activate(_berco.getSimulation().getCurrentTime());
-                        _berco.setShip(null);
-                        _berco.setOcupado(false);
-                    } /*else {
-                        navio.out();
-                        navio.into(_berco.getQueueOut());
-                        if (_berco.getQueueOut().getBerco().isIdle()) {
-                            _berco.getQueueOut().getBerco().activate(_berco.getSimulation().getCurrentTime());
+                        escreverArquivo();
+                        
+                        while(true)
+                        {
+                            if(!finalizarAtendimentoNavio()){
+                                _berco.passivo();
+                            }
+                            else{
+                                break;
+                            }
                         }
-                    } // else throw away / insert*/
+                        
+                    }
                 } // else queue is empty / not empty
             } // while                
         } // try
@@ -163,7 +166,7 @@ public class BercoBusiness {
 
                 portainerBerco.setFilas(filaBerco, null);
                 
-                filaBerco.setPortainer(portainerBerco);
+                //filaBerco.setPortainer(portainerBerco);
 
                 if (portainerBerco.isIdle()) {
                     portainerBerco.activate(this._berco.getSimulation().getCurrentTime());
@@ -179,7 +182,7 @@ public class BercoBusiness {
 
                     portainerBerco.setFilas(filaBerco, null);
 
-                    filaBerco.setPortainer(portainerBerco);
+                    //filaBerco.setPortainer(portainerBerco);
 
                     if (portainerBerco.isIdle()) {
                         portainerBerco.activate(this._berco.getSimulation().getCurrentTime());
@@ -248,6 +251,25 @@ public class BercoBusiness {
                 break;
             }
         }
+    }
+    
+    private boolean finalizarAtendimentoNavio(){
+        if(_berco.getRotaBercoToSaida().GetNextElement(_berco.getShip())){
+            try {
+                if(_berco.getRotaBercoToSaida().isIdle()){
+                    _berco.getRotaBercoToSaida().activate(_berco.getSimulation().getCurrentTime());                        
+                }
+                if(_berco.getRotaPraticoToBerco().isIdle()){
+                    _berco.getRotaPraticoToBerco().activate(_berco.getSimulation().getCurrentTime());
+                }
+                _berco.setShip(null);
+                _berco.setOcupado(false);
+                return true;
+            } catch (    JSimSecurityException | JSimInvalidParametersException ex) {
+                Logger.getLogger(BercoBusiness.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        return false;
     }
 
     public int getCounter() {

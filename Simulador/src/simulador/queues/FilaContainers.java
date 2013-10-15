@@ -17,26 +17,16 @@ import java.io.IOException;
  */
 public class FilaContainers extends JSimHead {
 
-    private JSimProcess _portainer;
     private double _horaFinalAtendimento;
     private double _horaInicioAtendimento;
     private String _nomeFila;
     private int _numeroContainers;
 
-    public FilaContainers(String name, JSimSimulation sim, JSimProcess p)
+    public FilaContainers(String name, JSimSimulation sim)
             throws JSimInvalidParametersException, JSimTooManyHeadsException, IOException {
         super(name, sim);
-        _portainer = p;
         _nomeFila = name;
     } // constructor
-
-    public JSimProcess getPortainer() {
-        return _portainer;
-    }
-
-    public void setPortainer(JSimProcess p) {
-        _portainer = p;
-    }
 
     public double getHoraFinalAtendimento() {
         return _horaFinalAtendimento;

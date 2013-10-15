@@ -22,6 +22,7 @@ import negocio.BercoBusiness;
 import shipyard.land.move.Portainer;
 import shipyard.sea.Navio;
 import simulador.queues.FilaNavios;
+import simulador.rotas.BercoToRotaSaidaRt;
 import simulador.rotas.PraticoToBercoRt;
 
 /**
@@ -47,14 +48,16 @@ public class Berco extends JSimProcess {
     private int _counter;
     private double _transTq;
     private FilaNavios _queueOut;
-    private int _idBerco;
-    private File _arquivo;
-    private FileWriter _fw;
-    private BufferedWriter _bw;
+    private int _idBerco;    
     private BercoBusiness _bercoNegocio;
     private Navio _ship;
     private boolean _ocupado = false;
-    private PraticoToBercoRt rotaPraticoToBerco;
+    private PraticoToBercoRt _rotaPraticoToBerco;
+    private BercoToRotaSaidaRt _rotaBercoToSaida;
+    
+    private File _arquivo;
+    private FileWriter _fw;
+    private BufferedWriter _bw;
     
     public Berco(JSimSimulation simulation, int idBerco, int numeroPortainers, EstacaoCaminhoesInternos estacao)
             throws JSimSimulationAlreadyTerminatedException, JSimInvalidParametersException, JSimTooManyProcessesException {
@@ -258,10 +261,18 @@ public class Berco extends JSimProcess {
     }
 
     public PraticoToBercoRt getRotaPraticoToBerco() {
-        return rotaPraticoToBerco;
+        return _rotaPraticoToBerco;
     }
 
     public void setRotaPraticoToBerco(PraticoToBercoRt rotaPraticoToBerco) {
-        this.rotaPraticoToBerco = rotaPraticoToBerco;
+        this._rotaPraticoToBerco = rotaPraticoToBerco;
+    }
+
+    public BercoToRotaSaidaRt getRotaBercoToSaida() {
+        return _rotaBercoToSaida;
+    }
+
+    public void setRotaBercoToSaida(BercoToRotaSaidaRt _rotaBercoToSaida) {
+        this._rotaBercoToSaida = _rotaBercoToSaida;
     }
 }

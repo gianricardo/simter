@@ -4,6 +4,7 @@
  */
 package shipyard.load;
 
+import Enumerators.ContainerTipos;
 import cz.zcu.fav.kiv.jsim.JSimLink;
 
 /**
@@ -13,12 +14,13 @@ import cz.zcu.fav.kiv.jsim.JSimLink;
 public class Container extends JSimLink {
     
     private String _id;
-    private float _medida;
     
     private float _tempoAtendimento;
     private double _timeOfCreation;
+    private ContainerTipos _origemContainer;
+    private ContainerTipos _destinoContainer;
     
-    public Container(double time, String id)
+    public Container(double time, String id, ContainerTipos origemContainer, ContainerTipos destinoContainer)
     {
             _timeOfCreation = time;
             _id = new StringBuilder()
@@ -28,10 +30,6 @@ public class Container extends JSimLink {
 
     public String getId() {
         return _id;
-    }
-
-    public float getMedida() {
-        return _medida;
     }
 
     public float getTempoAtendimento() {

@@ -47,14 +47,14 @@ public class EstacaoCaminhoesInternos extends JSimProcess {
             _nomeEstacao = name;
             _filaCaminhoesEstacao = new FilaCaminhoesInternos("Fila de Caminhões " + this._nomeEstacao, _simulation);
             
-            criarArquivo();
+            //criarArquivo();
 
             for (int i = 0; i < NumeroCaminhoes; i++) {
                 _caminhaoPatio = new CaminhaoPatio(myParent.getCurrentTime(), String.valueOf(i), super.getName(), _simulation, 1);
                 _caminhaoPatio.setCarregado(false);
                 _caminhoesEstacao.add(_caminhaoPatio);
                 _caminhaoPatio.into(_filaCaminhoesEstacao);
-                escreverArquivo(_filaCaminhoesEstacao);
+                //escreverArquivo(_filaCaminhoesEstacao);
             }            
         } catch (JSimTooManyHeadsException ex) {
             Logger.getLogger(EstacaoCaminhoesInternos.class.getName()).log(Level.SEVERE, null, ex);

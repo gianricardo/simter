@@ -101,13 +101,7 @@ public class PortainerBusiness {
                                 }
                             }
                             _portainer.setContainer(null);
-                        } /*else {
-                         container.out();
-                         container.into(queueOut);
-                         if (queueOut.getPortainer().isIdle()) {
-                         queueOut.getPortainer().activate(myParent.getCurrentTime());
-                         }
-                         }*/ // else throw away / insert
+                        }
                     }
                 } // else queue is empty / not empty
             } // while            

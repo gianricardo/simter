@@ -4,6 +4,7 @@
  */
 package shipyard.sea;
 
+import Enumerators.ContainerTipos;
 import cz.zcu.fav.kiv.jsim.JSimInvalidParametersException;
 import cz.zcu.fav.kiv.jsim.JSimLink;
 import cz.zcu.fav.kiv.jsim.JSimSecurityException;
@@ -75,13 +76,13 @@ public class Navio extends JSimLink {
             for (int i = 1; i <= _numeroRegioesNavio; i++) {
                 contadorContainers = 0;
                 try {
-                    _filaContainer = new FilaContainers("Fila de Containers " + i + " navio " + _idNavio, _simulation, null);
+                    _filaContainer = new FilaContainers("Fila de Containers " + i + " navio " + _idNavio, _simulation);
                 } catch (JSimInvalidParametersException | JSimTooManyHeadsException | IOException ex) {
                     Logger.getLogger(shipyard.land.staticplace.Berco.class.getName()).log(Level.SEVERE, null, ex);
                 }
 
                 for (j = aux; j <= i * (_numeroContainersDescarregar / _numeroRegioesNavio); j++) {
-                    _container = new Container(_timeOfCreation, String.valueOf(j));
+                    _container = new Container(_timeOfCreation, "Container " + String.valueOf(j) + " do navio " + this._idNavio, ContainerTipos.Navio, ContainerTipos.CaminhaoExterno);
                     _container.into(_filaContainer);
                     contadorContainers++;
                 }
@@ -89,7 +90,7 @@ public class Navio extends JSimLink {
                 if (i == _numeroRegioesNavio) {
                     int auxiliarResto = _numeroContainersDescarregar - j;
                     for (int z = j; z <= j + auxiliarResto; z++) {
-                        _container = new JSimLink(new Container(_timeOfCreation, String.valueOf(z)));
+                        _container = new JSimLink(new Container(_timeOfCreation, "Container " + String.valueOf(z) + " do navio " + this._idNavio, ContainerTipos.Navio, ContainerTipos.CaminhaoExterno));
                         _container.into(_filaContainer);
                         contadorContainers++;
                     }                    

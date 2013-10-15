@@ -74,7 +74,7 @@ public class FilaNaviosEntradaToPraticoRt extends RouteBase {
                         return false;
                     }                    
                     _navios.add(novonavio);
-                    _navios.get(0).escreverArquivo("\r\n colocado na rota " + this.getName() + "no momento " + myParent.getCurrentTime());
+                    _navios.get(0).escreverArquivo("\r\n colocado na " + this.getName() + " no momento " + myParent.getCurrentTime());
                     novonavio.out();                
                     super.OcuparRota();
                 } catch (JSimSecurityException ex) {
