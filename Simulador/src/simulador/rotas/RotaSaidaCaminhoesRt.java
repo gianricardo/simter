@@ -76,7 +76,7 @@ public class RotaSaidaCaminhoesRt extends RouteBase {
             return false;
         } else {
             this._caminhoes.add(_caminhao);
-            _caminhoes.get(0).escreverArquivo("\r\n colocado na " + this.getName() + " no momento " + myParent.getCurrentTime());
+            _caminhoes.get(0).escreverArquivo("\r\nEntrou na " + this.getName() + " no momento " + myParent.getCurrentTime());
             super.OcuparRota();
             return true;
         }

@@ -72,6 +72,9 @@ public class PosicaoCargaDescargaEstacaoArmazenamento extends JSimProcess {
                                 if(_rotaSaidaCaminhoes.isIdle()){
                                     _rotaSaidaCaminhoes.activate(myParent.getCurrentTime());
                                 }
+                                if(_rotaAtePosicao.isIdle()){
+                                    _rotaAtePosicao.activate(myParent.getCurrentTime());
+                                }
                                 break;
                             }
                         } catch (IOException ex) {
@@ -98,8 +101,9 @@ public class PosicaoCargaDescargaEstacaoArmazenamento extends JSimProcess {
             if (novoCaminhao == null) {
                 return false;
             }            
-            _rotaSaidaCaminhoes.addCaminhoes(novoCaminhao);
-            _caminhao = null;            
+            novoCaminhao.escreverArquivo("\r\nCarregou " + novoCaminhao.getContainer().getId());
+            _rotaSaidaCaminhoes.addCaminhoes(novoCaminhao);            
+            _caminhao = null; 
         }
         return true;
     }

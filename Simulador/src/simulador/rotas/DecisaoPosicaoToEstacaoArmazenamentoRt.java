@@ -97,7 +97,7 @@ public class DecisaoPosicaoToEstacaoArmazenamentoRt extends RouteBase {
         else{
             escreverArquivo("\r\n caminhao " + _caminhao.getIdCaminhao() + " entrou no momento " + myParent.getCurrentTime());
             this._caminhoes.add(_caminhao);
-            _caminhoes.get(0).escreverArquivo("\r\n colocado na " + this.getName() + " no momento " + myParent.getCurrentTime());            
+            _caminhoes.get(0).escreverArquivo("\r\nEntrou na " + this.getName() + " no momento " + myParent.getCurrentTime());            
             super.OcuparRota();
             return true;
         }        

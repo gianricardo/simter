@@ -9,7 +9,6 @@ import cz.zcu.fav.kiv.jsim.JSimInvalidParametersException;
 import cz.zcu.fav.kiv.jsim.JSimLink;
 import cz.zcu.fav.kiv.jsim.JSimSecurityException;
 import cz.zcu.fav.kiv.jsim.JSimSystem;
-import cz.zcu.fav.kiv.jsim.random.JSimUniformStream;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import shipyard.land.move.CaminhaoExterno;
@@ -93,6 +92,7 @@ public class TranstainerBusiness {
         if (_caminhaoExterno != null && (_caminhaoExterno.getOperacao() == CaminhaoExternoOperacao.Descarregar || _caminhaoExterno.getOperacao() == CaminhaoExternoOperacao.DescarregarCarregar)) {
             try {
                 _transtainer.segurar(JSimSystem.uniform(10, 10));
+                _caminhaoExterno.escreverArquivo("\r\nDescarregou " + _caminhaoExterno.getContainer().getId());
                 _caminhaoExterno.setContainer(null);
                 _caminhaoExterno.setCarregado(false);
                 _transtainer.getEstacaoArmazenamento().incrementQuantidadeCargaMomento();

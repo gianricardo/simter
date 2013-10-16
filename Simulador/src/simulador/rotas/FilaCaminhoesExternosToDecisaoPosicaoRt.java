@@ -88,7 +88,7 @@ public class FilaCaminhoesExternosToDecisaoPosicaoRt extends RouteBase {
                     }
                     _caminhoes.add(novoCaminhao);
                     escreverArquivo("\r\n caminhao " + _caminhoes.get(0).getIdCaminhao() + " entrou no momento " + myParent.getCurrentTime());
-                    _caminhoes.get(0).escreverArquivo("\r\n colocado na " + this.getName() + " no momento " + myParent.getCurrentTime());
+                    _caminhoes.get(0).escreverArquivo("\r\nEntrou na " + this.getName() + " no momento " + myParent.getCurrentTime());
                     novoCaminhao.out();
                     super.OcuparRota();
                 } catch (JSimSecurityException ex) {

@@ -38,7 +38,7 @@ public class CaminhaoExterno extends JSimLink{
                     .toString();
             
             criarArquivo();
-            escreverArquivo("Caminhão "+id+" criado no momento " + time);
+            escreverArquivo("Caminhão "+id+"\r\nCriado no momento " + time);
     } // constructor
 
     public Container getContainer() {

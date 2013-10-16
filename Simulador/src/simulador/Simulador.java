@@ -10,9 +10,11 @@ import cz.zcu.fav.kiv.jsim.JSimMethodNotSupportedException;
 import cz.zcu.fav.kiv.jsim.JSimSimulation;
 import cz.zcu.fav.kiv.jsim.random.JSimUniformStream;
 import java.io.BufferedWriter;
+import java.io.Console;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Date;
 import shipyard.land.move.Transtainer;
 import shipyard.land.staticplace.Berco;
 import shipyard.land.staticplace.EstacaoArmazenamento;
@@ -92,16 +94,16 @@ public class Simulador {
                 filaCaminhoes1 = new FilaCaminhoesExternos("Fila Entrada de Caminhões no Porto", simulation);
                 
                 geradorCaminhoes = new GeradorCaminhoesExternos("Gerador Caminhoes 1", simulation,
-                        new UniformDistributionStream(new JSimUniformStream(20, 20.1)), filaCaminhoes1);
+                        new UniformDistributionStream(new JSimUniformStream(30, 30.1)), filaCaminhoes1);
                 
                 rotaEntradaCaminhoes = new FilaCaminhoesExternosToDecisaoPosicaoRt("rota Entrada Caminhões -> Decisão Posição Carga Descarga",
                         simulation, 1/*capacidade*/, filaCaminhoes1, 
-                        new UniformDistributionStream(new JSimUniformStream(10, 10.1)));
+                        new UniformDistributionStream(new JSimUniformStream(50, 50.1)));
                 
                 geradorCaminhoes.setRotaEntradaCaminhoes(rotaEntradaCaminhoes);
                 
                 rotaSaidaCaminhoes = new RotaSaidaCaminhoesRt("rota Saída Caminhões do Porto", simulation, 1/*capacidade*/,
-                        new UniformDistributionStream(new JSimUniformStream(10, 10.1)));
+                        new UniformDistributionStream(new JSimUniformStream(50, 50.1)));
                 
                 estacaoArmazenamentoContainers = new EstacaoArmazenamento(simulation, "Estação de armazenamento", 500, 2);
                 
@@ -115,7 +117,7 @@ public class Simulador {
                     posicaoCargaDescargaEstacaoArmazenamento.setTranstainer(transtainer);
                     
                     rotaDecisaoPosicaoEstacaoArmazenamento = new DecisaoPosicaoToEstacaoArmazenamentoRt("rota Decisão Posição Carga Descarga To Posição Carga Descarga " +i, simulation,
-                                                                                                        1/*capacidade*/, new UniformDistributionStream(new JSimUniformStream(10, 10.1)));
+                                                                                                        1/*capacidade*/, new UniformDistributionStream(new JSimUniformStream(50, 50.1)));
                     
                     rotaEntradaCaminhoes.addRotasEstacaoArmazenamento(rotaDecisaoPosicaoEstacaoArmazenamento);
                     
@@ -173,7 +175,7 @@ public class Simulador {
                 simulation.message("Ativando os Geradores");
                 bw.write("Ativando os Geradores\r\n");  
                 
-                geradorCaminhoes.activate(0.0);
+                //geradorCaminhoes.activate(0.0);
                 geradorNavios.activate(0.0);
 
                 simulation.message("Executando a simulação.");
@@ -191,13 +193,9 @@ public class Simulador {
                 simulation.message("Fila 1: Tamanho médio da fila = " + filaNavios1.getLw() + ", Tempo médio de espera na fila dos navios que já deixaram o porto = " + filaNavios1.getTw() + ", Tempo médio de espera na fila dos navios = " + filaNavios1.getTwForAllLinks());
                 bw.write("\r\nFila 1: Tamanho médio da fila = " + filaNavios1.getLw() + ", \r\nTempo médio de espera na fila dos navios que já deixaram o porto = " + filaNavios1.getTw() + ", \r\nTempo médio de espera na fila dos navios = " + filaNavios1.getTwForAllLinks() + "\r\n");
                 simulation.message("Estatísticas dos Berços:");
-                bw.write("\r\nEstatísticas dos Berços: ");
-                /*simulation.message("Berco 1: Número de navios que já saíram do berço = " + berco1.getCounter() + ", sum of Tq (for transactions thrown away by this server) = " + berco1.getTransTq());
-                bw.write("\r\nBerco 1: Número de navios que já saíram do berço = " + berco1.getCounter() + ", sum of Tq (for transactions thrown away by this server) = " + berco1.getTransTq() + "\r\n");*/
+                bw.write("\r\nEstatísticas dos Berços: ");                
 
                 simulation.shutdown();
-                /*berco1.getBw().close();
-                berco2.getBw().close();*/
                 bw.close();
             }
         } catch (IOException ex) {

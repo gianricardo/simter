@@ -51,7 +51,7 @@ public class GeradorCaminhoesExternos extends JSimProcess {
                 _container = new Container(myParent.getCurrentTime(), "Container do Caminhão Externo " + _numeroCaminhao, ContainerTipos.CaminhaoExterno, ContainerTipos.CaminhaoExterno);                
                 novo.setContainer(_container);
                 novo.setCarregado(true);
-                novo.setOperacao(CaminhaoExternoOperacao.Descarregar);
+                novo.setOperacao(CaminhaoExternoOperacao.DescarregarCarregar);
                 novo.into(_queue);
                 
                 if(_rotaEntradaCaminhoes.isIdle()){
