@@ -26,26 +26,25 @@ import simulador.rotas.RotaSaidaCaminhoesRt;
  *
  * @author Eduardo
  */
-public class PosicaoCargaDescargaEstacaoArmazenamento extends JSimProcess {
+public class PosicaoCargaDescargaEstacaoArmazenamentoCaminhaoExterno extends JSimProcess {
 
     private double _lambda;
-    private JSimLink _caminhao;
+    private CaminhaoExterno _caminhao;
     private JSimSimulation _simulation;
     private String _nome;
     private Transtainer _transtainer;
     private DecisaoPosicaoToEstacaoArmazenamentoRt _rotaAtePosicao;
     private RotaSaidaCaminhoesRt _rotaSaidaCaminhoes;
-    
     private File _arquivo;
     private FileWriter _fw;
     private BufferedWriter _bw;
 
-    public PosicaoCargaDescargaEstacaoArmazenamento(String name, JSimSimulation sim)
+    public PosicaoCargaDescargaEstacaoArmazenamentoCaminhaoExterno(String name, JSimSimulation sim)
             throws JSimSimulationAlreadyTerminatedException, JSimInvalidParametersException, JSimTooManyProcessesException, IOException {
         super(name, sim);
         _simulation = sim;
         _nome = name;
-        
+
         criarArquivo();
     } // constructor
 
@@ -62,23 +61,22 @@ public class PosicaoCargaDescargaEstacaoArmazenamento extends JSimProcess {
                         _transtainer.activate(myParent.getCurrentTime());
                     }
                     passivate();
-                    while(true){
+                    while (true) {
                         try {
-                            if(!liberarCaminhao(_caminhao)){
+                            if (!liberarCaminhao(_caminhao)) {
                                 passivate();
-                            }
-                            else{
+                            } else {
                                 escreverArquivo(" Liberando caminhao no momento " + myParent.getCurrentTime());
-                                if(_rotaSaidaCaminhoes.isIdle()){
+                                if (_rotaSaidaCaminhoes.isIdle()) {
                                     _rotaSaidaCaminhoes.activate(myParent.getCurrentTime());
                                 }
-                                if(_rotaAtePosicao.isIdle()){
+                                if (_rotaAtePosicao.isIdle()) {
                                     _rotaAtePosicao.activate(myParent.getCurrentTime());
                                 }
                                 break;
                             }
                         } catch (IOException ex) {
-                            Logger.getLogger(PosicaoCargaDescargaEstacaoArmazenamento.class.getName()).log(Level.SEVERE, null, ex);
+                            Logger.getLogger(PosicaoCargaDescargaEstacaoArmazenamentoCaminhaoExterno.class.getName()).log(Level.SEVERE, null, ex);
                         }
                     }
                 } // else queue is empty / not empty
@@ -100,21 +98,25 @@ public class PosicaoCargaDescargaEstacaoArmazenamento extends JSimProcess {
             CaminhaoExterno novoCaminhao = (CaminhaoExterno) jsl;
             if (novoCaminhao == null) {
                 return false;
-            }            
-            novoCaminhao.escreverArquivo("\r\nCarregou " + novoCaminhao.getContainer().getId());
-            _rotaSaidaCaminhoes.addCaminhoes(novoCaminhao);            
-            _caminhao = null; 
+            }
+            if (novoCaminhao.isFinalizado()) {
+                novoCaminhao.escreverArquivo("\r\nCarregou " + novoCaminhao.getContainer().getId());
+                if (_rotaSaidaCaminhoes.addCaminhoes(novoCaminhao)) {                    
+                    _caminhao = null;
+                    return true;
+                }
+            }
         }
-        return true;
+        return false;
     }
 
-    public void setCaminhao(JSimLink _caminhao) {
+    public void setCaminhao(CaminhaoExterno _caminhao) {
         this._caminhao = _caminhao;
     }
 
     public JSimLink getCaminhao() {
         return _caminhao;
-    }    
+    }
 
     public void setRotaAtePosicao(DecisaoPosicaoToEstacaoArmazenamentoRt _rotaAtePosicao) {
         this._rotaAtePosicao = _rotaAtePosicao;
@@ -123,7 +125,7 @@ public class PosicaoCargaDescargaEstacaoArmazenamento extends JSimProcess {
     public void setRotaSaidaCaminhoes(RotaSaidaCaminhoesRt _rotaSaidaCaminhoes) {
         this._rotaSaidaCaminhoes = _rotaSaidaCaminhoes;
     }
-    
+
     private void criarArquivo() {
         if (_arquivo == null) {
             try {

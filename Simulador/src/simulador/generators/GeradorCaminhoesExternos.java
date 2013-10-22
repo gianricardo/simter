@@ -4,7 +4,7 @@
  */
 package simulador.generators;
 
-import Enumerators.CaminhaoExternoOperacao;
+import Enumerators.CaminhaoOperacao;
 import Enumerators.ContainerTipos;
 import cz.zcu.fav.kiv.jsim.JSimException;
 import cz.zcu.fav.kiv.jsim.JSimInvalidParametersException;
@@ -51,7 +51,7 @@ public class GeradorCaminhoesExternos extends JSimProcess {
                 _container = new Container(myParent.getCurrentTime(), "Container do Caminhão Externo " + _numeroCaminhao, ContainerTipos.CaminhaoExterno, ContainerTipos.CaminhaoExterno);                
                 novo.setContainer(_container);
                 novo.setCarregado(true);
-                novo.setOperacao(CaminhaoExternoOperacao.DescarregarCarregar);
+                novo.setOperacao(CaminhaoOperacao.DescarregarCarregar);
                 novo.into(_queue);
                 
                 if(_rotaEntradaCaminhoes.isIdle()){

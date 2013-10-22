@@ -10,6 +10,7 @@ import cz.zcu.fav.kiv.jsim.JSimSecurityException;
 import cz.zcu.fav.kiv.jsim.JSimSimulationAlreadyTerminatedException;
 import cz.zcu.fav.kiv.jsim.JSimSystem;
 import cz.zcu.fav.kiv.jsim.JSimTooManyProcessesException;
+import cz.zcu.fav.kiv.jsim.random.JSimUniformStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
@@ -20,6 +21,9 @@ import shipyard.land.staticplace.Berco;
 import shipyard.land.staticplace.PosicaoCargaDescargaBerco;
 import shipyard.sea.Navio;
 import simulador.queues.FilaContainers;
+import simulador.random.UniformDistributionStream;
+import simulador.rotas.DecisaoPosicaoToPosicaoBercoRt;
+import simulador.rotas.PosicaoBercoToDecisaoPosicaoEstacaoRt;
 import utils.Formatters;
 
 /**
@@ -101,14 +105,37 @@ public class BercoBusiness {
         return tempoPortainers;
     }
 
-    private void criarProcessos(int NumeroPortainers) {
+    private void criarProcessos(int NumeroPortainers) {        
         for (int i = 0; i < NumeroPortainers; i++) {
             try {
-                PosicaoCargaDescargaBerco posicaoCargaDescarga = new PosicaoCargaDescargaBerco("Posicao " + i, this._berco.getSimulation(), 0, null, _berco.getEstacaoCaminhoes());
+                PosicaoCargaDescargaBerco posicaoCargaDescarga = new PosicaoCargaDescargaBerco("Posicao " + i, this._berco.getSimulation(), null);
+                
+                DecisaoPosicaoToPosicaoBercoRt rotaDecisaoToPosBerco = new DecisaoPosicaoToPosicaoBercoRt("Rota Decisao para Posicao Carga Descarga Berço", _berco.getSimulation(), 1,
+                                                                    new UniformDistributionStream(new JSimUniformStream(10, 10.1)));
+                
+                PosicaoBercoToDecisaoPosicaoEstacaoRt rotaPosicaoBercoToDecisaoPosicaoEstacao = new PosicaoBercoToDecisaoPosicaoEstacaoRt("Rota posicao carga descarga berco " + i + " para Decisao Estacao", _berco.getSimulation(), 1,
+                                                                    new UniformDistributionStream(new JSimUniformStream(10, 10.1)));
 
+                posicaoCargaDescarga.setRotaDecisaoPosicaoCargaDescargaBerco(rotaDecisaoToPosBerco);
+                
+                posicaoCargaDescarga.setRotaPosicaoDecisaoPosicaoEstacao(rotaPosicaoBercoToDecisaoPosicaoEstacao);
+                
+                rotaDecisaoToPosBerco.setPosicaoBerco(posicaoCargaDescarga);
+                
+                rotaPosicaoBercoToDecisaoPosicaoEstacao.setPosicaoBerco(posicaoCargaDescarga);
+                
+                rotaPosicaoBercoToDecisaoPosicaoEstacao.setDecisaoPosicaoEstacao(_berco.getDecisaoCaminhoesPatioEstacao());
+                
+                _berco.getDecisaoCaminhoesPatioEstacao().addListaRotasPosicaoBercoOrigem(rotaPosicaoBercoToDecisaoPosicaoEstacao);
+                
+                rotaDecisaoToPosBerco.setDecisaoPosicoesBerco(_berco.getDecisaoCaminhoesPatioBerco());                
+                
                 Portainer portainerBerco = new Portainer("Portainer " + i, _berco.getSimulation(), 0, 0, this._berco, posicaoCargaDescarga);
+                
+                portainerBerco.setDecisaoSolicitacoes(_berco.getDecisaoCaminhoesPatioEstacao());
 
-                posicaoCargaDescarga.setPortainer(portainerBerco);
+                posicaoCargaDescarga.setPortainer(portainerBerco);                
+                
 
                 this._berco.getListaPortainers().add(portainerBerco);
                 this._berco.getListaPosicoes().add(posicaoCargaDescarga);
@@ -209,25 +236,12 @@ public class BercoBusiness {
                 }
             }           
             
-            this._berco.setTempoAtendimentoPortainers(0);            
-
-            //boolean finalizado = false;
-            /*for (int j = 0; j < ArrayHoraFimAten.length; j++) {
-                
-                if (ArrayHoraFimAten[j] > 0) {
-                    finalizado = true;
-                } else {
-                    finalizado = false;
-                    break;
-                }
-                
-            }*/
-
+            this._berco.setTempoAtendimentoPortainers(0);
+            
             if (!finalizado) {
                 // If we have nothing to do, we sleep.
                 this._berco.passivo();
-            } else {
-                
+            } else {                
                 double[] ArrayHoraFimAten = new double[_berco.getShip().getFilasContainers().size()];
                 double[] ArrayHoraIniAten = new double[_berco.getShip().getFilasContainers().size()];
                 for (int i = 0; i < _berco.getShip().getFilasContainers().size(); i++) {

@@ -4,7 +4,7 @@
  */
 package shipyard.land.move;
 
-import Enumerators.CaminhaoExternoOperacao;
+import Enumerators.CaminhaoOperacao;
 import cz.zcu.fav.kiv.jsim.JSimLink;
 import cz.zcu.fav.kiv.jsim.JSimSimulation;
 import java.io.BufferedWriter;
@@ -18,7 +18,7 @@ import shipyard.load.Container;
  * @author Eduardo
  */
 public class CaminhaoExterno extends JSimLink{    
-    private CaminhaoExternoOperacao _operacao;
+    private CaminhaoOperacao _operacao;
     private double _timeOfCreation;
     private String _idCaminhao;
     private Container _container;
@@ -33,9 +33,7 @@ public class CaminhaoExterno extends JSimLink{
      public CaminhaoExterno(double time, String id, JSimSimulation simulation)
     {        
             _timeOfCreation = time;
-            _idCaminhao = new StringBuilder()
-                    .append(id)
-                    .toString();
+            _idCaminhao = id;
             
             criarArquivo();
             escreverArquivo("Caminhão "+id+"\r\nCriado no momento " + time);
@@ -57,11 +55,11 @@ public class CaminhaoExterno extends JSimLink{
         this._carregado = _carregado;
     }
 
-    public CaminhaoExternoOperacao getOperacao() {
+    public CaminhaoOperacao getOperacao() {
         return _operacao;
     }
 
-    public void setOperacao(CaminhaoExternoOperacao _operacao) {
+    public void setOperacao(CaminhaoOperacao _operacao) {
         this._operacao = _operacao;
     }
 

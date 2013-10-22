@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import shipyard.land.move.CaminhaoExterno;
-import shipyard.land.staticplace.PosicaoCargaDescargaEstacaoArmazenamento;
+import shipyard.land.staticplace.PosicaoCargaDescargaEstacaoArmazenamentoCaminhaoExterno;
 import simulador.random.DistributionFunctionStream;
 
 /**
@@ -28,7 +28,7 @@ import simulador.random.DistributionFunctionStream;
 public class DecisaoPosicaoToEstacaoArmazenamentoRt extends RouteBase {
 
     private List<CaminhaoExterno> _caminhoes = new ArrayList();
-    private PosicaoCargaDescargaEstacaoArmazenamento _posicao;
+    private PosicaoCargaDescargaEstacaoArmazenamentoCaminhaoExterno _posicao;
     private String idRota;
     
     private File _arquivo;
@@ -103,7 +103,7 @@ public class DecisaoPosicaoToEstacaoArmazenamentoRt extends RouteBase {
         }        
     }
 
-    public void setPosicao(PosicaoCargaDescargaEstacaoArmazenamento _posicao) {
+    public void setPosicao(PosicaoCargaDescargaEstacaoArmazenamentoCaminhaoExterno _posicao) {
         this._posicao = _posicao;
     }
     

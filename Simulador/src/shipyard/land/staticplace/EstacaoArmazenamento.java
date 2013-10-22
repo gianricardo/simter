@@ -36,19 +36,16 @@ public class EstacaoArmazenamento extends JSimProcess {
     
     private FilaContainers _filaContainersParaCaminhoesExternos;
     private FilaContainers _filaContainersParaNavio;
-    private List<PosicaoCargaDescargaEstacaoArmazenamento> _listaPosicoes = new ArrayList<>();
+    private List<PosicaoCargaDescargaEstacaoArmazenamentoCaminhaoExterno> _listaPosicoes = new ArrayList<>();
     private Container _container;
-    private int _numeroTranstainers;
     
     private File _arquivo;
     private FileWriter _fw;
     private BufferedWriter _bw;
 
-    public EstacaoArmazenamento(JSimSimulation simulation, String idEstacaoArmazenamento, int numeroContainersInicial, int numeroTranstainers)
+    public EstacaoArmazenamento(JSimSimulation simulation, String idEstacaoArmazenamento, int numeroContainersInicial)
             throws JSimSimulationAlreadyTerminatedException, JSimInvalidParametersException, JSimTooManyProcessesException {
         super(idEstacaoArmazenamento, simulation);
-        
-        _numeroTranstainers = numeroTranstainers;
         
         try {
             _filaContainersParaCaminhoesExternos = new FilaContainers("fila de containers da estação para saída via caminhões externos", simulation);
@@ -101,11 +98,7 @@ public class EstacaoArmazenamento extends JSimProcess {
         return _simulation;
     }
 
-    public int getNumeroTranstainers() {
-        return _numeroTranstainers;
-    }
-
-    public void addListaPosicoes(PosicaoCargaDescargaEstacaoArmazenamento _posicao) {
+    public void addListaPosicoes(PosicaoCargaDescargaEstacaoArmazenamentoCaminhaoExterno _posicao) {
         this._listaPosicoes.add(_posicao);
     }    
 

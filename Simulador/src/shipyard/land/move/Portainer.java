@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import negocio.PortainerBusiness;
+import shipyard.land.staticplace.DecisaoCaminhaoPatioPosicaoEstacao;
 import shipyard.land.staticplace.PosicaoCargaDescargaBerco;
 import shipyard.load.Container;
 import simulador.queues.FilaContainers;
@@ -54,8 +55,12 @@ public class Portainer extends JSimProcess {
     private JSimSimulation _simulation;
     private int _numeroContainersDescarregar;
     private int _numeroContainersCarregar;
+    private boolean _descarregar;
+    private boolean _carregar;
     private Container _container;
     private PortainerBusiness _portainerNegocio;
+    
+    private DecisaoCaminhaoPatioPosicaoEstacao _decisaoSolicitacoes;
 
     //CaminhoesPatio
     //BercosAtende
@@ -251,6 +256,36 @@ public class Portainer extends JSimProcess {
     
     @Override
     protected void life() {
-        this._portainerNegocio.life();
+        try {
+            this._portainerNegocio.life();
+        } catch (JSimSecurityException | JSimInvalidParametersException ex) {
+            Logger.getLogger(Portainer.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
+
+    public boolean isDescarregar() {
+        return _descarregar;
+    }
+
+    public void setDescarregar(boolean _descarregar) {
+        this._descarregar = _descarregar;
+    }
+
+    public boolean isCarregar() {
+        return _carregar;
+    }
+
+    public void setCarregar(boolean _carregar) {
+        this._carregar = _carregar;
+    }
+
+    
+    
+    public DecisaoCaminhaoPatioPosicaoEstacao getDecisaoSolicitacoes() {
+        return _decisaoSolicitacoes;
+    }
+
+    public void setDecisaoSolicitacoes(DecisaoCaminhaoPatioPosicaoEstacao _decisaoSolicitacoes) {
+        this._decisaoSolicitacoes = _decisaoSolicitacoes;
+    }    
 }

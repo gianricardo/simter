@@ -46,9 +46,10 @@ public class GeradorNavios extends JSimProcess {
         try {
             while (true) {
                 // Periodically creating new navios and putting them into the queue.
-                Navio novo = new Navio(myParent.getCurrentTime(), String.valueOf(_numeroNavio), 2, _simulation);
-                novo.setNumeroContainersDescarregar((int)(new UniformDistributionStream(new JSimUniformStream(100, 100.1)).getNext()));
-                novo.into(_queue);
+                Navio novoNavio = new Navio(myParent.getCurrentTime(), String.valueOf(_numeroNavio), 1, _simulation);
+                novoNavio.setNumeroContainersCarregar((int)(new UniformDistributionStream(new JSimUniformStream(0, 0.1)).getNext()));
+                novoNavio.setNumeroContainersDescarregar((int)(new UniformDistributionStream(new JSimUniformStream(10, 10.1)).getNext()));                
+                novoNavio.into(_queue);
                 if (_queue.getRotaEntradaPratico().isIdle()) {
                     _queue.getRotaEntradaPratico().activate(myParent.getCurrentTime());
                 }

@@ -4,7 +4,7 @@
  */
 package negocio;
 
-import Enumerators.CaminhaoExternoOperacao;
+import Enumerators.CaminhaoOperacao;
 import cz.zcu.fav.kiv.jsim.JSimInvalidParametersException;
 import cz.zcu.fav.kiv.jsim.JSimLink;
 import cz.zcu.fav.kiv.jsim.JSimSecurityException;
@@ -89,14 +89,14 @@ public class TranstainerBusiness {
     }
 
     public void descarregarCaminhao() {
-        if (_caminhaoExterno != null && (_caminhaoExterno.getOperacao() == CaminhaoExternoOperacao.Descarregar || _caminhaoExterno.getOperacao() == CaminhaoExternoOperacao.DescarregarCarregar)) {
+        if (_caminhaoExterno != null && (_caminhaoExterno.getOperacao() == CaminhaoOperacao.Descarregar || _caminhaoExterno.getOperacao() == CaminhaoOperacao.DescarregarCarregar)) {
             try {
-                _transtainer.segurar(JSimSystem.uniform(10, 10));
+                _transtainer.segurar(JSimSystem.uniform(100, 100));
                 _caminhaoExterno.escreverArquivo("\r\nDescarregou " + _caminhaoExterno.getContainer().getId());
                 _caminhaoExterno.setContainer(null);
                 _caminhaoExterno.setCarregado(false);
                 _transtainer.getEstacaoArmazenamento().incrementQuantidadeCargaMomento();
-                if (_caminhaoExterno.getOperacao() == CaminhaoExternoOperacao.Descarregar) {
+                if (_caminhaoExterno.getOperacao() == CaminhaoOperacao.Descarregar) {
                     _caminhaoExterno.setFinalizado(true);
                 }
             } catch (JSimInvalidParametersException ex) {
@@ -110,13 +110,13 @@ public class TranstainerBusiness {
     }
 
     public void carregarCaminhao() {
-        if (_caminhaoExterno != null && (_caminhaoExterno.getOperacao() == CaminhaoExternoOperacao.Carregar || _caminhaoExterno.getOperacao() == CaminhaoExternoOperacao.DescarregarCarregar)) {
+        if (_caminhaoExterno != null && (_caminhaoExterno.getOperacao() == CaminhaoOperacao.Carregar || _caminhaoExterno.getOperacao() == CaminhaoOperacao.DescarregarCarregar)) {
             try {
                 JSimLink container = _transtainer.getEstacaoArmazenamento().getFilaContainersParaCaminhoesExternos().first();
-                _transtainer.segurar(JSimSystem.uniform(10, 10));
-                _caminhaoExterno.setContainer((Container) container);
-                _caminhaoExterno.setCarregado(true);
                 container.out();
+                _transtainer.segurar(JSimSystem.uniform(100, 100));
+                _caminhaoExterno.setContainer((Container) container);
+                _caminhaoExterno.setCarregado(true);                
                 _transtainer.getEstacaoArmazenamento().decrementQuantidadeCargaMomento();
                 _caminhaoExterno.setFinalizado(true);
             } catch (JSimSecurityException | JSimInvalidParametersException ex) {

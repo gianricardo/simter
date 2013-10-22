@@ -6,9 +6,7 @@ package shipyard.land.staticplace;
 
 import cz.zcu.fav.kiv.jsim.JSimException;
 import cz.zcu.fav.kiv.jsim.JSimInvalidParametersException;
-import cz.zcu.fav.kiv.jsim.JSimLink;
 import cz.zcu.fav.kiv.jsim.JSimProcess;
-import cz.zcu.fav.kiv.jsim.JSimSecurityException;
 import cz.zcu.fav.kiv.jsim.JSimSimulation;
 import cz.zcu.fav.kiv.jsim.JSimSimulationAlreadyTerminatedException;
 import cz.zcu.fav.kiv.jsim.JSimTooManyProcessesException;
@@ -21,6 +19,8 @@ import java.util.logging.Logger;
 import shipyard.land.move.CaminhaoPatio;
 import shipyard.land.move.Portainer;
 import simulador.queues.FilaCaminhoesInternos;
+import simulador.rotas.DecisaoPosicaoToPosicaoBercoRt;
+import simulador.rotas.PosicaoBercoToDecisaoPosicaoEstacaoRt;
 
 /**
  *
@@ -28,50 +28,61 @@ import simulador.queues.FilaCaminhoesInternos;
  */
 public class PosicaoCargaDescargaBerco extends JSimProcess {
 
-    private double _lambda;
-    private FilaCaminhoesInternos _queueIn;
     private CaminhaoPatio _caminhao;
+    private boolean _posicaoOcupada;
     private JSimSimulation _simulation;
     private Portainer _portainer;
-    private EstacaoCaminhoesInternos _estacao;
-    private String _nome;    
+    private String _nome;
     private File _arquivo;
     private FileWriter _fw;
     private BufferedWriter _bw;
-    private boolean _navioOcupandoPosicao;
-            
-    public PosicaoCargaDescargaBerco(String name, JSimSimulation sim, double l, Portainer p, EstacaoCaminhoesInternos estacaoCaminhoes)
+    private boolean _navioOcupandoPosicao;    
+    
+    private int _numeroContainersDescarregarNavio;    
+    private int _numeroContainersCarregarNavio;
+    
+    
+    private DecisaoPosicaoToPosicaoBercoRt _rotaDecisaoPosicaoCargaDescargaBerco;
+    private PosicaoBercoToDecisaoPosicaoEstacaoRt _rotaPosicaoDecisaoPosicaoEstacao;
+    
+
+    public PosicaoCargaDescargaBerco(String name, JSimSimulation sim, Portainer p)
             throws JSimSimulationAlreadyTerminatedException, JSimInvalidParametersException, JSimTooManyProcessesException, IOException {
         super(name, sim);
-        _lambda = l;
         _simulation = sim;
         _portainer = p;
-        _estacao = estacaoCaminhoes;
         _nome = name;
     } // constructor
 
     @Override
     protected void life() {
-        setFila();
-
         try {
             while (true) {
-                if (_queueIn.empty()) {
-                    // If we have nothing to do, we sleep.
+                if (_caminhao == null) {
                     passivate();
                 } else {
-                    _caminhao = getNextCaminhao();
-                    _caminhao.out();
                     if (_portainer.isIdle()) {
                         _portainer.activate(myParent.getCurrentTime());
                     }
                     passivate();
-                    try {
-                        liberarCaminhao(_caminhao);
-                    } catch (IOException ex) {
-                        Logger.getLogger(PosicaoCargaDescargaBerco.class.getName()).log(Level.SEVERE, null, ex);
+                    while (true) {
+                        try {
+                            if(!liberarCaminhao(_caminhao)){
+                                passivate();
+                            }
+                            else{
+                                if(_rotaDecisaoPosicaoCargaDescargaBerco.isIdle()){
+                                    _rotaDecisaoPosicaoCargaDescargaBerco.activate(myParent.getCurrentTime());
+                                }
+                                if(_rotaPosicaoDecisaoPosicaoEstacao.isIdle()){
+                                    _rotaPosicaoDecisaoPosicaoEstacao.activate(myParent.getCurrentTime());
+                                }
+                                break;
+                            }
+                        } catch (IOException ex) {
+                            Logger.getLogger(PosicaoCargaDescargaBerco.class.getName()).log(Level.SEVERE, null, ex);
+                        }
                     }
-                    _portainer.activate(myParent.getCurrentTime());
                 } // else queue is empty / not empty
             } // while            
         } // try
@@ -81,39 +92,29 @@ public class PosicaoCargaDescargaBerco extends JSimProcess {
         }
     }
 
-    public void setFila() {
-        _queueIn = _estacao.getFilaCaminhoesEstacao();
-    }
-
     public void setPortainer(Portainer p) {
         _portainer = p;
     }
 
-    public void liberarCaminhao(CaminhaoPatio caminhao) throws IOException {       
-        try {
-            caminhao.setCarregado(false);
-            caminhao.into(_estacao.getFilaCaminhoesEstacao());
-        } catch (JSimSecurityException ex) {
-            Logger.getLogger(PosicaoCargaDescargaBerco.class.getName()).log(Level.SEVERE, null, ex);
+    public boolean liberarCaminhao(CaminhaoPatio caminhao) throws IOException {
+        if(!_rotaPosicaoDecisaoPosicaoEstacao.AddCaminhao(caminhao)){
+            return false;
+        }
+        else{
+            _caminhao = null;
+            _posicaoOcupada = false;
+            return true;
         }
     }
-
-    public CaminhaoPatio getNextCaminhao() {
-        JSimLink jsl = _queueIn.first();
-        if (jsl instanceof CaminhaoPatio) {
-            CaminhaoPatio novoCaminhao = (CaminhaoPatio) jsl;
-            _caminhao = novoCaminhao;
-            return _caminhao;
-        } else {
-            System.out.println(jsl.getClass());
-            return null;
-        }
-    }
-
+    
     public CaminhaoPatio getCaminhao() {
         return _caminhao;
     }
-    
+
+    public void setCaminhao(CaminhaoPatio _caminhao) {
+        this._caminhao = _caminhao;
+    }
+
     private void criarArquivo() {
         if (_arquivo == null) {
             try {
@@ -145,8 +146,44 @@ public class PosicaoCargaDescargaBerco extends JSimProcess {
     public boolean isNavioOcupandoPosicao() {
         return _navioOcupandoPosicao;
     }
-    
+
     public void setNavioOcupandoPosicao(boolean _navioPosicao) {
         this._navioOcupandoPosicao = _navioPosicao;
     }    
+
+    public int getNumeroContainersDescarregarNavio() {
+        return _numeroContainersDescarregarNavio;
+    }
+
+    public int getNumeroContainersCarregarNavio() {
+        return _numeroContainersCarregarNavio;
+    }
+
+    public void setNumeroContainersDescarregarNavio(int _numeroContainersDescarregarNavio) {
+        this._numeroContainersDescarregarNavio = _numeroContainersDescarregarNavio;
+    }
+
+    public void setNumeroContainersCarregarNavio(int _numeroContainersCarregarNavio) {
+        this._numeroContainersCarregarNavio = _numeroContainersCarregarNavio;
+    }
+
+    public DecisaoPosicaoToPosicaoBercoRt getRotaDecisaoPosicaoCargaDescargaBerco() {
+        return _rotaDecisaoPosicaoCargaDescargaBerco;
+    }
+
+    public void setRotaDecisaoPosicaoCargaDescargaBerco(DecisaoPosicaoToPosicaoBercoRt _rotaDecisaoPosicaoCargaDescargaBerco) {
+        this._rotaDecisaoPosicaoCargaDescargaBerco = _rotaDecisaoPosicaoCargaDescargaBerco;
+    }
+
+    public boolean isPosicaoOcupada() {
+        return _posicaoOcupada;
+    }
+
+    public void setPosicaoOcupada(boolean _posicaoOcupada) {
+        this._posicaoOcupada = _posicaoOcupada;
+    }    
+
+    public void setRotaPosicaoDecisaoPosicaoEstacao(PosicaoBercoToDecisaoPosicaoEstacaoRt _rotaPosicaoDecisaoPosicaoEstacao) {
+        this._rotaPosicaoDecisaoPosicaoEstacao = _rotaPosicaoDecisaoPosicaoEstacao;
+    }
 }

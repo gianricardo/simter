@@ -21,6 +21,7 @@ import java.util.logging.Logger;
 import negocio.BercoBusiness;
 import shipyard.land.move.Portainer;
 import shipyard.sea.Navio;
+import simulador.queues.FilaCaminhoesInternos;
 import simulador.queues.FilaNavios;
 import simulador.rotas.BercoToRotaSaidaRt;
 import simulador.rotas.PraticoToBercoRt;
@@ -41,7 +42,6 @@ public class Berco extends JSimProcess {
     private int _numeroRegioesBerco;
     private List<Portainer> _listaPortainers = new ArrayList<>();
     private List<PosicaoCargaDescargaBerco> _listaPosicoes = new ArrayList<>();
-    private EstacaoCaminhoesInternos _estacaoCaminhoes;
     private JSimSimulation _simulation;
     private double _mu;
     private double _p;
@@ -55,18 +55,22 @@ public class Berco extends JSimProcess {
     private PraticoToBercoRt _rotaPraticoToBerco;
     private BercoToRotaSaidaRt _rotaBercoToSaida;
     
+    private DecisaoCaminhaoPatioPosicaoEstacao _decisaoCaminhoesPatioEstacao;
+    private DecisaoCaminhaoPatioPosicaoBerco _decisaoCaminhoesPatioBerco;
+    
     private File _arquivo;
     private FileWriter _fw;
     private BufferedWriter _bw;
     
-    public Berco(JSimSimulation simulation, int idBerco, int numeroPortainers, EstacaoCaminhoesInternos estacao)
+    public Berco(JSimSimulation simulation, int idBerco, int numeroPortainers, DecisaoCaminhaoPatioPosicaoEstacao decisaoCaminhoesPatio, DecisaoCaminhaoPatioPosicaoBerco decisaoCaminhoesPatioPosicaoBerco)
             throws JSimSimulationAlreadyTerminatedException, JSimInvalidParametersException, JSimTooManyProcessesException {
         super(Integer.toString(idBerco), simulation);
         this._simulation = simulation;
         this._idBerco = idBerco;
         this._numeroPortainers = numeroPortainers;
-        this._estacaoCaminhoes = estacao;
-        this._bercoNegocio = new BercoBusiness(this);
+        this._decisaoCaminhoesPatioEstacao = decisaoCaminhoesPatio;
+        this._decisaoCaminhoesPatioBerco = decisaoCaminhoesPatioPosicaoBerco;
+        this._bercoNegocio = new BercoBusiness(this);        
     }    
     
     public int getNumeroPortainers() {
@@ -238,15 +242,7 @@ public class Berco extends JSimProcess {
     
     public List<PosicaoCargaDescargaBerco> getListaPosicoes() {
         return _listaPosicoes;
-    }
-    
-    public EstacaoCaminhoesInternos getEstacaoCaminhoes() {
-        return _estacaoCaminhoes;
-    }
-    
-    public void setEstacaoCaminhoes(EstacaoCaminhoesInternos estacaoCaminhoes) {
-        this._estacaoCaminhoes = estacaoCaminhoes;
-    }
+    }    
     
     public void setShip(Navio _ship) {
         this._ship = _ship;
@@ -274,5 +270,13 @@ public class Berco extends JSimProcess {
 
     public void setRotaBercoToSaida(BercoToRotaSaidaRt _rotaBercoToSaida) {
         this._rotaBercoToSaida = _rotaBercoToSaida;
+    }
+
+    public DecisaoCaminhaoPatioPosicaoEstacao getDecisaoCaminhoesPatioEstacao() {
+        return _decisaoCaminhoesPatioEstacao;
+    }
+
+    public DecisaoCaminhaoPatioPosicaoBerco getDecisaoCaminhoesPatioBerco() {
+        return _decisaoCaminhoesPatioBerco;
     }
 }

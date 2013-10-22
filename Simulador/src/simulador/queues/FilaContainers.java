@@ -6,7 +6,6 @@ package simulador.queues;
 
 import cz.zcu.fav.kiv.jsim.JSimHead;
 import cz.zcu.fav.kiv.jsim.JSimInvalidParametersException;
-import cz.zcu.fav.kiv.jsim.JSimProcess;
 import cz.zcu.fav.kiv.jsim.JSimSimulation;
 import cz.zcu.fav.kiv.jsim.JSimTooManyHeadsException;
 import java.io.IOException;
@@ -18,9 +17,12 @@ import java.io.IOException;
 public class FilaContainers extends JSimHead {
 
     private double _horaFinalAtendimento;
+    private double _horaFinalDescarregamento;
+    private double _horaFinalCarregamento;
     private double _horaInicioAtendimento;
     private String _nomeFila;
     private int _numeroContainers;
+    private int _numeroContainersCarregar;
 
     public FilaContainers(String name, JSimSimulation sim)
             throws JSimInvalidParametersException, JSimTooManyHeadsException, IOException {
@@ -54,5 +56,21 @@ public class FilaContainers extends JSimHead {
 
     public String getNomeFila() {
         return _nomeFila;
+    }
+
+    public int getNumeroContainersCarregar() {
+        return _numeroContainersCarregar;
+    }
+
+    public void setNumeroContainersCarregar(int _numeroContainersCarregar) {
+        this._numeroContainersCarregar = _numeroContainersCarregar;
+    }
+
+    public void setHoraFinalDescarregamento(double _horaFinalDescarregamento) {
+        this._horaFinalDescarregamento = _horaFinalDescarregamento;
+    }
+
+    public void setHoraFinalCarregamento(double _horaFinalCarregamento) {
+        this._horaFinalCarregamento = _horaFinalCarregamento;
     }
 }

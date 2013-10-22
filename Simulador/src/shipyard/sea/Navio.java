@@ -55,6 +55,10 @@ public class Navio extends JSimLink {
         this.updateShip();
     }
 
+    public void setNumeroContainersCarregar(int _numeroContainersCarregar) {
+        this._numeroContainersCarregar = _numeroContainersCarregar;
+    }
+
     public Navio(double time, String id, int numeroRegioesNavio, JSimSimulation simulation) {
         _timeOfCreation = time;
         _idNavio = id + " ";
@@ -71,6 +75,10 @@ public class Navio extends JSimLink {
         int aux = 1;
         int j;
         int contadorContainers;
+        
+        int numeroContainersCarregarPorFila;
+        
+        numeroContainersCarregarPorFila = _numeroContainersCarregar/_numeroRegioesNavio;
 
         try {
             for (int i = 1; i <= _numeroRegioesNavio; i++) {
@@ -93,12 +101,15 @@ public class Navio extends JSimLink {
                         _container = new JSimLink(new Container(_timeOfCreation, "Container " + String.valueOf(z) + " do navio " + this._idNavio, ContainerTipos.Navio, ContainerTipos.CaminhaoExterno));
                         _container.into(_filaContainer);
                         contadorContainers++;
-                    }                    
+                    }
+                    
+                    numeroContainersCarregarPorFila = numeroContainersCarregarPorFila + (_numeroContainersCarregar%_numeroRegioesNavio);
                 }
                 aux = j;
                 _filaContainer.setNumeroContainers(contadorContainers);
+                _filaContainer.setNumeroContainersCarregar(numeroContainersCarregarPorFila);
                 _filasContainers.add(_filaContainer);
-            }
+            }            
         } catch (JSimSecurityException jse) {
             jse.printStackTrace(System.err);
         }

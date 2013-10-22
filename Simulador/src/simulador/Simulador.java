@@ -10,23 +10,24 @@ import cz.zcu.fav.kiv.jsim.JSimMethodNotSupportedException;
 import cz.zcu.fav.kiv.jsim.JSimSimulation;
 import cz.zcu.fav.kiv.jsim.random.JSimUniformStream;
 import java.io.BufferedWriter;
-import java.io.Console;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.Date;
 import shipyard.land.move.Transtainer;
 import shipyard.land.staticplace.Berco;
+import shipyard.land.staticplace.DecisaoCaminhaoPatioPosicaoBerco;
+import shipyard.land.staticplace.DecisaoCaminhaoPatioPosicaoEstacao;
 import shipyard.land.staticplace.EstacaoArmazenamento;
-import shipyard.land.staticplace.EstacaoCaminhoesInternos;
-import shipyard.land.staticplace.PosicaoCargaDescargaEstacaoArmazenamento;
+import shipyard.land.staticplace.PosicaoCargaDescargaEstacaoArmazenamentoCaminhaoExterno;
 import shipyard.sea.Pratico;
 import simulador.generators.GeradorCaminhoesExternos;
 import simulador.generators.GeradorNavios;
 import simulador.queues.FilaCaminhoesExternos;
+import simulador.queues.FilaCaminhoesInternos;
 import simulador.queues.FilaNavios;
 import simulador.random.UniformDistributionStream;
 import simulador.rotas.BercoToRotaSaidaRt;
+import simulador.rotas.DecisaoEstacaoToDecisaoBercoRt;
 import simulador.rotas.DecisaoPosicaoToEstacaoArmazenamentoRt;
 import simulador.rotas.FilaCaminhoesExternosToDecisaoPosicaoRt;
 import simulador.rotas.FilaNaviosEntradaToPraticoRt;
@@ -68,11 +69,9 @@ public class Simulador {
                 FilaCaminhoesExternosToDecisaoPosicaoRt rotaEntradaCaminhoes;
                 DecisaoPosicaoToEstacaoArmazenamentoRt rotaDecisaoPosicaoEstacaoArmazenamento;
                 EstacaoArmazenamento estacaoArmazenamentoContainers;
-                PosicaoCargaDescargaEstacaoArmazenamento posicaoCargaDescargaEstacaoArmazenamento;
+                PosicaoCargaDescargaEstacaoArmazenamentoCaminhaoExterno posicaoCargaDescargaEstacaoArmazenamento;
                 Transtainer transtainer;
-                RotaSaidaCaminhoesRt rotaSaidaCaminhoes;
-                EstacaoCaminhoesInternos estacaoCaminhoesInternos;
-                int numeroTranstainers=2;
+                RotaSaidaCaminhoesRt rotaSaidaCaminhoes;                
                 
                 /*Objetos do Cais*/
                 GeradorNavios geradorNavios;
@@ -83,36 +82,45 @@ public class Simulador {
                 RotaSaidaNaviosRt rotaSaidaNavios;
                 PraticoToBercoRt rotaPraticoBerco;    
                 Berco berco;
-                int numeroBercos = 2;
+                FilaCaminhoesInternos _filaCaminhoesPatioVazios;
+                
+                /*Objetos intermediarios*/
+                DecisaoCaminhaoPatioPosicaoEstacao _decisaoCaminhoesEstacaoArmazenamento;
+                DecisaoCaminhaoPatioPosicaoBerco _decisaoCaminhoesBerco;
+                DecisaoEstacaoToDecisaoBercoRt _rotaDecisaoEstacaoToDecisaoBerco;
+                
+                int numeroBercos = 1;
+                int numeroTranstainers=2;
 
                 System.out.println("Iniciado a simulação\r\n");
                 bw.write("Iniciado a simulação\r\n");
 
                 simulation = new JSimSimulation("Enfileirando Navios\r\n");
-                bw.write("Enfileirando Navios\r\n");
+                bw.write("Enfileirando Navios\r\n");                
+                
+                // <editor-fold defaultstate="collapsed" desc="Terra">
                 
                 filaCaminhoes1 = new FilaCaminhoesExternos("Fila Entrada de Caminhões no Porto", simulation);
                 
                 geradorCaminhoes = new GeradorCaminhoesExternos("Gerador Caminhoes 1", simulation,
-                        new UniformDistributionStream(new JSimUniformStream(30, 30.1)), filaCaminhoes1);
+                        new UniformDistributionStream(new JSimUniformStream(50, 50.1)), filaCaminhoes1);
                 
-                rotaEntradaCaminhoes = new FilaCaminhoesExternosToDecisaoPosicaoRt("rota Entrada Caminhões -> Decisão Posição Carga Descarga",
-                        simulation, 1/*capacidade*/, filaCaminhoes1, 
-                        new UniformDistributionStream(new JSimUniformStream(50, 50.1)));
+                rotaEntradaCaminhoes = new FilaCaminhoesExternosToDecisaoPosicaoRt("Rota Entrada Caminhoes", simulation,
+                       1, filaCaminhoes1, new UniformDistributionStream(new JSimUniformStream(50, 50.1)));                
                 
                 geradorCaminhoes.setRotaEntradaCaminhoes(rotaEntradaCaminhoes);
                 
                 rotaSaidaCaminhoes = new RotaSaidaCaminhoesRt("rota Saída Caminhões do Porto", simulation, 1/*capacidade*/,
                         new UniformDistributionStream(new JSimUniformStream(50, 50.1)));
                 
-                estacaoArmazenamentoContainers = new EstacaoArmazenamento(simulation, "Estação de armazenamento", 500, 2);
+                estacaoArmazenamentoContainers = new EstacaoArmazenamento(simulation, "Estação de armazenamento", 500);
                 
                 for(int i=0;i<numeroTranstainers;i++){
-                    posicaoCargaDescargaEstacaoArmazenamento = new PosicaoCargaDescargaEstacaoArmazenamento("Posicao Carga Descarga Estacao de Armazenamento" +i, simulation);
+                    posicaoCargaDescargaEstacaoArmazenamento = new PosicaoCargaDescargaEstacaoArmazenamentoCaminhaoExterno("Posicao Carga Descarga Estacao de Armazenamento" +i, simulation);
                     
                     estacaoArmazenamentoContainers.addListaPosicoes(posicaoCargaDescargaEstacaoArmazenamento);
                     
-                    transtainer = new Transtainer("Transtainer 1", simulation, estacaoArmazenamentoContainers, posicaoCargaDescargaEstacaoArmazenamento);
+                    transtainer = new Transtainer("Transtainer " + i, simulation, estacaoArmazenamentoContainers, posicaoCargaDescargaEstacaoArmazenamento);
                     
                     posicaoCargaDescargaEstacaoArmazenamento.setTranstainer(transtainer);
                     
@@ -128,10 +136,28 @@ public class Simulador {
                     posicaoCargaDescargaEstacaoArmazenamento.setRotaSaidaCaminhoes(rotaSaidaCaminhoes);
                     
                     rotaSaidaCaminhoes.addPosicoesCargaDescargaEstacaoArmazenamentos(posicaoCargaDescargaEstacaoArmazenamento);
-                }                
+                }       
                 
-                // <editor-fold defaultstate="collapsed" desc="Mar">
-
+                // </editor-fold>
+                
+                // <editor-fold defaultstate="collapsed" desc="Intermediário">
+                
+                _filaCaminhoesPatioVazios = new FilaCaminhoesInternos("Fila de Caminhões Pátio Vazios", simulation, 10); 
+                
+                _decisaoCaminhoesBerco = new DecisaoCaminhaoPatioPosicaoBerco("Decisao Caminhoes Patio Posicoes Berco", simulation);
+                 
+                 _rotaDecisaoEstacaoToDecisaoBerco =
+                        new DecisaoEstacaoToDecisaoBercoRt("Rota entre decisão de posições da estação para berço",
+                        simulation, 1, new UniformDistributionStream(new JSimUniformStream(50, 50.1)), _decisaoCaminhoesBerco);
+                 
+                 _decisaoCaminhoesEstacaoArmazenamento = new DecisaoCaminhaoPatioPosicaoEstacao("Decisao Caminhoes Patio Posicoes Estacao", simulation,
+                                                                    _filaCaminhoesPatioVazios, _rotaDecisaoEstacaoToDecisaoBerco);
+                 _rotaDecisaoEstacaoToDecisaoBerco.setDecisaoToPosicoesEstacao(_decisaoCaminhoesEstacaoArmazenamento);
+                
+                // </editor-fold>
+                
+                // <editor-fold defaultstate="collapsed" desc="Mar">                
+                
                 filaNavios1 = new FilaNavios("Fila Entrada de Navios no Porto", simulation);
                 
                 geradorNavios = new GeradorNavios("Gerador 1", simulation,
@@ -148,12 +174,10 @@ public class Simulador {
                 
                 pratico.setRotaNavioPratico(rotaEntradaToPratico);
 
-                filaNavios1.setRotaEntradaPratico(rotaEntradaToPratico);                
-                
-                estacaoCaminhoesInternos = new EstacaoCaminhoesInternos("Estação de caminhões do porto", simulation, 0, 50); 
+                filaNavios1.setRotaEntradaPratico(rotaEntradaToPratico);               
                 
                 for(int i=0; i<numeroBercos; i++){
-                    berco = new Berco(simulation, i+1, 2, estacaoCaminhoesInternos);
+                    berco = new Berco(simulation, i+1, 1, _decisaoCaminhoesEstacaoArmazenamento, _decisaoCaminhoesBerco);
                     
                     rotaPraticoBerco = new PraticoToBercoRt("rota Pratico -> Berco" + berco.getName(), simulation, 1, berco, pratico,
                                                           new UniformDistributionStream(new JSimUniformStream(5, 5.1)));
@@ -168,7 +192,7 @@ public class Simulador {
                     berco.setRotaBercoToSaida(rotaBercoSaida);
                     
                     rotaSaidaNavios.AddRotaBercoToRotaSaida(rotaBercoSaida);
-                }  
+                }
                 
                 // </editor-fold>
 

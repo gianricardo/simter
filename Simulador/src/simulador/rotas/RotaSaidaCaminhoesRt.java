@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import shipyard.land.move.CaminhaoExterno;
-import shipyard.land.staticplace.PosicaoCargaDescargaEstacaoArmazenamento;
+import shipyard.land.staticplace.PosicaoCargaDescargaEstacaoArmazenamentoCaminhaoExterno;
 import simulador.random.DistributionFunctionStream;
 
 /**
@@ -24,7 +24,7 @@ import simulador.random.DistributionFunctionStream;
 public class RotaSaidaCaminhoesRt extends RouteBase {
 
     private List<CaminhaoExterno> _caminhoes = new ArrayList();
-    private List<PosicaoCargaDescargaEstacaoArmazenamento> _posicoesCargaDescargaEstacaoArmazenamentos = new ArrayList();
+    private List<PosicaoCargaDescargaEstacaoArmazenamentoCaminhaoExterno> _posicoesCargaDescargaEstacaoArmazenamentos = new ArrayList();
 
     public RotaSaidaCaminhoesRt(String idRoute, JSimSimulation simulation, int capacidade, DistributionFunctionStream stream)
             throws JSimSimulationAlreadyTerminatedException, JSimInvalidParametersException, JSimTooManyProcessesException {
@@ -82,7 +82,7 @@ public class RotaSaidaCaminhoesRt extends RouteBase {
         }
     }
 
-    public void addPosicoesCargaDescargaEstacaoArmazenamentos(PosicaoCargaDescargaEstacaoArmazenamento _posicaoCargaDescargaEstacaoArmazenamentos) {
+    public void addPosicoesCargaDescargaEstacaoArmazenamentos(PosicaoCargaDescargaEstacaoArmazenamentoCaminhaoExterno _posicaoCargaDescargaEstacaoArmazenamentos) {
         this._posicoesCargaDescargaEstacaoArmazenamentos.add(_posicaoCargaDescargaEstacaoArmazenamentos);
     }
 }

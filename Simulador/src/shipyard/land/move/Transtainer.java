@@ -16,7 +16,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import negocio.TranstainerBusiness;
 import shipyard.land.staticplace.EstacaoArmazenamento;
-import shipyard.land.staticplace.PosicaoCargaDescargaEstacaoArmazenamento;
+import shipyard.land.staticplace.PosicaoCargaDescargaEstacaoArmazenamentoCaminhaoExterno;
 
 /**
  *
@@ -32,12 +32,12 @@ public class Transtainer extends JSimProcess {
     private EstacaoArmazenamento _estacaoArmazenamento;
     private JSimSimulation _simulation;    
     private TranstainerBusiness _transtainerNegocio;
-    private PosicaoCargaDescargaEstacaoArmazenamento _posicaoCargaDescarga;
+    private PosicaoCargaDescargaEstacaoArmazenamentoCaminhaoExterno _posicaoCargaDescarga;
 
     //CaminhoesPatio
     //BercosAtende
     //IdentificadoresNavios
-    public Transtainer(String name, JSimSimulation sim, EstacaoArmazenamento estacaoArmazenamento, PosicaoCargaDescargaEstacaoArmazenamento posicao)
+    public Transtainer(String name, JSimSimulation sim, EstacaoArmazenamento estacaoArmazenamento, PosicaoCargaDescargaEstacaoArmazenamentoCaminhaoExterno posicao)
             throws JSimSimulationAlreadyTerminatedException, JSimInvalidParametersException, JSimTooManyProcessesException, IOException {
         super(name, sim);        
         this._nomeTranstainer = name;
@@ -48,7 +48,7 @@ public class Transtainer extends JSimProcess {
         this._transtainerNegocio = new TranstainerBusiness(this);
     } // constructor 
 
-    public PosicaoCargaDescargaEstacaoArmazenamento getPosicaoCargaDescarga() {
+    public PosicaoCargaDescargaEstacaoArmazenamentoCaminhaoExterno getPosicaoCargaDescarga() {
         return _posicaoCargaDescarga;
     }  
     
