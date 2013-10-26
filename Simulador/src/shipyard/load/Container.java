@@ -26,6 +26,8 @@ public class Container extends JSimLink {
             _id = new StringBuilder()
                     .append(id)
                     .toString();
+            _origemContainer = origemContainer;
+            _destinoContainer = destinoContainer;
     } // constructor
 
     public String getId() {
@@ -44,4 +46,20 @@ public class Container extends JSimLink {
     {
             return _timeOfCreation;
     } // getCreationTime
+
+    public void setOrigemContainer(ContainerTipos _origemContainer) {
+        this._origemContainer = _origemContainer;
+    }
+
+    public void setDestinoContainer(ContainerTipos _destinoContainer) {
+        this._destinoContainer = _destinoContainer;
+    }    
+
+    public ContainerTipos getOrigemContainer() {
+        return _origemContainer;
+    }
+
+    public ContainerTipos getDestinoContainer() {
+        return _destinoContainer;
+    }
 }

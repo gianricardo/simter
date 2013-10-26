@@ -36,15 +36,11 @@ public class PosicaoCargaDescargaBerco extends JSimProcess {
     private File _arquivo;
     private FileWriter _fw;
     private BufferedWriter _bw;
-    private boolean _navioOcupandoPosicao;    
-    
-    private int _numeroContainersDescarregarNavio;    
+    private boolean _navioOcupandoPosicao;
+    private int _numeroContainersDescarregarNavio;
     private int _numeroContainersCarregarNavio;
-    
-    
     private DecisaoPosicaoToPosicaoBercoRt _rotaDecisaoPosicaoCargaDescargaBerco;
     private PosicaoBercoToDecisaoPosicaoEstacaoRt _rotaPosicaoDecisaoPosicaoEstacao;
-    
 
     public PosicaoCargaDescargaBerco(String name, JSimSimulation sim, Portainer p)
             throws JSimSimulationAlreadyTerminatedException, JSimInvalidParametersException, JSimTooManyProcessesException, IOException {
@@ -61,26 +57,34 @@ public class PosicaoCargaDescargaBerco extends JSimProcess {
                 if (_caminhao == null) {
                     passivate();
                 } else {
+                    if(_caminhao.getContainer() == null){
+                        _caminhao.escreverArquivo(" -Chegou na posição " + getName() + " sem container.");
+                    }
+                    else{
+                        _caminhao.escreverArquivo(" -Chegou na posição " + getName() + " com o container " + _caminhao.getContainer());
+                    }
+                    
                     if (_portainer.isIdle()) {
                         _portainer.activate(myParent.getCurrentTime());
                     }
                     passivate();
-                    while (true) {
-                        try {
-                            if(!liberarCaminhao(_caminhao)){
-                                passivate();
-                            }
-                            else{
-                                if(_rotaDecisaoPosicaoCargaDescargaBerco.isIdle()){
-                                    _rotaDecisaoPosicaoCargaDescargaBerco.activate(myParent.getCurrentTime());
+                    if (_caminhao.isFinalizado()) {
+                        while (true) {
+                            try {
+                                if (!liberarCaminhao(_caminhao)) {
+                                    passivate();
+                                } else {
+                                    if (_rotaDecisaoPosicaoCargaDescargaBerco.isIdle()) {
+                                        _rotaDecisaoPosicaoCargaDescargaBerco.activate(myParent.getCurrentTime());
+                                    }
+                                    if (_rotaPosicaoDecisaoPosicaoEstacao.isIdle()) {
+                                        _rotaPosicaoDecisaoPosicaoEstacao.activate(myParent.getCurrentTime());
+                                    }
+                                    break;
                                 }
-                                if(_rotaPosicaoDecisaoPosicaoEstacao.isIdle()){
-                                    _rotaPosicaoDecisaoPosicaoEstacao.activate(myParent.getCurrentTime());
-                                }
-                                break;
+                            } catch (IOException ex) {
+                                Logger.getLogger(PosicaoCargaDescargaBerco.class.getName()).log(Level.SEVERE, null, ex);
                             }
-                        } catch (IOException ex) {
-                            Logger.getLogger(PosicaoCargaDescargaBerco.class.getName()).log(Level.SEVERE, null, ex);
                         }
                     }
                 } // else queue is empty / not empty
@@ -97,16 +101,16 @@ public class PosicaoCargaDescargaBerco extends JSimProcess {
     }
 
     public boolean liberarCaminhao(CaminhaoPatio caminhao) throws IOException {
-        if(!_rotaPosicaoDecisaoPosicaoEstacao.AddCaminhao(caminhao)){
+        if (!_rotaPosicaoDecisaoPosicaoEstacao.AddCaminhao(caminhao)) {
             return false;
-        }
-        else{
-            _caminhao = null;
+        } else {
+            _caminhao.setFinalizado(false);
+            _caminhao = null;            
             _posicaoOcupada = false;
             return true;
         }
     }
-    
+
     public CaminhaoPatio getCaminhao() {
         return _caminhao;
     }
@@ -149,7 +153,7 @@ public class PosicaoCargaDescargaBerco extends JSimProcess {
 
     public void setNavioOcupandoPosicao(boolean _navioPosicao) {
         this._navioOcupandoPosicao = _navioPosicao;
-    }    
+    }
 
     public int getNumeroContainersDescarregarNavio() {
         return _numeroContainersDescarregarNavio;
@@ -181,7 +185,7 @@ public class PosicaoCargaDescargaBerco extends JSimProcess {
 
     public void setPosicaoOcupada(boolean _posicaoOcupada) {
         this._posicaoOcupada = _posicaoOcupada;
-    }    
+    }
 
     public void setRotaPosicaoDecisaoPosicaoEstacao(PosicaoBercoToDecisaoPosicaoEstacaoRt _rotaPosicaoDecisaoPosicaoEstacao) {
         this._rotaPosicaoDecisaoPosicaoEstacao = _rotaPosicaoDecisaoPosicaoEstacao;

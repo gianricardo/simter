@@ -60,16 +60,16 @@ public class Portainer extends JSimProcess {
     private Container _container;
     private PortainerBusiness _portainerNegocio;
     
+    private boolean _movimentacaoFinalizada;
+    
     private DecisaoCaminhaoPatioPosicaoEstacao _decisaoSolicitacoes;
 
     //CaminhoesPatio
     //BercosAtende
     //IdentificadoresNavios
-    public Portainer(String name, JSimSimulation sim, double parMu, double parP, JSimProcess berco, PosicaoCargaDescargaBerco posicao)
+    public Portainer(String name, JSimSimulation sim, JSimProcess berco, PosicaoCargaDescargaBerco posicao)
             throws JSimSimulationAlreadyTerminatedException, JSimInvalidParametersException, JSimTooManyProcessesException, IOException {
         super(name, sim);
-        this.mu = parMu;
-        this.p = parP;
         this._nomePortainer = name;
         this._berco = berco;
         this._posicaoCargaDescarga = posicao;
@@ -287,5 +287,17 @@ public class Portainer extends JSimProcess {
 
     public void setDecisaoSolicitacoes(DecisaoCaminhaoPatioPosicaoEstacao _decisaoSolicitacoes) {
         this._decisaoSolicitacoes = _decisaoSolicitacoes;
-    }    
+    }
+
+    public boolean isMovimentacaoFinalizada() {
+        return _movimentacaoFinalizada;
+    }
+
+    public void setMovimentacaoFinalizada(boolean _movimentacaoFinalizada) {
+        this._movimentacaoFinalizada = _movimentacaoFinalizada;
+    }
+    
+    public void criarSolicitacaoCaminhoes(){
+        _portainerNegocio.CriarSolicitacao();
+    }
 }

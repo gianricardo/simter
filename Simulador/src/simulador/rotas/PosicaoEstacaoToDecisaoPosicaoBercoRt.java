@@ -15,27 +15,25 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import shipyard.land.move.CaminhaoPatio;
 import shipyard.land.staticplace.DecisaoCaminhaoPatioPosicaoBerco;
-import shipyard.land.staticplace.DecisaoCaminhaoPatioPosicaoEstacao;
+import shipyard.land.staticplace.PosicaoCargaDescargaEstacaoArmazenamentoCaminhaoInterno;
 import simulador.random.DistributionFunctionStream;
 
 /**
  *
  * @author Eduardo
  */
-public class DecisaoEstacaoToDecisaoBercoRt extends RouteBase {
-
+public class PosicaoEstacaoToDecisaoPosicaoBercoRt extends RouteBase{
+    
+    private PosicaoCargaDescargaEstacaoArmazenamentoCaminhaoInterno _posicaoInterna;
+    private DecisaoCaminhaoPatioPosicaoBerco _decisaoCaminhoesBerco;
+    
     private List<CaminhaoPatio> _caminhoes = new ArrayList(); 
     
-    private DecisaoCaminhaoPatioPosicaoBerco _decisaoToPosicoesBerco;
-    private DecisaoCaminhaoPatioPosicaoEstacao _decisaoToPosicoesEstacao;
-
-    public DecisaoEstacaoToDecisaoBercoRt(String idRoute, JSimSimulation simulation, int capacidade, DistributionFunctionStream stream, 
-                                            DecisaoCaminhaoPatioPosicaoBerco decisaoToPosicoesBerco)
+    public PosicaoEstacaoToDecisaoPosicaoBercoRt(String idRoute, JSimSimulation simulation, int capacidade, DistributionFunctionStream stream)
             throws JSimSimulationAlreadyTerminatedException, JSimInvalidParametersException, JSimTooManyProcessesException {
-        super(idRoute, simulation, capacidade, stream);        
-        _decisaoToPosicoesBerco = decisaoToPosicoesBerco;
+        super(idRoute, simulation, capacidade, stream);
     }
-
+    
     @Override
     protected void life() {
         while (true) {
@@ -52,11 +50,11 @@ public class DecisaoEstacaoToDecisaoBercoRt extends RouteBase {
                     while (true) {
                         if (!_caminhoes.isEmpty()) {
                             if (ElementOut()) {
-                                if(_decisaoToPosicoesBerco.isIdle()){
-                                    _decisaoToPosicoesBerco.activate(myParent.getCurrentTime());
+                                if(_posicaoInterna.isIdle()){
+                                    _posicaoInterna.activate(myParent.getCurrentTime());
                                 }
-                                if(_decisaoToPosicoesEstacao.isIdle()){
-                                    _decisaoToPosicoesEstacao.activate(myParent.getCurrentTime());
+                                if(_decisaoCaminhoesBerco.isIdle()){
+                                    _decisaoCaminhoesBerco.activate(myParent.getCurrentTime());
                                 }
                                 break;
                             } else {
@@ -83,7 +81,7 @@ public class DecisaoEstacaoToDecisaoBercoRt extends RouteBase {
     }
 
     public boolean ElementOut() {
-        if(!_decisaoToPosicoesBerco.addCaminhao(_caminhoes.get(0))){
+        if(!_decisaoCaminhoesBerco.addCaminhao(_caminhoes.get(0))){
             return false;
         }
         else{
@@ -93,7 +91,11 @@ public class DecisaoEstacaoToDecisaoBercoRt extends RouteBase {
         }
     }
 
-    public void setDecisaoToPosicoesEstacao(DecisaoCaminhaoPatioPosicaoEstacao _decisaoToPosicoesEstacao) {
-        this._decisaoToPosicoesEstacao = _decisaoToPosicoesEstacao;
+    public void setDecisaoCaminhoesBerco(DecisaoCaminhaoPatioPosicaoBerco _decisaoCaminhoesBerco) {
+        this._decisaoCaminhoesBerco = _decisaoCaminhoesBerco;
+    }
+
+    public void setPosicaoInterna(PosicaoCargaDescargaEstacaoArmazenamentoCaminhaoInterno _posicaoInterna) {
+        this._posicaoInterna = _posicaoInterna;
     }
 }

@@ -5,6 +5,7 @@
 package negocio;
 
 import Enumerators.CaminhaoOperacao;
+import Enumerators.ContainerTipos;
 import cz.zcu.fav.kiv.jsim.JSimInvalidParametersException;
 import cz.zcu.fav.kiv.jsim.JSimLink;
 import cz.zcu.fav.kiv.jsim.JSimSecurityException;
@@ -27,45 +28,91 @@ public class TranstainerBusiness {
     private CaminhaoPatio _caminhaoPatio;
 
     public TranstainerBusiness(Transtainer transtainer) {
-
         this._transtainer = transtainer;
-
     }
 
     public void life() {
         while (true) {
-            if (_transtainer.getPosicaoCargaDescarga().getCaminhao() == null) {
+            if (_transtainer.getPosicaoCargaDescarga().getCaminhao() == null && _transtainer.getPosicaoCargaDescargaInterna().getCaminhao() == null) {
                 _transtainer.passivo();
             } else {
-                if (caminhaoOcupado()) {
-                    descarregarCaminhao();
-                    if (caminhaoFinalizado()) {
-                        if (_transtainer.getPosicaoCargaDescarga().isIdle()) {
-                            try {
-                                _transtainer.getPosicaoCargaDescarga().activate(_transtainer.getSimulation().getCurrentTime());
-                            } catch (JSimSecurityException | JSimInvalidParametersException ex) {
-                                Logger.getLogger(TranstainerBusiness.class.getName()).log(Level.SEVERE, null, ex);
-                            }
-                        }
-                        _transtainer.passivo();
-                    }
-                } else {
-                    carregarCaminhao();
-                    if (_transtainer.getPosicaoCargaDescarga().isIdle()) {
-                        try {
-                            _transtainer.getPosicaoCargaDescarga().activate(_transtainer.getSimulation().getCurrentTime());
-                        } catch (JSimSecurityException | JSimInvalidParametersException ex) {
-                            Logger.getLogger(TranstainerBusiness.class.getName()).log(Level.SEVERE, null, ex);
-                        }
-                    }
-                    _transtainer.passivo();
+                if (_transtainer.getPosicaoCargaDescarga().getCaminhao() != null) {
+                    atenderPosicaoExterna();
+                } else if (_transtainer.getPosicaoCargaDescargaInterna().getCaminhao() != null) {
+                    atenderPosicaoInterna();
                 }
+                _transtainer.passivo();
             }
         } // while
-    } // life    
+    } // life   
 
-    public boolean caminhaoOcupado() {
-        JSimLink jsl = this._transtainer.getPosicaoCargaDescarga().getCaminhao();
+    public void atenderPosicaoExterna() {
+        if (caminhaoOcupado(_transtainer.getPosicaoCargaDescarga().getCaminhao())) {
+            descarregarCaminhao();
+            if (caminhaoFinalizado()) {
+                if (_transtainer.getPosicaoCargaDescarga().isIdle()) {
+                    try {
+                        _transtainer.getPosicaoCargaDescarga().activate(_transtainer.getSimulation().getCurrentTime());
+                    } catch (JSimSecurityException | JSimInvalidParametersException ex) {
+                        Logger.getLogger(TranstainerBusiness.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+            } else {
+                carregarCaminhao();
+                if (_transtainer.getPosicaoCargaDescarga().isIdle()) {
+                    try {
+                        _transtainer.getPosicaoCargaDescarga().activate(_transtainer.getSimulation().getCurrentTime());
+                    } catch (JSimSecurityException | JSimInvalidParametersException ex) {
+                        Logger.getLogger(TranstainerBusiness.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+            }
+        } else {
+            carregarCaminhao();
+            if (_transtainer.getPosicaoCargaDescarga().isIdle()) {
+                try {
+                    _transtainer.getPosicaoCargaDescarga().activate(_transtainer.getSimulation().getCurrentTime());
+                } catch (JSimSecurityException | JSimInvalidParametersException ex) {
+                    Logger.getLogger(TranstainerBusiness.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        }
+    }
+
+    public void atenderPosicaoInterna() {
+        if (caminhaoOcupado(_transtainer.getPosicaoCargaDescargaInterna().getCaminhao())) {
+            descarregarCaminhao();
+            if (caminhaoFinalizado()) {
+                if (_transtainer.getPosicaoCargaDescargaInterna().isIdle()) {
+                    try {
+                        _transtainer.getPosicaoCargaDescargaInterna().activate(_transtainer.getSimulation().getCurrentTime());
+                    } catch (JSimSecurityException | JSimInvalidParametersException ex) {
+                        Logger.getLogger(TranstainerBusiness.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+            } else {
+                carregarCaminhao();
+                if (_transtainer.getPosicaoCargaDescarga().isIdle()) {
+                    try {
+                        _transtainer.getPosicaoCargaDescarga().activate(_transtainer.getSimulation().getCurrentTime());
+                    } catch (JSimSecurityException | JSimInvalidParametersException ex) {
+                        Logger.getLogger(TranstainerBusiness.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+            }
+        } else {
+            carregarCaminhao();
+            if (_transtainer.getPosicaoCargaDescarga().isIdle()) {
+                try {
+                    _transtainer.getPosicaoCargaDescarga().activate(_transtainer.getSimulation().getCurrentTime());
+                } catch (JSimSecurityException | JSimInvalidParametersException ex) {
+                    Logger.getLogger(TranstainerBusiness.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        }
+    }
+
+    public boolean caminhaoOcupado(JSimLink jsl) {
         if (jsl instanceof CaminhaoExterno) {
             _caminhaoExterno = (CaminhaoExterno) jsl;
             _caminhaoPatio = null;
@@ -81,7 +128,7 @@ public class TranstainerBusiness {
             if (_caminhaoPatio == null) {
                 return false;
             }
-            if (_caminhaoPatio.isCarregado()) {
+            if (_caminhaoPatio.getContainer() != null) {
                 return true;
             }
         }
@@ -91,7 +138,20 @@ public class TranstainerBusiness {
     public void descarregarCaminhao() {
         if (_caminhaoExterno != null && (_caminhaoExterno.getOperacao() == CaminhaoOperacao.Descarregar || _caminhaoExterno.getOperacao() == CaminhaoOperacao.DescarregarCarregar)) {
             try {
-                _transtainer.segurar(JSimSystem.uniform(100, 100));
+                _transtainer.segurar(JSimSystem.uniform(10, 10));
+                if (_caminhaoExterno.getContainer().getDestinoContainer() == ContainerTipos.CaminhaoExterno) {
+                    try {
+                        _caminhaoExterno.getContainer().into(_transtainer.getEstacaoArmazenamento().getFilaContainersParaCaminhoesExternos());
+                    } catch (JSimSecurityException ex) {
+                        Logger.getLogger(TranstainerBusiness.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                } else {
+                    try {
+                        _caminhaoExterno.getContainer().into(_transtainer.getEstacaoArmazenamento().getFilaContainersParaNavio());
+                    } catch (JSimSecurityException ex) {
+                        Logger.getLogger(TranstainerBusiness.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
                 _caminhaoExterno.escreverArquivo("\r\nDescarregou " + _caminhaoExterno.getContainer().getId());
                 _caminhaoExterno.setContainer(null);
                 _caminhaoExterno.setCarregado(false);
@@ -103,9 +163,31 @@ public class TranstainerBusiness {
                 Logger.getLogger(TranstainerBusiness.class.getName()).log(Level.SEVERE, null, ex);
             }
         } else if (_caminhaoPatio != null) {
-            _caminhaoPatio.setContainer(null);
-            _caminhaoPatio.setCarregado(false);
-            _transtainer.getEstacaoArmazenamento().incrementQuantidadeCargaMomento();
+            try {
+                _transtainer.segurar(JSimSystem.uniform(10, 10));
+                if (_caminhaoPatio.getContainer().getDestinoContainer() == ContainerTipos.CaminhaoExterno) {
+                    try {
+                        JSimLink _container = _caminhaoPatio.getContainer();
+                        _container.into(_transtainer.getEstacaoArmazenamento().getFilaContainersParaCaminhoesExternos());
+                    } catch (JSimSecurityException ex) {
+                        Logger.getLogger(TranstainerBusiness.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                } else {
+                    try {
+                        _caminhaoPatio.getContainer().into(_transtainer.getEstacaoArmazenamento().getFilaContainersParaNavio());
+                    } catch (JSimSecurityException ex) {
+                        Logger.getLogger(TranstainerBusiness.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+                _caminhaoPatio.setContainer(null);
+                _caminhaoPatio.setCarregado(false);
+                _transtainer.getEstacaoArmazenamento().incrementQuantidadeCargaMomento();
+                if (_caminhaoPatio.getOperacao() == CaminhaoOperacao.Descarregar) {
+                    _caminhaoPatio.setFinalizado(true);
+                }
+            } catch (JSimInvalidParametersException ex) {
+                Logger.getLogger(TranstainerBusiness.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
     }
 
@@ -116,7 +198,7 @@ public class TranstainerBusiness {
                 container.out();
                 _transtainer.segurar(JSimSystem.uniform(100, 100));
                 _caminhaoExterno.setContainer((Container) container);
-                _caminhaoExterno.setCarregado(true);                
+                _caminhaoExterno.setCarregado(true);
                 _transtainer.getEstacaoArmazenamento().decrementQuantidadeCargaMomento();
                 _caminhaoExterno.setFinalizado(true);
             } catch (JSimSecurityException | JSimInvalidParametersException ex) {
@@ -125,10 +207,11 @@ public class TranstainerBusiness {
         } else if (_caminhaoPatio != null) {
             try {
                 JSimLink container = _transtainer.getEstacaoArmazenamento().getFilaContainersParaNavio().first();
+                container.out();
                 _caminhaoPatio.setContainer((Container) container);
                 _caminhaoPatio.setCarregado(true);
-                container.out();
                 _transtainer.getEstacaoArmazenamento().decrementQuantidadeCargaMomento();
+                _caminhaoPatio.setFinalizado(true);
             } catch (JSimSecurityException ex) {
                 Logger.getLogger(TranstainerBusiness.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -137,6 +220,8 @@ public class TranstainerBusiness {
 
     public boolean caminhaoFinalizado() {
         if (_caminhaoExterno != null && _caminhaoExterno.isFinalizado()) {
+            return true;
+        } else if (_caminhaoPatio != null && _caminhaoPatio.isFinalizado()) {
             return true;
         }
         return false;

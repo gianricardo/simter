@@ -62,10 +62,8 @@ public class Navio extends JSimLink {
     public Navio(double time, String id, int numeroRegioesNavio, JSimSimulation simulation) {
         _timeOfCreation = time;
         _idNavio = id + " ";
-        //_numeroContainersDescarregar = (int) JSimSystem.uniform(10, 10);
         _simulation = simulation;
         _numeroRegioesNavio = numeroRegioesNavio;
-        _comprimentoEmPosicoesCargaDescarga = 1;
         
         criarArquivo();
         escreverArquivo("Navio " + _idNavio + "\r\n Criado no momento " + _timeOfCreation);        
@@ -90,7 +88,7 @@ public class Navio extends JSimLink {
                 }
 
                 for (j = aux; j <= i * (_numeroContainersDescarregar / _numeroRegioesNavio); j++) {
-                    _container = new Container(_timeOfCreation, "Container " + String.valueOf(j) + " do navio " + this._idNavio, ContainerTipos.Navio, ContainerTipos.CaminhaoExterno);
+                    _container = new Container(_timeOfCreation, "Container " + String.valueOf(j) + " do navio " + this._idNavio, ContainerTipos.Navio, ContainerTipos.CaminhaoExterno);                    
                     _container.into(_filaContainer);
                     contadorContainers++;
                 }

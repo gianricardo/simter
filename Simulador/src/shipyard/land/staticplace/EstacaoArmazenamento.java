@@ -36,7 +36,6 @@ public class EstacaoArmazenamento extends JSimProcess {
     
     private FilaContainers _filaContainersParaCaminhoesExternos;
     private FilaContainers _filaContainersParaNavio;
-    private List<PosicaoCargaDescargaEstacaoArmazenamentoCaminhaoExterno> _listaPosicoes = new ArrayList<>();
     private Container _container;
     
     private File _arquivo;
@@ -48,8 +47,8 @@ public class EstacaoArmazenamento extends JSimProcess {
         super(idEstacaoArmazenamento, simulation);
         
         try {
-            _filaContainersParaCaminhoesExternos = new FilaContainers("fila de containers da estação para saída via caminhões externos", simulation);
-            _filaContainersParaNavio = new FilaContainers("fila de containers da estação para saída via navios", simulation);
+            _filaContainersParaCaminhoesExternos = new FilaContainers("Fila de Containers da Estação para Saída via Caminhões Externos", simulation);
+            _filaContainersParaNavio = new FilaContainers("Fila de Containers da Estação para Saída via Navios", simulation);
         } catch (JSimTooManyHeadsException | IOException ex) {
             Logger.getLogger(EstacaoArmazenamento.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -96,11 +95,7 @@ public class EstacaoArmazenamento extends JSimProcess {
     
     public JSimSimulation getSimulation() {
         return _simulation;
-    }
-
-    public void addListaPosicoes(PosicaoCargaDescargaEstacaoArmazenamentoCaminhaoExterno _posicao) {
-        this._listaPosicoes.add(_posicao);
-    }    
+    }   
 
     public void incrementQuantidadeCargaMomento() {
         this._quantidadeCargaMomento++;

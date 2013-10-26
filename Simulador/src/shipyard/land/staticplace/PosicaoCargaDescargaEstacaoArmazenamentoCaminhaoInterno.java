@@ -6,7 +6,6 @@ package shipyard.land.staticplace;
 
 import cz.zcu.fav.kiv.jsim.JSimException;
 import cz.zcu.fav.kiv.jsim.JSimInvalidParametersException;
-import cz.zcu.fav.kiv.jsim.JSimLink;
 import cz.zcu.fav.kiv.jsim.JSimProcess;
 import cz.zcu.fav.kiv.jsim.JSimSimulation;
 import cz.zcu.fav.kiv.jsim.JSimSimulationAlreadyTerminatedException;
@@ -17,11 +16,10 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import shipyard.land.move.CaminhaoExterno;
 import shipyard.land.move.CaminhaoPatio;
 import shipyard.land.move.Transtainer;
-import simulador.rotas.DecisaoPosicaoToEstacaoArmazenamentoRt;
-import simulador.rotas.RotaSaidaCaminhoesRt;
+import simulador.rotas.DecisaoPosicaoToEstacaoArmazenamentoIntRt;
+import simulador.rotas.PosicaoEstacaoToDecisaoPosicaoBercoRt;
 
 /**
  *
@@ -29,14 +27,11 @@ import simulador.rotas.RotaSaidaCaminhoesRt;
  */
 public class PosicaoCargaDescargaEstacaoArmazenamentoCaminhaoInterno extends JSimProcess {
 
-    private double _lambda;
-    private JSimLink _caminhao;
+    private CaminhaoPatio _caminhao;
     private JSimSimulation _simulation;
-    private String _nome;
     private Transtainer _transtainer;
-    private DecisaoPosicaoToEstacaoArmazenamentoRt _rotaAtePosicao;
-    private RotaSaidaCaminhoesRt _rotaSaidaCaminhoes;
-    
+    private DecisaoPosicaoToEstacaoArmazenamentoIntRt _rotaAtePosicao;
+    private PosicaoEstacaoToDecisaoPosicaoBercoRt _rotaAteDecisaoBerco;
     private File _arquivo;
     private FileWriter _fw;
     private BufferedWriter _bw;
@@ -45,9 +40,6 @@ public class PosicaoCargaDescargaEstacaoArmazenamentoCaminhaoInterno extends JSi
             throws JSimSimulationAlreadyTerminatedException, JSimInvalidParametersException, JSimTooManyProcessesException, IOException {
         super(name, sim);
         _simulation = sim;
-        _nome = name;
-        
-        criarArquivo();
     } // constructor
 
     @Override
@@ -58,22 +50,19 @@ public class PosicaoCargaDescargaEstacaoArmazenamentoCaminhaoInterno extends JSi
                     // If we have nothing to do, we sleep.
                     passivate();
                 } else {
-                    escreverArquivo(" Iniciando Movimentação do Transtainer para caminhao no momento " + myParent.getCurrentTime());
                     if (_transtainer.isIdle()) {
                         _transtainer.activate(myParent.getCurrentTime());
                     }
                     passivate();
-                    while(true){
+                    while (true) {
                         try {
-                            if(!liberarCaminhao(_caminhao)){
+                            if (!liberarCaminhao(_caminhao)) {
                                 passivate();
-                            }
-                            else{
-                                escreverArquivo(" Liberando caminhao no momento " + myParent.getCurrentTime());
-                                if(_rotaSaidaCaminhoes.isIdle()){
-                                    _rotaSaidaCaminhoes.activate(myParent.getCurrentTime());
+                            } else {
+                                if (_rotaAteDecisaoBerco.isIdle()) {
+                                    _rotaAteDecisaoBerco.activate(myParent.getCurrentTime());
                                 }
-                                if(_rotaAtePosicao.isIdle()){
+                                if (_rotaAtePosicao.isIdle()) {
                                     _rotaAtePosicao.activate(myParent.getCurrentTime());
                                 }
                                 break;
@@ -95,54 +84,27 @@ public class PosicaoCargaDescargaEstacaoArmazenamentoCaminhaoInterno extends JSi
         _transtainer = t;
     }
 
-    public boolean liberarCaminhao(JSimLink caminhao) throws IOException {
-        JSimLink jsl = caminhao;
-        if (jsl instanceof CaminhaoPatio) {
-            CaminhaoPatio novoCaminhao = (CaminhaoPatio) jsl;
-            if (novoCaminhao == null) {
-                return false;
-            }            
-            novoCaminhao.escreverArquivo("\r\nCarregou " + novoCaminhao.getContainer().getId());
-            //_rotaSaidaCaminhoes.addCaminhoes(novoCaminhao);            
-            _caminhao = null; 
+    public boolean liberarCaminhao(CaminhaoPatio caminhao) throws IOException {
+        if (_rotaAteDecisaoBerco.GetNextElement(caminhao)) {
+            _caminhao = null;
+            return true;
         }
-        return true;
+        return false;
     }
 
-    public void setCaminhao(JSimLink _caminhao) {
+    public void setCaminhao(CaminhaoPatio _caminhao) {
         this._caminhao = _caminhao;
     }
 
-    public JSimLink getCaminhao() {
+    public CaminhaoPatio getCaminhao() {
         return _caminhao;
-    }    
+    }
 
-    public void setRotaAtePosicao(DecisaoPosicaoToEstacaoArmazenamentoRt _rotaAtePosicao) {
+    public void setRotaAtePosicao(DecisaoPosicaoToEstacaoArmazenamentoIntRt _rotaAtePosicao) {
         this._rotaAtePosicao = _rotaAtePosicao;
     }
 
-    public void setRotaSaidaCaminhoes(RotaSaidaCaminhoesRt _rotaSaidaCaminhoes) {
-        this._rotaSaidaCaminhoes = _rotaSaidaCaminhoes;
-    }
-    
-    private void criarArquivo() {
-        if (_arquivo == null) {
-            try {
-                _arquivo = new File("../arquivo" + getName() + ".txt");
-                _fw = new FileWriter(_arquivo, false);
-                _bw = new BufferedWriter(_fw);
-            } catch (IOException ex) {
-                ex.printStackTrace(System.err);
-            }
-        }
-    }
-
-    public void escreverArquivo(String texto) {
-        try {
-            _bw.write("\r\n " + texto);
-            _bw.flush();
-        } catch (IOException ex) {
-            ex.printStackTrace(System.err);
-        }
+    public void setRotaAteDecisaoBerco(PosicaoEstacaoToDecisaoPosicaoBercoRt _rotaAteDecisaoBerco) {
+        this._rotaAteDecisaoBerco = _rotaAteDecisaoBerco;
     }
 }

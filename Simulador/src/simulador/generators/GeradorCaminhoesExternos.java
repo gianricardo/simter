@@ -48,7 +48,7 @@ public class GeradorCaminhoesExternos extends JSimProcess {
                 // Periodically creating new navios and putting them into the queue.
                 CaminhaoExterno novo = new CaminhaoExterno(myParent.getCurrentTime(), String.valueOf(_numeroCaminhao), _simulation);
                 
-                _container = new Container(myParent.getCurrentTime(), "Container do Caminhão Externo " + _numeroCaminhao, ContainerTipos.CaminhaoExterno, ContainerTipos.CaminhaoExterno);                
+                _container = new Container(myParent.getCurrentTime(), "Container do Caminhão Externo " + _numeroCaminhao, ContainerTipos.CaminhaoExterno, ContainerTipos.Navio);                
                 novo.setContainer(_container);
                 novo.setCarregado(true);
                 novo.setOperacao(CaminhaoOperacao.DescarregarCarregar);

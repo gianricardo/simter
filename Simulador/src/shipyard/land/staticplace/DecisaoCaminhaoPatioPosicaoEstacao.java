@@ -27,28 +27,31 @@ import utils.SolicitacaoCaminhoesPatio;
  * @author Eduardo
  */
 public class DecisaoCaminhaoPatioPosicaoEstacao extends JSimProcess {
-
-    private List<SolicitacaoCaminhoesPatio> listaSolicitacoesCaminhoes = new ArrayList();
+    
+    private List<SolicitacaoCaminhoesPatio> _listaSolicitacoesCaminhoes = new ArrayList();
+    
     private List<DecisaoPosicaoToEstacaoArmazenamentoIntRt> _listaRotasPosicoesEstacaoDestino = new ArrayList();
     private List<PosicaoBercoToDecisaoPosicaoEstacaoRt> _listaRotasPosicaoBercoOrigem = new ArrayList();
+    
     private DecisaoEstacaoToDecisaoBercoRt _rotaDecisaoBerco;
+    
     private FilaCaminhoesInternos _filaCaminhoesVazios;
     private CaminhaoPatio _caminhao;
     private int indiceUltimaSolicitacaoAtendida = 0;
     private int indiceUltimaRotaVerificada = 0;
     private SolicitacaoCaminhoesPatio _solicitacaoMomento;
-
+    
     public DecisaoCaminhaoPatioPosicaoEstacao(String idDecisao, JSimSimulation simulation, FilaCaminhoesInternos filaCaminhoesVazios, DecisaoEstacaoToDecisaoBercoRt rotaDecisaoBerco)
             throws JSimSimulationAlreadyTerminatedException, JSimInvalidParametersException, JSimTooManyProcessesException {
         super(idDecisao, simulation);
         _filaCaminhoesVazios = filaCaminhoesVazios;
         _rotaDecisaoBerco = rotaDecisaoBerco;
     }
-
+    
     @Override
     protected void life() {
         while (true) {
-            if (listaSolicitacoesCaminhoes.isEmpty()) {
+            if (_listaSolicitacoesCaminhoes.isEmpty()) {
                 try {
                     passivate();
                 } catch (JSimSecurityException ex) {
@@ -61,7 +64,7 @@ public class DecisaoCaminhaoPatioPosicaoEstacao extends JSimProcess {
                         if (!_filaCaminhoesVazios.empty()) {
                             try {
                                 _caminhao = (CaminhaoPatio) _filaCaminhoesVazios.first();
-                                _caminhao.escreverArquivo("\r\nEntrou na " + this.getName() + " no momento " + myParent.getCurrentTime());
+                                _caminhao.escreverArquivo("\r\n -Entrou na " + this.getName() + " no momento " + myParent.getCurrentTime());
                                 _caminhao.out();
                                 verificarProximaSolicitacao();
                             } catch (JSimSecurityException ex) {
@@ -74,75 +77,159 @@ public class DecisaoCaminhaoPatioPosicaoEstacao extends JSimProcess {
                                 Logger.getLogger(DecisaoCaminhaoPatioPosicaoEstacao.class.getName()).log(Level.SEVERE, null, ex);
                             }
                         }
-                    }
-                    else{
+                    } else {
                         verificarProximaSolicitacao();
                     }
                 } else {
-                    verificarProximaSolicitacao();
-                }
-            }
-        }
-    }
-
-    public void AdicionarSolicitacao(SolicitacaoCaminhoesPatio solicitacao) {
-        listaSolicitacoesCaminhoes.add(solicitacao);
-    }
-
-    public void verificarCaminhoesRotas() {
-        for (int i = indiceUltimaRotaVerificada; i < _listaRotasPosicaoBercoOrigem.size(); i++) {
-            _caminhao = _listaRotasPosicaoBercoOrigem.get(i).VerificarCaminhaoFinalizado();            
-            if (_caminhao != null) {
-                _caminhao.escreverArquivo("\r\nEntrou na " + getName() + " no momento " + myParent.getCurrentTime());
-                indiceUltimaRotaVerificada++;
-                if(indiceUltimaRotaVerificada >= _listaRotasPosicaoBercoOrigem.size()){
-                    indiceUltimaRotaVerificada = 0;
-                }
-                _caminhao.setContainer(null);
-                break;
-            }
-        }
-    }
-
-    public void verificarProximaSolicitacao() {
-        _solicitacaoMomento = listaSolicitacoesCaminhoes.get(indiceUltimaSolicitacaoAtendida);
-
-        if (_solicitacaoMomento.getNumeroCaminhoesDescarregar() > 0) {
-            _caminhao.setRotaPosicaoBercoAposDecisao(_solicitacaoMomento.getRotaDecisaoPosicaoBerco());
-            if (_caminhao.getContainer() == null) {
-                _caminhao.setOperacao(CaminhaoOperacao.Carregar);
-                while (true) {
-                    if (!_rotaDecisaoBerco.GetNextElement(_caminhao)) {
+                    if(_caminhao.isMovimentacaoFinalizada()){
                         try {
                             passivate();
                         } catch (JSimSecurityException ex) {
                             Logger.getLogger(DecisaoCaminhaoPatioPosicaoEstacao.class.getName()).log(Level.SEVERE, null, ex);
                         }
-                    } else {
-                        _caminhao = null;
-                        if (_rotaDecisaoBerco.isIdle()) {
-                            try {
-                                _rotaDecisaoBerco.activate(myParent.getCurrentTime());
-                            } catch (JSimSecurityException | JSimInvalidParametersException ex) {
-                                Logger.getLogger(DecisaoCaminhaoPatioPosicaoEstacao.class.getName()).log(Level.SEVERE, null, ex);
-                            }
-                        }
-                        break;
+                    }
+                    else{
+                        verificarProximaSolicitacao();
                     }
                 }
             }
         }
+    }    
+    
+    public void verificarCaminhoesRotas() {
+        for (int i = indiceUltimaRotaVerificada; i < _listaRotasPosicaoBercoOrigem.size(); i++) {
+            _caminhao = _listaRotasPosicaoBercoOrigem.get(i).VerificarCaminhaoFinalizado();
+            if (_caminhao != null) {
+                _caminhao.escreverArquivo("\r\n -Entrou na " + getName() + " no momento " + myParent.getCurrentTime());
+                _caminhao.setMovimentacaoFinalizada(false);
+                indiceUltimaRotaVerificada++;
+                if (indiceUltimaRotaVerificada >= _listaRotasPosicaoBercoOrigem.size()) {
+                    indiceUltimaRotaVerificada = 0;
+                }
+                //_caminhao.setContainer(null);
+                if (_listaRotasPosicaoBercoOrigem.get(i).isIdle()) {
+                    try {
+                        _listaRotasPosicaoBercoOrigem.get(i).activate(myParent.getCurrentTime());
+                    } catch (JSimSecurityException | JSimInvalidParametersException ex) {
+                        Logger.getLogger(DecisaoCaminhaoPatioPosicaoEstacao.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+                break;
+            }
+        }
     }
-
+    
+    public void verificarProximaSolicitacao() {
+        
+        _solicitacaoMomento = _listaSolicitacoesCaminhoes.get(indiceUltimaSolicitacaoAtendida);
+        
+        if (_solicitacaoMomento.getNumeroCaminhoesDescarregar() >= 0) {
+            _caminhao.setRotaPosicaoBercoAposDecisao(_solicitacaoMomento.getRotaDecisaoPosicaoBerco());
+            _solicitacaoMomento.setNumeroCaminhoesDescarregar(_solicitacaoMomento.getNumeroCaminhoesDescarregar()-1);
+            if (_caminhao.getContainer() == null) {
+                DecidirCaminhaoVazioDescarregarNavio();
+            } else {
+                try {
+                    DecidirCaminhaoOcupadoDescarregarNavio();
+                } catch (JSimSecurityException | JSimInvalidParametersException ex) {
+                    Logger.getLogger(DecisaoCaminhaoPatioPosicaoEstacao.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+            indiceUltimaSolicitacaoAtendida++;
+            if (indiceUltimaSolicitacaoAtendida >= _listaSolicitacoesCaminhoes.size()) {
+                indiceUltimaSolicitacaoAtendida = 0;
+            }
+        }
+        
+        else if (_solicitacaoMomento.getNumeroCaminhoesCarregar() >= 0){
+            _caminhao.setRotaPosicaoBercoAposDecisao(_solicitacaoMomento.getRotaDecisaoPosicaoBerco());
+            _solicitacaoMomento.setNumeroCaminhoesCarregar(_solicitacaoMomento.getNumeroCaminhoesCarregar()-1);
+            if (_caminhao.getContainer() == null) {
+                DecidirCaminhaoVazioCarregarNavio();
+            } else {                
+                    DecidirCaminhaoOcupadoCarregarNavio();                
+            }
+        }
+        
+        else{
+            _listaSolicitacoesCaminhoes.remove(_solicitacaoMomento);
+        }
+    }
+    
+    public void DecidirCaminhaoVazioDescarregarNavio() {
+        _caminhao.setOperacao(CaminhaoOperacao.Carregar);
+        while (true) {
+            if (!_rotaDecisaoBerco.GetNextElement(_caminhao)) {
+                try {
+                    passivate();
+                } catch (JSimSecurityException ex) {
+                    Logger.getLogger(DecisaoCaminhaoPatioPosicaoEstacao.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            } else {
+                _caminhao = null;
+                if (_rotaDecisaoBerco.isIdle()) {
+                    try {
+                        _rotaDecisaoBerco.activate(myParent.getCurrentTime());
+                    } catch (JSimSecurityException | JSimInvalidParametersException ex) {
+                        Logger.getLogger(DecisaoCaminhaoPatioPosicaoEstacao.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+                break;
+            }
+        }
+    }
+    
+    public void DecidirCaminhaoOcupadoDescarregarNavio() throws JSimSecurityException, JSimInvalidParametersException {
+        DecisaoPosicaoToEstacaoArmazenamentoIntRt _rotaMomento;
+        _caminhao.setOperacao(CaminhaoOperacao.Descarregar);        
+        while (true) {
+            _rotaMomento = ElementOut();
+            if (_rotaMomento == null) {
+                passivate();
+            } else {
+                if (_rotaMomento.isIdle()) {
+                    _rotaMomento.activate(myParent.getCurrentTime());
+                }
+                break;
+            }
+        }
+    }
+    
+    public void DecidirCaminhaoVazioCarregarNavio(){
+        
+    }
+    
+    public void DecidirCaminhaoOcupadoCarregarNavio(){
+        
+    }
+    
+    public DecisaoPosicaoToEstacaoArmazenamentoIntRt ElementOut() {
+        for (int i = 0; i < _listaRotasPosicoesEstacaoDestino.size(); i++) {
+            if (_listaRotasPosicoesEstacaoDestino.get(i).GetNextElement(_caminhao)) {
+                _caminhao = null;
+                return _listaRotasPosicoesEstacaoDestino.get(i);
+            }
+        }
+        return null;
+    }
+    
     public CaminhaoPatio getCaminhao() {
         return _caminhao;
     }
-
+    
     public void setCaminhao(CaminhaoPatio _caminhao) {
         this._caminhao = _caminhao;
     }
-
+    
     public void addListaRotasPosicaoBercoOrigem(PosicaoBercoToDecisaoPosicaoEstacaoRt _listaRotasPosicaoBercoOrigem) {
         this._listaRotasPosicaoBercoOrigem.add(_listaRotasPosicaoBercoOrigem);
+    }
+    
+    public void AdicionarSolicitacao(SolicitacaoCaminhoesPatio solicitacao) {
+        _listaSolicitacoesCaminhoes.add(solicitacao);
+    }
+
+    public void addListaRotasPosicoesEstacaoDestino(DecisaoPosicaoToEstacaoArmazenamentoIntRt _listaRotasPosicoesEstacaoDestino) {
+        this._listaRotasPosicoesEstacaoDestino.add(_listaRotasPosicoesEstacaoDestino);
     }
 }

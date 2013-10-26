@@ -10,20 +10,26 @@ import cz.zcu.fav.kiv.jsim.JSimSecurityException;
 import cz.zcu.fav.kiv.jsim.JSimSimulation;
 import cz.zcu.fav.kiv.jsim.JSimSimulationAlreadyTerminatedException;
 import cz.zcu.fav.kiv.jsim.JSimTooManyProcessesException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import shipyard.land.move.CaminhaoPatio;
+import simulador.rotas.DecisaoEstacaoToDecisaoBercoRt;
 import simulador.rotas.DecisaoPosicaoToEstacaoArmazenamentoRt;
 import simulador.rotas.DecisaoPosicaoToPosicaoBercoRt;
-import simulador.rotas.RouteBase;
+import simulador.rotas.PosicaoEstacaoToDecisaoPosicaoBercoRt;
 
 /**
  *
  * @author Eduardo
  */
 public class DecisaoCaminhaoPatioPosicaoBerco extends JSimProcess {
+    
     private CaminhaoPatio _caminhao;    
-    private RouteBase rotaOrigem;  
+    
+    private List<PosicaoEstacaoToDecisaoPosicaoBercoRt> _listaRotasEstacao = new ArrayList();
+    private DecisaoEstacaoToDecisaoBercoRt _rotaDecisaoEstacaoDecisaoBerco;    
     
     private DecisaoPosicaoToPosicaoBercoRt _rotaMomento;
     
@@ -53,6 +59,15 @@ public class DecisaoCaminhaoPatioPosicaoBerco extends JSimProcess {
                             if (_rotaMomento.isIdle()) {
                                 _rotaMomento.activate(myParent.getCurrentTime());
                             }
+                            if(_rotaDecisaoEstacaoDecisaoBerco.isIdle()){
+                                _rotaDecisaoEstacaoDecisaoBerco.activate(myParent.getCurrentTime());
+                            }
+                            for(int i = 0; i<_listaRotasEstacao.size();i++)
+                            {
+                                if(_listaRotasEstacao.get(i).isIdle()){
+                                    _listaRotasEstacao.get(i).activate(myParent.getCurrentTime());
+                                }
+                            }
                             break;
                         }
                     }
@@ -77,11 +92,19 @@ public class DecisaoCaminhaoPatioPosicaoBerco extends JSimProcess {
     public boolean addCaminhao(CaminhaoPatio caminhao) {
         if (_caminhao == null) {
             _caminhao = caminhao;
-            _caminhao.escreverArquivo("\r\nEntrou na " + this.getName() + " no momento " + myParent.getCurrentTime());                        
+            _caminhao.escreverArquivo(" -Entrou na " + this.getName() + " no momento " + myParent.getCurrentTime());                        
             return true;
         }
         else{
             return false;            
         }        
+    }
+
+    public void addListaRotasEstacao(PosicaoEstacaoToDecisaoPosicaoBercoRt _listaRotasEstacao) {
+        this._listaRotasEstacao.add(_listaRotasEstacao);
+    }
+
+    public void setRotaDecisaoEstacaoDecisaoBerco(DecisaoEstacaoToDecisaoBercoRt _rotaDecisaoEstacaoDecisaoBerco) {
+        this._rotaDecisaoEstacaoDecisaoBerco = _rotaDecisaoEstacaoDecisaoBerco;
     }
 }

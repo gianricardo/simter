@@ -21,7 +21,6 @@ import java.util.logging.Logger;
 import negocio.BercoBusiness;
 import shipyard.land.move.Portainer;
 import shipyard.sea.Navio;
-import simulador.queues.FilaCaminhoesInternos;
 import simulador.queues.FilaNavios;
 import simulador.rotas.BercoToRotaSaidaRt;
 import simulador.rotas.PraticoToBercoRt;
@@ -36,8 +35,6 @@ public class Berco extends JSimProcess {
     private double _horaSaida;
     private double _tempoTotalAtendimento;
     private double _tempoAtendimentoPortainers;
-    private double _tempoMovimentacao;
-    private double _horaInicioMovimentacao;
     private double _horaAtracacao;
     private int _numeroRegioesBerco;
     private List<Portainer> _listaPortainers = new ArrayList<>();
@@ -62,12 +59,11 @@ public class Berco extends JSimProcess {
     private FileWriter _fw;
     private BufferedWriter _bw;
     
-    public Berco(JSimSimulation simulation, int idBerco, int numeroPortainers, DecisaoCaminhaoPatioPosicaoEstacao decisaoCaminhoesPatio, DecisaoCaminhaoPatioPosicaoBerco decisaoCaminhoesPatioPosicaoBerco)
+    public Berco(JSimSimulation simulation, int idBerco, DecisaoCaminhaoPatioPosicaoEstacao decisaoCaminhoesPatio, DecisaoCaminhaoPatioPosicaoBerco decisaoCaminhoesPatioPosicaoBerco)
             throws JSimSimulationAlreadyTerminatedException, JSimInvalidParametersException, JSimTooManyProcessesException {
         super(Integer.toString(idBerco), simulation);
         this._simulation = simulation;
         this._idBerco = idBerco;
-        this._numeroPortainers = numeroPortainers;
         this._decisaoCaminhoesPatioEstacao = decisaoCaminhoesPatio;
         this._decisaoCaminhoesPatioBerco = decisaoCaminhoesPatioPosicaoBerco;
         this._bercoNegocio = new BercoBusiness(this);        
@@ -103,22 +99,6 @@ public class Berco extends JSimProcess {
     
     public void setTempoAtendimentoPortainers(double tempoAtendimentoPortainers) {
         this._tempoAtendimentoPortainers = tempoAtendimentoPortainers;
-    }
-    
-    public double getTempoMovimentacao() {
-        return _tempoMovimentacao;
-    }
-    
-    public void setTempoMovimentacao(double tempoMovimentacao) {
-        this._tempoMovimentacao = tempoMovimentacao;
-    }
-    
-    public double getHoraInicioMovimentacao() {
-        return _horaInicioMovimentacao;
-    }
-    
-    public void setHoraInicioMovimentacao(double horaInicioMovimentacao) {
-        this._horaInicioMovimentacao = horaInicioMovimentacao;
     }
     
     public double getHoraAtracacao() {

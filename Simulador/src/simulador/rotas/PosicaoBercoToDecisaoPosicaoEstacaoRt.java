@@ -59,7 +59,8 @@ public class PosicaoBercoToDecisaoPosicaoEstacaoRt extends RouteBase {
             while (true) {
                 if (_decisaoPosicaoEstacao.getCaminhao() == null) {
                     _decisaoPosicaoEstacao.setCaminhao(_caminhoes.get(0));
-                    super.LiberarRota();
+                    super.LiberarRota();                    
+                    _caminhoes.get(0).escreverArquivo("\r\n -Entrou na " + _decisaoPosicaoEstacao.getName() + " no momento " + myParent.getCurrentTime());
                     _caminhoes.remove(0);
                     if (_decisaoPosicaoEstacao.isIdle()) {
                         _decisaoPosicaoEstacao.activate(myParent.getCurrentTime());
@@ -70,8 +71,11 @@ public class PosicaoBercoToDecisaoPosicaoEstacaoRt extends RouteBase {
                     break;
                 }
                 else{
-                    _caminhoes.get(0).setMovimentacaoFinalizada(true);
+                    if(!_caminhoes.isEmpty()){
+                        _caminhoes.get(0).setMovimentacaoFinalizada(true);
+                    }
                     passivate();
+                    break;
                 }
             }
         } catch (JSimSecurityException | JSimInvalidParametersException ex) {
@@ -103,7 +107,7 @@ public class PosicaoBercoToDecisaoPosicaoEstacaoRt extends RouteBase {
             return false;
         } else {
             _caminhoes.add(caminhao);
-            _caminhoes.get(0).escreverArquivo("\r\n colocado na " + this.getName() + " no momento " + myParent.getCurrentTime());
+            _caminhoes.get(0).escreverArquivo(" -Colocado na " + this.getName() + " no momento " + myParent.getCurrentTime());
             return true;
         }
     }

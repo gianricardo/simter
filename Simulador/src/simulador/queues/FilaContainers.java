@@ -22,11 +22,11 @@ public class FilaContainers extends JSimHead {
     private double _horaInicioAtendimento;
     private String _nomeFila;
     private int _numeroContainers;
-    private int _numeroContainersCarregar;
+    private int _numeroContainersCarregar;    
 
     public FilaContainers(String name, JSimSimulation sim)
             throws JSimInvalidParametersException, JSimTooManyHeadsException, IOException {
-        super(name, sim);
+        super(name, sim);        
         _nomeFila = name;
     } // constructor
 
@@ -68,7 +68,7 @@ public class FilaContainers extends JSimHead {
 
     public void setHoraFinalDescarregamento(double _horaFinalDescarregamento) {
         this._horaFinalDescarregamento = _horaFinalDescarregamento;
-    }
+}
 
     public void setHoraFinalCarregamento(double _horaFinalCarregamento) {
         this._horaFinalCarregamento = _horaFinalCarregamento;

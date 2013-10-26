@@ -17,6 +17,7 @@ import java.io.IOException;
 import negocio.TranstainerBusiness;
 import shipyard.land.staticplace.EstacaoArmazenamento;
 import shipyard.land.staticplace.PosicaoCargaDescargaEstacaoArmazenamentoCaminhaoExterno;
+import shipyard.land.staticplace.PosicaoCargaDescargaEstacaoArmazenamentoCaminhaoInterno;
 
 /**
  *
@@ -32,25 +33,31 @@ public class Transtainer extends JSimProcess {
     private EstacaoArmazenamento _estacaoArmazenamento;
     private JSimSimulation _simulation;    
     private TranstainerBusiness _transtainerNegocio;
-    private PosicaoCargaDescargaEstacaoArmazenamentoCaminhaoExterno _posicaoCargaDescarga;
+    private PosicaoCargaDescargaEstacaoArmazenamentoCaminhaoExterno _posicaoCargaDescargaExterna;
+    private PosicaoCargaDescargaEstacaoArmazenamentoCaminhaoInterno _posicaoCargaDescargaInterna;
 
     //CaminhoesPatio
     //BercosAtende
     //IdentificadoresNavios
-    public Transtainer(String name, JSimSimulation sim, EstacaoArmazenamento estacaoArmazenamento, PosicaoCargaDescargaEstacaoArmazenamentoCaminhaoExterno posicao)
+    public Transtainer(String name, JSimSimulation sim, EstacaoArmazenamento estacaoArmazenamento, PosicaoCargaDescargaEstacaoArmazenamentoCaminhaoExterno posicaoExterna, PosicaoCargaDescargaEstacaoArmazenamentoCaminhaoInterno posicaoInterna)
             throws JSimSimulationAlreadyTerminatedException, JSimInvalidParametersException, JSimTooManyProcessesException, IOException {
         super(name, sim);        
         this._nomeTranstainer = name;
         this._estacaoArmazenamento = estacaoArmazenamento;
         this._simulation = sim;
-        this._posicaoCargaDescarga = posicao;
+        this._posicaoCargaDescargaExterna = posicaoExterna;
+        this._posicaoCargaDescargaInterna = posicaoInterna;
         
         this._transtainerNegocio = new TranstainerBusiness(this);
     } // constructor 
 
     public PosicaoCargaDescargaEstacaoArmazenamentoCaminhaoExterno getPosicaoCargaDescarga() {
-        return _posicaoCargaDescarga;
-    }  
+        return _posicaoCargaDescargaExterna;
+    }
+
+    public PosicaoCargaDescargaEstacaoArmazenamentoCaminhaoInterno getPosicaoCargaDescargaInterna() {
+        return _posicaoCargaDescargaInterna;
+    }
     
     public void passivo() {
         try {

@@ -25,10 +25,11 @@ public class CaminhaoPatio extends JSimLink{
     private double _timeOfCreation;
     private String _idCaminhao;
     private boolean _carregado;
+    public boolean _finalizado;
     private double _horaRecebimentoContainer;
     
     private DecisaoPosicaoToPosicaoBercoRt _rotaPosicaoBercoAposDecisao;
-    private CaminhaoOperacao _operacao;        
+    private CaminhaoOperacao _operacaoEstacaoArmazenamento;        
     
     private boolean _movimentacaoFinalizada;
     
@@ -43,7 +44,7 @@ public class CaminhaoPatio extends JSimLink{
             _capacidade = capacidade;
             
             criarArquivo();
-            escreverArquivo("Caminhão "+id+"\r\nCriado no momento " + time);
+            escreverArquivo("Caminhão "+id+"\r\n -Criado no momento " + time);
     } // constructor
 
     public int getCapacidade() {
@@ -120,10 +121,18 @@ public class CaminhaoPatio extends JSimLink{
     }
 
     public CaminhaoOperacao getOperacao() {
-        return _operacao;
+        return _operacaoEstacaoArmazenamento;
     }
 
     public void setOperacao(CaminhaoOperacao _operacao) {
-        this._operacao = _operacao;
+        this._operacaoEstacaoArmazenamento = _operacao;
+    }
+
+    public boolean isFinalizado() {
+        return _finalizado;
+    }
+
+    public void setFinalizado(boolean _finalizado) {
+        this._finalizado = _finalizado;
     }
 }

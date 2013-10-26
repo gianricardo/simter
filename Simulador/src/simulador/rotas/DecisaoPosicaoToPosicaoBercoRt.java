@@ -59,7 +59,7 @@ public class DecisaoPosicaoToPosicaoBercoRt extends RouteBase {
             return false;
         } else {
             _caminhoes.add(elemento);
-            _caminhoes.get(0).escreverArquivo("\r\n colocado na " + this.getName() + " no momento " + myParent.getCurrentTime());
+            _caminhoes.get(0).escreverArquivo(" -Colocado na " + this.getName() + " no momento " + myParent.getCurrentTime());
             return true;
         }
     }
