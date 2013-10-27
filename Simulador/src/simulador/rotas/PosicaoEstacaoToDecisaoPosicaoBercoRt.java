@@ -74,6 +74,11 @@ public class PosicaoEstacaoToDecisaoPosicaoBercoRt extends RouteBase{
             return false;
         } else {
             _caminhoes.add(elemento);
+            if (_caminhoes.get(0).getContainer() == null) {
+                _caminhoes.get(0).escreverArquivo(" -Deixou a posição da Estação sem container.");
+            } else {
+                _caminhoes.get(0).escreverArquivo(" -Deixou a posição da Estação com o " + _caminhoes.get(0).getContainer().getId());
+            }            
             _caminhoes.get(0).escreverArquivo(" -Colocado na " + getName() + " no momento " + myParent.getCurrentTime());
             super.OcuparRota();
             return true;

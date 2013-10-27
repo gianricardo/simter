@@ -45,6 +45,8 @@ public class PosicaoBercoToDecisaoPosicaoEstacaoRt extends RouteBase {
                 }
             } else {
                 try {
+                    _caminhoes.get(0).setMovimentacaoFinalizada(false);
+                    _caminhoes.get(0).setFinalizado(false);
                     hold(super.getStream().getNext());
                     ElementOut();
                 } catch (JSimSecurityException | JSimInvalidParametersException ex) {
@@ -56,35 +58,32 @@ public class PosicaoBercoToDecisaoPosicaoEstacaoRt extends RouteBase {
 
     public void ElementOut() {
         try {
-            while (true) {
-                if (_decisaoPosicaoEstacao.getCaminhao() == null) {
-                    _decisaoPosicaoEstacao.setCaminhao(_caminhoes.get(0));
-                    super.LiberarRota();                    
-                    _caminhoes.get(0).escreverArquivo("\r\n -Entrou na " + _decisaoPosicaoEstacao.getName() + " no momento " + myParent.getCurrentTime());
-                    _caminhoes.remove(0);
-                    if (_decisaoPosicaoEstacao.isIdle()) {
-                        _decisaoPosicaoEstacao.activate(myParent.getCurrentTime());
-                    }
-                    if (_posicaoBerco.isIdle()) {
-                        _posicaoBerco.activate(myParent.getCurrentTime());
-                    }
-                    break;
+            if (_decisaoPosicaoEstacao.getCaminhao() == null) {
+                _decisaoPosicaoEstacao.setCaminhao(_caminhoes.get(0));
+                _caminhoes.get(0).setMovimentacaoFinalizada(true);
+                super.LiberarRota();
+                _decisaoPosicaoEstacao.escreverArquivo("\r\nAdicionando caminhão " + _caminhoes.get(0).getIdCaminhao() + " da rota " + this.getName()+ " no momento " + myParent.getCurrentTime());
+                _caminhoes.get(0).escreverArquivo("\r\n -Entrou na " + _decisaoPosicaoEstacao.getName() + " no momento " + myParent.getCurrentTime());
+                _caminhoes.remove(0);
+                if (_decisaoPosicaoEstacao.isIdle()) {
+                    _decisaoPosicaoEstacao.activate(myParent.getCurrentTime());
                 }
-                else{
-                    if(!_caminhoes.isEmpty()){
-                        _caminhoes.get(0).setMovimentacaoFinalizada(true);
-                    }
-                    passivate();
-                    break;
+                if (_posicaoBerco.isIdle()) {
+                    _posicaoBerco.activate(myParent.getCurrentTime());
                 }
+            } else {
+                if (!_caminhoes.isEmpty()) {
+                    _caminhoes.get(0).setMovimentacaoFinalizada(true);
+                }
+                passivate();
             }
         } catch (JSimSecurityException | JSimInvalidParametersException ex) {
             Logger.getLogger(PraticoToBercoRt.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
-    public CaminhaoPatio VerificarCaminhaoFinalizado(){
-        if(!_caminhoes.isEmpty() && _caminhoes.get(0).isMovimentacaoFinalizada()){
+
+    public CaminhaoPatio VerificarCaminhaoFinalizado() {
+        if (!_caminhoes.isEmpty() && _caminhoes.get(0).isMovimentacaoFinalizada()) {
             CaminhaoPatio caminhaoRetornado = _caminhoes.get(0);
             super.LiberarRota();
             _caminhoes.remove(0);
@@ -95,9 +94,8 @@ public class PosicaoBercoToDecisaoPosicaoEstacaoRt extends RouteBase {
                     Logger.getLogger(PosicaoBercoToDecisaoPosicaoEstacaoRt.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
-            return caminhaoRetornado;       
-        }
-        else{
+            return caminhaoRetornado;
+        } else {
             return null;
         }
     }
@@ -107,6 +105,7 @@ public class PosicaoBercoToDecisaoPosicaoEstacaoRt extends RouteBase {
             return false;
         } else {
             _caminhoes.add(caminhao);
+            super.OcuparRota();
             _caminhoes.get(0).escreverArquivo(" -Colocado na " + this.getName() + " no momento " + myParent.getCurrentTime());
             return true;
         }

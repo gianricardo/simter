@@ -10,7 +10,6 @@ import cz.zcu.fav.kiv.jsim.JSimSecurityException;
 import cz.zcu.fav.kiv.jsim.JSimSystem;
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import shipyard.land.move.Portainer;
@@ -134,6 +133,8 @@ public class BercoBusiness {
                 portainerBerco = _berco.getListaPortainers().get(portainer);
 
                 portainerBerco.setFilas(filaBerco, null);
+                
+                portainerBerco.setMovimentacaoFinalizada(false);
                 
                 portainerBerco.criarSolicitacaoCaminhoes();
 

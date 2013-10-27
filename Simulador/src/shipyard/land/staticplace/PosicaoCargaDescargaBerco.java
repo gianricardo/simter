@@ -57,19 +57,21 @@ public class PosicaoCargaDescargaBerco extends JSimProcess {
                 if (_caminhao == null) {
                     passivate();
                 } else {
-                    if(_caminhao.getContainer() == null){
+                    _caminhao.setFinalizado(false);
+                    if (_caminhao.getContainer() == null) {
                         _caminhao.escreverArquivo(" -Chegou na posição " + getName() + " sem container.");
+                    } else {
+                        _caminhao.escreverArquivo(" -Chegou na posição " + getName() + " com o container " + _caminhao.getContainer().getId());
                     }
-                    else{
-                        _caminhao.escreverArquivo(" -Chegou na posição " + getName() + " com o container " + _caminhao.getContainer());
-                    }
-                    
+
                     if (_portainer.isIdle()) {
                         _portainer.activate(myParent.getCurrentTime());
                     }
+
                     passivate();
-                    if (_caminhao.isFinalizado()) {
-                        while (true) {
+
+                    while (true) {
+                        if (_caminhao.isFinalizado()) {
                             try {
                                 if (!liberarCaminhao(_caminhao)) {
                                     passivate();
@@ -85,8 +87,11 @@ public class PosicaoCargaDescargaBerco extends JSimProcess {
                             } catch (IOException ex) {
                                 Logger.getLogger(PosicaoCargaDescargaBerco.class.getName()).log(Level.SEVERE, null, ex);
                             }
+                        } else {
+                            passivate();
                         }
                     }
+
                 } // else queue is empty / not empty
             } // while            
         } // try
@@ -105,7 +110,7 @@ public class PosicaoCargaDescargaBerco extends JSimProcess {
             return false;
         } else {
             _caminhao.setFinalizado(false);
-            _caminhao = null;            
+            _caminhao = null;
             _posicaoOcupada = false;
             return true;
         }

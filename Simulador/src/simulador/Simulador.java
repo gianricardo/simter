@@ -111,7 +111,7 @@ public class Simulador {
 
                 // <editor-fold defaultstate="collapsed" desc="Intermediário">
 
-                _filaCaminhoesPatioVazios = new FilaCaminhoesInternos("Fila de Caminhões do Pátio Vazios", simulation, 2);
+                _filaCaminhoesPatioVazios = new FilaCaminhoesInternos("Fila de Caminhões do Pátio Vazios", simulation, 10);
 
                 _decisaoCaminhoesBerco = new DecisaoCaminhaoPatioPosicaoBerco("Decisão de Caminhões do Pátio para Posicões do Berco", simulation);
 
@@ -155,6 +155,8 @@ public class Simulador {
                     posicaoCargaDescargaEstacaoExterna.setTranstainer(transtainer);
 
                     posicaoCargaDescargaEstacaoInterna.setTranstainer(transtainer);
+                    
+                    posicaoCargaDescargaEstacaoInterna.setFilaCaminhoesVazios(_filaCaminhoesPatioVazios);
 
                     rotaDecisaoPosicaoEstacaoArmazenamentoExt = new DecisaoPosicaoToEstacaoArmazenamentoRt
                             ("Rota da Decisão de Caminhões Externos para Posição Carga Descarga " + i, simulation,
@@ -202,7 +204,7 @@ public class Simulador {
                 filaNavios1 = new FilaNavios("Fila de Entrada de Navios no Porto", simulation);
 
                 geradorNavios = new GeradorNavios("Gerador de Navios 1", simulation,
-                        new UniformDistributionStream(new JSimUniformStream(350, 350.1)), filaNavios1);
+                        new UniformDistributionStream(new JSimUniformStream(250, 250.1)), filaNavios1);
 
                 pratico = new Pratico("Pratico", simulation);
 
@@ -221,14 +223,14 @@ public class Simulador {
                     berco = new Berco(simulation, i + 1, _decisaoCaminhoesEstacaoArmazenamento, _decisaoCaminhoesBerco);
 
                     rotaPraticoBerco = new PraticoToBercoRt("Rota do Prático até o Berco " + berco.getName(), simulation, 1, berco, pratico,
-                            new UniformDistributionStream(new JSimUniformStream(5, 5.1)));
+                            new UniformDistributionStream(new JSimUniformStream(50, 50.1)));
 
                     pratico.addListaRotasBerco(rotaPraticoBerco);
 
                     berco.setRotaPraticoToBerco(rotaPraticoBerco);
 
                     rotaBercoSaida = new BercoToRotaSaidaRt("Rota do Berco até Rota de Saída do Porto" + berco.getName(), simulation, 1, berco, rotaSaidaNavios,
-                            new UniformDistributionStream(new JSimUniformStream(5, 5.1)));
+                            new UniformDistributionStream(new JSimUniformStream(50, 50.1)));
 
                     berco.setRotaBercoToSaida(rotaBercoSaida);
 
@@ -240,11 +242,11 @@ public class Simulador {
 
                         DecisaoPosicaoToPosicaoBercoRt rotaDecisaoToPosBerco = new DecisaoPosicaoToPosicaoBercoRt
                                 ("Rota da Decisão de Caminhões do Pátio para Posicão de Carga e Descarga " + j + " do Berço " + berco.getName(), simulation, 1,
-                                new UniformDistributionStream(new JSimUniformStream(10, 10.1)));
+                                new UniformDistributionStream(new JSimUniformStream(50, 50.1)));
 
                         PosicaoBercoToDecisaoPosicaoEstacaoRt rotaPosicaoBercoToDecisaoPosicaoEstacao = new PosicaoBercoToDecisaoPosicaoEstacaoRt
                                 ("Rota da Posicão de Carga e Descarga " + j + " do Berço " + berco.getName() + " para Decisão de Posições da Estação", simulation, 1,
-                                new UniformDistributionStream(new JSimUniformStream(10, 10.1)));
+                                new UniformDistributionStream(new JSimUniformStream(50, 50.1)));
 
                         posicaoCargaDescarga.setRotaDecisaoPosicaoCargaDescargaBerco(rotaDecisaoToPosBerco);
 
@@ -282,7 +284,7 @@ public class Simulador {
                 simulation.message("Executando a simulação.");
                 bw.write("Executando a simulação.\r\n");
 
-                while ((simulation.getCurrentTime() < 1600.0) && (simulation.step() == true)) {
+                while ((simulation.getCurrentTime() < 5000.0) && (simulation.step() == true)) {
                     continue;
                 }
 
