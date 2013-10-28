@@ -9,6 +9,10 @@ import cz.zcu.fav.kiv.jsim.JSimSecurityException;
 import cz.zcu.fav.kiv.jsim.JSimSimulation;
 import cz.zcu.fav.kiv.jsim.JSimSimulationAlreadyTerminatedException;
 import cz.zcu.fav.kiv.jsim.JSimTooManyProcessesException;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -25,10 +29,16 @@ public class RotaSaidaCaminhoesRt extends RouteBase {
 
     private List<CaminhaoExterno> _caminhoes = new ArrayList();
     private List<PosicaoCargaDescargaEstacaoArmazenamentoCaminhaoExterno> _posicoesCargaDescargaEstacaoArmazenamentos = new ArrayList();
+    
+    private File _arquivo;
+    private FileWriter _fw;
+    private BufferedWriter _bw;
 
     public RotaSaidaCaminhoesRt(String idRoute, JSimSimulation simulation, int capacidade, DistributionFunctionStream stream)
             throws JSimSimulationAlreadyTerminatedException, JSimInvalidParametersException, JSimTooManyProcessesException {
         super(idRoute, simulation, capacidade, stream);
+        
+        criarArquivo();
     }
 
     @Override
@@ -65,6 +75,7 @@ public class RotaSaidaCaminhoesRt extends RouteBase {
     public boolean ElementOut() {
         if (!_caminhoes.isEmpty()) {
             super.LiberarRota();
+            escreverArquivo(" -Caminhao " + _caminhoes.get(0).getIdCaminhao() + " saiu da rota no momento " + myParent.getCurrentTime());
             _caminhoes.remove(0);
             return true;
         }
@@ -76,7 +87,8 @@ public class RotaSaidaCaminhoesRt extends RouteBase {
             return false;
         } else {
             this._caminhoes.add(_caminhao);
-            _caminhoes.get(0).escreverArquivo("\r\nEntrou na " + this.getName() + " no momento " + myParent.getCurrentTime());
+            escreverArquivo("\r\n -Caminhao " + _caminhoes.get(0).getIdCaminhao() + " entrou na rota no momento " + myParent.getCurrentTime());
+            _caminhoes.get(0).escreverArquivo(" -Entrou na " + this.getName() + " no momento " + myParent.getCurrentTime());
             super.OcuparRota();
             return true;
         }
@@ -84,5 +96,26 @@ public class RotaSaidaCaminhoesRt extends RouteBase {
 
     public void addPosicoesCargaDescargaEstacaoArmazenamentos(PosicaoCargaDescargaEstacaoArmazenamentoCaminhaoExterno _posicaoCargaDescargaEstacaoArmazenamentos) {
         this._posicoesCargaDescargaEstacaoArmazenamentos.add(_posicaoCargaDescargaEstacaoArmazenamentos);
+    }
+    
+    private void criarArquivo() {
+        if (_arquivo == null) {
+            try {
+                _arquivo = new File("../Rotas/arquivo" + this.getName() + ".txt");
+                _fw = new FileWriter(_arquivo, false);
+                _bw = new BufferedWriter(_fw);
+            } catch (IOException ex) {
+                ex.printStackTrace(System.err);
+            }
+        }
+    }
+
+    public void escreverArquivo(String texto) {
+        try {
+            _bw.write("\r\n" + texto);
+            _bw.flush();
+        } catch (IOException ex) {
+            ex.printStackTrace(System.err);
+        }
     }
 }

@@ -48,7 +48,7 @@ public class BercoBusiness {
                                         
                     _berco.setHoraAtracacao(_berco.getSimulation().getCurrentTime());                    
                     
-                    navio.escreverArquivo("\r\n iniciando as atividades no berço " + _berco.getName() +" no momento " + _berco.getSimulation().getCurrentTime());
+                    navio.escreverArquivo(" -Iniciando as atividades no berço " + _berco.getName() +" no momento " + _berco.getSimulation().getCurrentTime());
 
                     updateFilasPortainers();
 
@@ -126,13 +126,16 @@ public class BercoBusiness {
         Portainer portainerBerco;
         
         for (int portainer = 0; portainer < _berco.getListaPortainers().size(); portainer++) {
+            
             _berco.getListaPortainers().get(portainer).setMovimentacaoFinalizada(false);
+            
             for (nfila = auxFila; nfila < numeroFilasPortainer + auxFila; nfila++) {
+                
                 filaBerco = (FilaContainers) _berco.getShip().getFilasContainers().get(nfila);                
 
                 portainerBerco = _berco.getListaPortainers().get(portainer);
 
-                portainerBerco.setFilas(filaBerco, null);
+                portainerBerco.setFilas(filaBerco);
                 
                 portainerBerco.setMovimentacaoFinalizada(false);
                 
@@ -150,7 +153,7 @@ public class BercoBusiness {
 
                     portainerBerco = _berco.getListaPortainers().get(portainer);
 
-                    portainerBerco.setFilas(filaBerco, null);
+                    portainerBerco.setFilas(filaBerco);
 
                     if (portainerBerco.isIdle()) {
                         portainerBerco.activate(this._berco.getSimulation().getCurrentTime());

@@ -36,7 +36,7 @@ public class CaminhaoExterno extends JSimLink{
             _idCaminhao = id;
             
             criarArquivo();
-            escreverArquivo("Caminhão "+id+"\r\nCriado no momento " + time);
+            escreverArquivo("Caminhão "+id+"\r\n -Criado no momento " + time);
     } // constructor
 
     public Container getContainer() {
@@ -74,7 +74,7 @@ public class CaminhaoExterno extends JSimLink{
     private void criarArquivo() {
         if (_arquivo == null) {
             try {
-                _arquivo = new File("../arquivoCaminhaoExterno" + _idCaminhao + ".txt");
+                _arquivo = new File("../CaminhoesExternos/arquivoCaminhaoExterno" + _idCaminhao + ".txt");
                 _fw = new FileWriter(_arquivo, false);
                 _bw = new BufferedWriter(_fw);
             } catch (IOException ex) {
@@ -85,7 +85,7 @@ public class CaminhaoExterno extends JSimLink{
 
     public void escreverArquivo(String texto) {
         try {
-            _bw.write("\r\n " + texto);
+            _bw.write("\r\n" + texto);
             _bw.flush();
         } catch (IOException ex) {
             ex.printStackTrace(System.err);

@@ -55,8 +55,17 @@ public class EstacaoArmazenamento extends JSimProcess {
 
         for (int i = 0; i < numeroContainersInicial; i++) {
             try {
-                _container = new Container(myParent.getCurrentTime(), "Container " + i + " da Estação de Armazenamento " , ContainerTipos.EstacaoArmazenamento, ContainerTipos.CaminhaoExterno);
+                _container = new Container(myParent.getCurrentTime(), "Container " + i + " da Estação de Armazenamento " , ContainerTipos.EstacaoArmazenamento, ContainerTipos.Navio);
                 _container.into(_filaContainersParaCaminhoesExternos);
+            } catch (JSimSecurityException ex) {
+                Logger.getLogger(EstacaoArmazenamento.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }    
+        
+        for (int i = 0; i < numeroContainersInicial; i++) {
+            try {
+                _container = new Container(myParent.getCurrentTime(), "Container " + i + " da Estação de Armazenamento " , ContainerTipos.EstacaoArmazenamento, ContainerTipos.Navio);
+                _container.into(_filaContainersParaNavio);
             } catch (JSimSecurityException ex) {
                 Logger.getLogger(EstacaoArmazenamento.class.getName()).log(Level.SEVERE, null, ex);
             }

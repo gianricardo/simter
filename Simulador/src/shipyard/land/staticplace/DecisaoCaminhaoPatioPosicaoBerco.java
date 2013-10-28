@@ -65,12 +65,12 @@ public class DecisaoCaminhaoPatioPosicaoBerco extends JSimProcess {
                                 _rotaDecisaoEstacaoDecisaoBerco.activate(myParent.getCurrentTime());
                             }
                             
-                            /*for(int i = 0; i<_listaRotasEstacao.size();i++)
+                            for(int i = 0; i<_listaRotasEstacao.size();i++)
                             {
                                 if(_listaRotasEstacao.get(i).isIdle()){
                                     _listaRotasEstacao.get(i).activate(myParent.getCurrentTime());
                                 }
-                            }*/
+                            }
                             break;
                         }
                     }

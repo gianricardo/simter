@@ -33,10 +33,14 @@ public class PortainerBusiness {
 
         if (_portainer.getNumeroContainersDescarregar() > 0) {
             _portainer.setDescarregar(true);
+        } else {
+            _portainer.setDescarregar(false);
         }
 
         if (_portainer.getNumeroContainersCarregar() > 0) {
             _portainer.setCarregar(true);
+        } else {
+            _portainer.setCarregar(false);
         }
 
         criarArquivo();
@@ -50,9 +54,9 @@ public class PortainerBusiness {
                         descarregarFilaContainersNavio();
                     }
 
-                    //if(_portainer.isCarregar()){
-                    //carregarFilaContainersNavio();
-                    //}
+                    if (_portainer.isCarregar()) {
+                        carregarFilaContainersNavio();
+                    }
 
                     _portainer.getFilasContainers().remove(_portainer.getQueueIn());
 
@@ -102,6 +106,7 @@ public class PortainerBusiness {
         _portainer.setQueueIn(_portainer.getFilasContainers().get(0));
         _portainer.getQueueIn().setHoraFinalAtendimento(0);
         _portainer.setNumeroContainersDescarregar(_portainer.getQueueIn().getNumeroContainers());
+        _portainer.setNumeroContainersCarregar(_portainer.getQueueIn().getNumeroContainersCarregar());
 
         SolicitacaoCaminhoesPatio solicitacao = new SolicitacaoCaminhoesPatio();
         solicitacao.setNumeroCaminhoesDescarregar(_portainer.getQueueIn().getNumeroContainers());
@@ -120,7 +125,7 @@ public class PortainerBusiness {
     }
 
     public void criarArquivo() {
-        _portainer.setArquivo(new File("../arquivoContainers" + _portainer.getNomePortainer() + " " + _portainer.getQueueIn().getNomeFila() + ".txt"));
+        _portainer.setArquivo(new File("../MovimentacoesPortainer/arquivoContainers" + _portainer.getNomePortainer() + " " + _portainer.getQueueIn().getNomeFila() + ".txt"));
         if (!this._portainer.getArquivo().exists()) {
             try {
                 this._portainer.getArquivo().createNewFile();
@@ -154,7 +159,7 @@ public class PortainerBusiness {
     private void descarregarFilaContainersNavio() throws JSimSecurityException, JSimInvalidParametersException {
         while (true) {
             if (_portainer.getQueueIn().empty()) {
-                _portainer.setMovimentacaoFinalizada(true);
+                //_portainer.setMovimentacaoFinalizada(true);
                 _portainer.passivo();
                 break;
             } else {
@@ -191,7 +196,7 @@ public class PortainerBusiness {
                         _portainer.setTempoTotalAtendimento(_portainer.getHoraSaidaContainer() - _portainer.getHoraMovimentacao());
 
                         if (_portainer.getQueueIn().empty()) {
-                            _portainer.setMovimentacaoFinalizada(true);
+                            //_portainer.setMovimentacaoFinalizada(true);
                             _portainer.getQueueIn().setHoraFinalDescarregamento(_portainer.getHoraSaidaContainer());
                             try {
                                 escreverArquivo();
@@ -216,40 +221,62 @@ public class PortainerBusiness {
 
     private void carregarFilaContainersNavio() throws JSimSecurityException, JSimInvalidParametersException {
         while (true) {
-            if (_portainer.getPosicaoCargaDescarga().getCaminhao() == null) {
+            if (_portainer.getQueueIn().getNumeroContainersCarregar() == _portainer.getQueueIn().getNumeroContainers()) {
+                _portainer.setMovimentacaoFinalizada(true);
                 _portainer.passivo();
+                break;
             } else {
-                if (_portainer.isCarregar()) {
-                    if (_portainer.getPosicaoCargaDescarga().isIdle() && _portainer.getPosicaoCargaDescarga().getCaminhao() == null) {
-                        _portainer.getPosicaoCargaDescarga().activate(_portainer.getSimulation().getCurrentTime());
+                if (_portainer.getPosicaoCargaDescarga().getCaminhao() == null) {
+                    _portainer.passivo();
+                } else {
+                    if (_portainer.getPosicaoCargaDescarga().getCaminhao().getContainer() == null || 
+                            _portainer.getPosicaoCargaDescarga().getCaminhao().isFinalizado()) {
+                        _portainer.passivo();
+                    } else {
+                        if (_portainer.isCarregar()) {
+                            if (_portainer.getPosicaoCargaDescarga().isIdle() && _portainer.getPosicaoCargaDescarga().getCaminhao() == null) {
+                                _portainer.getPosicaoCargaDescarga().activate(_portainer.getSimulation().getCurrentTime());
+                            }
+                        }
+
+                        _portainer.setContainer(_portainer.getPosicaoCargaDescarga().getCaminhao().getContainer());
+                        _portainer.setHoraMovimentacao(_portainer.getSimulation().getCurrentTime());
+                        _portainer.getPosicaoCargaDescarga().getCaminhao().setContainer(null);
+                        _portainer.getPosicaoCargaDescarga().getCaminhao().setFinalizado(true);
+
+                        _portainer.segurar(JSimSystem.uniform(10, 10));
+
+                        _portainer.getContainer().into(_portainer.getQueueIn());
+
+                        _portainer.getQueueIn().setNumeroContainers(_portainer.getQueueIn().getNumeroContainers() + 1);
+                        
+                        _portainer.setHoraSaidaContainer(_portainer.getSimulation().getCurrentTime());
+                        _portainer.setTempoTotalAtendimento(_portainer.getHoraSaidaContainer() - _portainer.getHoraMovimentacao());
+
+                        if (_portainer.getPosicaoCargaDescarga().isIdle()) {
+                            _portainer.getPosicaoCargaDescarga().activate(_portainer.getSimulation().getCurrentTime());
+                        }
+
+                        if (_portainer.getQueueIn().getNumeroContainersCarregar() == _portainer.getQueueIn().getNumeroContainers()) {
+                            _portainer.setMovimentacaoFinalizada(true);
+                            _portainer.getQueueIn().setHoraFinalCarregamento(_portainer.getHoraSaidaContainer());
+
+                            try {
+                                escreverArquivo();
+                            } catch (IOException ex) {
+                                Logger.getLogger(Portainer.class.getName()).log(Level.SEVERE, null, ex);
+                            }
+                            break;
+                        }
+
+                        _portainer.passivo();
+
+                        try {
+                            escreverArquivo();
+                        } catch (IOException ex) {
+                            Logger.getLogger(Portainer.class.getName()).log(Level.SEVERE, null, ex);
+                        }
                     }
-                }
-
-                _portainer.setContainer(_portainer.getPosicaoCargaDescarga().getCaminhao().getContainer());
-                _portainer.setHoraMovimentacao(_portainer.getSimulation().getCurrentTime());
-
-                _portainer.segurar(JSimSystem.uniform(10, 10));
-
-                _portainer.getPosicaoCargaDescarga().getCaminhao().setContainer(null);
-                _portainer.getContainer().into(_portainer.getQueueIn());
-
-                _portainer.getQueueIn().setNumeroContainers(_portainer.getQueueIn().getNumeroContainers() + 1);
-
-                if (_portainer.getQueueIn().getNumeroContainersCarregar() == _portainer.getQueueIn().getNumeroContainers()) {
-                    _portainer.getQueueIn().setHoraFinalCarregamento(_portainer.getHoraSaidaContainer());
-                    break;
-                }
-
-                if (_portainer.getPosicaoCargaDescarga().isIdle()) {
-                    _portainer.getPosicaoCargaDescarga().activate(_portainer.getSimulation().getCurrentTime());
-                }
-
-                _portainer.passivo();
-
-                try {
-                    escreverArquivo();
-                } catch (IOException ex) {
-                    Logger.getLogger(Portainer.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
         }

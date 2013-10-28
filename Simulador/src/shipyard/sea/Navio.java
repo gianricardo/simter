@@ -66,7 +66,7 @@ public class Navio extends JSimLink {
         _numeroRegioesNavio = numeroRegioesNavio;
         
         criarArquivo();
-        escreverArquivo("Navio " + _idNavio + "\r\n Criado no momento " + _timeOfCreation);        
+        escreverArquivo("Navio " + _idNavio + "\r\n -Criado no momento " + _timeOfCreation);        
     } // constructor
 
     private void updateShip() {
@@ -184,7 +184,7 @@ public class Navio extends JSimLink {
     private void criarArquivo() {
         if (_arquivo == null) {
             try {
-                _arquivo = new File("../arquivoNavio" + _idNavio + ".txt");
+                _arquivo = new File("../Navios/arquivoNavio" + _idNavio + ".txt");
                 _fw = new FileWriter(_arquivo, false);
                 _bw = new BufferedWriter(_fw);
             } catch (IOException ex) {
@@ -195,7 +195,7 @@ public class Navio extends JSimLink {
 
     public void escreverArquivo(String texto) {
         try {
-            _bw.write("\r\n " + texto);
+            _bw.write("\r\n" + texto);
             _bw.flush();
         } catch (IOException ex) {
             ex.printStackTrace(System.err);

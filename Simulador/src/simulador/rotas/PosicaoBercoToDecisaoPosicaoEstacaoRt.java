@@ -9,6 +9,10 @@ import cz.zcu.fav.kiv.jsim.JSimSecurityException;
 import cz.zcu.fav.kiv.jsim.JSimSimulation;
 import cz.zcu.fav.kiv.jsim.JSimSimulationAlreadyTerminatedException;
 import cz.zcu.fav.kiv.jsim.JSimTooManyProcessesException;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -27,10 +31,16 @@ public class PosicaoBercoToDecisaoPosicaoEstacaoRt extends RouteBase {
     private List<CaminhaoPatio> _caminhoes = new ArrayList();
     private DecisaoCaminhaoPatioPosicaoEstacao _decisaoPosicaoEstacao;
     private PosicaoCargaDescargaBerco _posicaoBerco;
+    
+    private File _arquivo;
+    private FileWriter _fw;
+    private BufferedWriter _bw;
 
     public PosicaoBercoToDecisaoPosicaoEstacaoRt(String idRoute, JSimSimulation simulation, int capacidade, DistributionFunctionStream stream)
             throws JSimSimulationAlreadyTerminatedException, JSimInvalidParametersException, JSimTooManyProcessesException {
         super(idRoute, simulation, capacidade, stream);
+        
+        criarArquivo();
     }
 
     @Override
@@ -64,6 +74,7 @@ public class PosicaoBercoToDecisaoPosicaoEstacaoRt extends RouteBase {
                 super.LiberarRota();
                 _decisaoPosicaoEstacao.escreverArquivo("\r\nAdicionando caminhão " + _caminhoes.get(0).getIdCaminhao() + " da rota " + this.getName()+ " no momento " + myParent.getCurrentTime());
                 _caminhoes.get(0).escreverArquivo("\r\n -Entrou na " + _decisaoPosicaoEstacao.getName() + " no momento " + myParent.getCurrentTime());
+                escreverArquivo(" -Caminhao " + _caminhoes.get(0).getIdCaminhao() + " saiu da rota no momento " + myParent.getCurrentTime());
                 _caminhoes.remove(0);
                 if (_decisaoPosicaoEstacao.isIdle()) {
                     _decisaoPosicaoEstacao.activate(myParent.getCurrentTime());
@@ -86,7 +97,8 @@ public class PosicaoBercoToDecisaoPosicaoEstacaoRt extends RouteBase {
         if (!_caminhoes.isEmpty() && _caminhoes.get(0).isMovimentacaoFinalizada()) {
             CaminhaoPatio caminhaoRetornado = _caminhoes.get(0);
             super.LiberarRota();
-            _caminhoes.remove(0);
+            escreverArquivo("\r\n -Caminhao " + _caminhoes.get(0).getIdCaminhao() + " saiu da rota no momento " + myParent.getCurrentTime());
+            _caminhoes.remove(0);            
             if (_posicaoBerco.isIdle()) {
                 try {
                     _posicaoBerco.activate(myParent.getCurrentTime());
@@ -107,6 +119,7 @@ public class PosicaoBercoToDecisaoPosicaoEstacaoRt extends RouteBase {
             _caminhoes.add(caminhao);
             super.OcuparRota();
             _caminhoes.get(0).escreverArquivo(" -Colocado na " + this.getName() + " no momento " + myParent.getCurrentTime());
+            escreverArquivo("\r\n -Caminhao " + _caminhoes.get(0).getIdCaminhao() + " entrou na rota no momento " + myParent.getCurrentTime());
             return true;
         }
     }
@@ -117,5 +130,26 @@ public class PosicaoBercoToDecisaoPosicaoEstacaoRt extends RouteBase {
 
     public void setPosicaoBerco(PosicaoCargaDescargaBerco _posicaoBerco) {
         this._posicaoBerco = _posicaoBerco;
+    }
+    
+    private void criarArquivo() {
+        if (_arquivo == null) {
+            try {
+                _arquivo = new File("../Rotas/arquivo" + this.getName() + ".txt");
+                _fw = new FileWriter(_arquivo, false);
+                _bw = new BufferedWriter(_fw);
+            } catch (IOException ex) {
+                ex.printStackTrace(System.err);
+            }
+        }
+    }
+
+    public void escreverArquivo(String texto) {
+        try {
+            _bw.write("\r\n" + texto);
+            _bw.flush();
+        } catch (IOException ex) {
+            ex.printStackTrace(System.err);
+        }
     }
 }

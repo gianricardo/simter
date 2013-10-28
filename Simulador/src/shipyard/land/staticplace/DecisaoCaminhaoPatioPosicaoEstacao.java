@@ -59,7 +59,10 @@ public class DecisaoCaminhaoPatioPosicaoEstacao extends JSimProcess {
         while (true) {
             if (_listaSolicitacoesCaminhoes.isEmpty() && _caminhao == null) {
                 try {
-                    passivate();
+                    verificarCaminhoesRotas();
+                    if(_caminhao == null){
+                        passivate();
+                    }                    
                 } catch (JSimSecurityException ex) {
                     Logger.getLogger(DecisaoCaminhaoPatioPosicaoEstacao.class.getName()).log(Level.SEVERE, null, ex);
                 }
@@ -70,7 +73,7 @@ public class DecisaoCaminhaoPatioPosicaoEstacao extends JSimProcess {
                         if (!_filaCaminhoesVazios.empty()) {
                             try {
                                 _caminhao = (CaminhaoPatio) _filaCaminhoesVazios.first();
-                                escreverArquivo("\r\nAdicionando caminhão " + _caminhao.getIdCaminhao() + " da fila de caminhões vazios" + " no momento " + myParent.getCurrentTime());
+                                escreverArquivo("\r\n -Adicionando caminhão " + _caminhao.getIdCaminhao() + " da fila de caminhões vazios" + " no momento " + myParent.getCurrentTime());
                                 _caminhao.escreverArquivo("\r\n -Entrou na " + this.getName() + " no momento " + myParent.getCurrentTime());
                                 _caminhao.out();
                                 verificarProximaSolicitacao();
@@ -103,17 +106,17 @@ public class DecisaoCaminhaoPatioPosicaoEstacao extends JSimProcess {
     }
 
     public void verificarCaminhoesRotas() {
-        for (int i = 0/*indiceUltimaRotaVerificada*/; i < _listaRotasPosicaoBercoOrigem.size(); i++) {
+        for (int i = 0; i < _listaRotasPosicaoBercoOrigem.size(); i++) {
             _caminhao = _listaRotasPosicaoBercoOrigem.get(i).VerificarCaminhaoFinalizado();
             if (_caminhao != null) {
                 _caminhao.escreverArquivo("\r\n -Entrou na " + getName() + " no momento " + myParent.getCurrentTime());
-                escreverArquivo("\r\nAdicionando caminhão " + _caminhao.getIdCaminhao() + " da rota " + _listaRotasPosicaoBercoOrigem.get(i).getName() + " no momento " + myParent.getCurrentTime());
-                _caminhao.setMovimentacaoFinalizada(false);
+                escreverArquivo("\r\n -Adicionando caminhão " + _caminhao.getIdCaminhao() + " da rota " + _listaRotasPosicaoBercoOrigem.get(i).getName() + " no momento " + myParent.getCurrentTime());
+                //_caminhao.setMovimentacaoFinalizada(false);
                 indiceUltimaRotaVerificada++;
                 if (indiceUltimaRotaVerificada >= _listaRotasPosicaoBercoOrigem.size()) {
                     indiceUltimaRotaVerificada = 0;
                 }
-                //_caminhao.setContainer(null);
+                
                 if (_listaRotasPosicaoBercoOrigem.get(i).isIdle()) {
                     try {
                         _listaRotasPosicaoBercoOrigem.get(i).activate(myParent.getCurrentTime());
@@ -127,15 +130,13 @@ public class DecisaoCaminhaoPatioPosicaoEstacao extends JSimProcess {
     }
 
     public void verificarProximaSolicitacao() {
-
         if (!_listaSolicitacoesCaminhoes.isEmpty()) {
             _solicitacaoMomento = _listaSolicitacoesCaminhoes.get(indiceUltimaSolicitacaoAtendida);
-
 
             if (_solicitacaoMomento.getNumeroCaminhoesDescarregar() > 0) {
                 _caminhao.setRotaPosicaoBercoAposDecisao(_solicitacaoMomento.getRotaDecisaoPosicaoBerco());
                 _solicitacaoMomento.setNumeroCaminhoesDescarregar(_solicitacaoMomento.getNumeroCaminhoesDescarregar() - 1);
-                if (_solicitacaoMomento.getNumeroCaminhoesDescarregar() <= 0) {
+                if (_solicitacaoMomento.getNumeroCaminhoesDescarregar() <= 0 && _solicitacaoMomento.getNumeroCaminhoesCarregar() <=0) {
                     _listaSolicitacoesCaminhoes.remove(_solicitacaoMomento);
                 }
                 if (_caminhao.getContainer() == null) {
@@ -154,15 +155,30 @@ public class DecisaoCaminhaoPatioPosicaoEstacao extends JSimProcess {
             } else if (_solicitacaoMomento.getNumeroCaminhoesCarregar() > 0) {
                 _caminhao.setRotaPosicaoBercoAposDecisao(_solicitacaoMomento.getRotaDecisaoPosicaoBerco());
                 _solicitacaoMomento.setNumeroCaminhoesCarregar(_solicitacaoMomento.getNumeroCaminhoesCarregar() - 1);
+                if (_solicitacaoMomento.getNumeroCaminhoesCarregar() <= 0) {
+                    _listaSolicitacoesCaminhoes.remove(_solicitacaoMomento);
+                }
                 if (_caminhao.getContainer() == null) {
-                    DecidirCaminhaoVazioCarregarNavio();
+                    try {
+                        DecidirCaminhaoVazioCarregarNavio();
+                    } catch (JSimSecurityException | JSimInvalidParametersException ex) {
+                        Logger.getLogger(DecisaoCaminhaoPatioPosicaoEstacao.class.getName()).log(Level.SEVERE, null, ex);
+                    }
                 } else {
-                    DecidirCaminhaoOcupadoCarregarNavio();
+                    try {
+                        DecidirCaminhaoOcupadoCarregarNavio();
+                    } catch (JSimSecurityException | JSimInvalidParametersException ex) {
+                        Logger.getLogger(DecisaoCaminhaoPatioPosicaoEstacao.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+                indiceUltimaSolicitacaoAtendida++;
+                if (indiceUltimaSolicitacaoAtendida >= _listaSolicitacoesCaminhoes.size()) {
+                    indiceUltimaSolicitacaoAtendida = 0;
                 }
             }
         } else {
             CaminhaoSemOperacao();
-        }
+        }        
     }
 
     public void DecidirCaminhaoVazioDescarregarNavio() {
@@ -175,7 +191,7 @@ public class DecisaoCaminhaoPatioPosicaoEstacao extends JSimProcess {
                     Logger.getLogger(DecisaoCaminhaoPatioPosicaoEstacao.class.getName()).log(Level.SEVERE, null, ex);
                 }
             } else {
-                escreverArquivo("Enviando caminhão " + _caminhao.getIdCaminhao() + " para rota " + _rotaDecisaoBerco.getName() + " no momento " + myParent.getCurrentTime());
+                escreverArquivo(" -Enviando caminhão " + _caminhao.getIdCaminhao() + " para rota " + _rotaDecisaoBerco.getName() + " no momento " + myParent.getCurrentTime());
                 _caminhao = null;
                 if (_rotaDecisaoBerco.isIdle()) {
                     try {
@@ -205,10 +221,36 @@ public class DecisaoCaminhaoPatioPosicaoEstacao extends JSimProcess {
         }
     }
 
-    public void DecidirCaminhaoVazioCarregarNavio() {
+    public void DecidirCaminhaoVazioCarregarNavio() throws JSimSecurityException, JSimInvalidParametersException {
+         DecisaoPosicaoToEstacaoArmazenamentoIntRt _rotaMomento;
+        _caminhao.setOperacao(CaminhaoOperacao.Carregar);
+        while (true) {
+            _rotaMomento = ElementOut();
+            if (_rotaMomento == null) {
+                passivate();
+            } else {
+                if (_rotaMomento.isIdle()) {
+                    _rotaMomento.activate(myParent.getCurrentTime());
+                }
+                break;
+            }
+        }
     }
 
-    public void DecidirCaminhaoOcupadoCarregarNavio() {
+    public void DecidirCaminhaoOcupadoCarregarNavio() throws JSimSecurityException, JSimInvalidParametersException {
+        DecisaoPosicaoToEstacaoArmazenamentoIntRt _rotaMomento;
+        _caminhao.setOperacao(CaminhaoOperacao.DescarregarCarregar);
+        while (true) {
+            _rotaMomento = ElementOut();
+            if (_rotaMomento == null) {
+                passivate();
+            } else {
+                if (_rotaMomento.isIdle()) {
+                    _rotaMomento.activate(myParent.getCurrentTime());
+                }
+                break;
+            }
+        }        
     }
 
     public void CaminhaoSemOperacao() {
@@ -253,7 +295,8 @@ public class DecisaoCaminhaoPatioPosicaoEstacao extends JSimProcess {
     public DecisaoPosicaoToEstacaoArmazenamentoIntRt ElementOut() {
         for (int i = 0; i < _listaRotasPosicoesEstacaoDestino.size(); i++) {
             if (_listaRotasPosicoesEstacaoDestino.get(i).GetNextElement(_caminhao)) {
-                escreverArquivo("Enviando caminhão " + _caminhao.getIdCaminhao() + " para rota " + _listaRotasPosicoesEstacaoDestino.get(i).getName() + " no momento " + myParent.getCurrentTime());
+                escreverArquivo(" -Enviando caminhão " + _caminhao.getIdCaminhao() + " para rota " + _listaRotasPosicoesEstacaoDestino.get(i).getName() + " no momento " + myParent.getCurrentTime());
+                _caminhao.setMovimentacaoFinalizada(false);
                 _caminhao = null;
                 return _listaRotasPosicoesEstacaoDestino.get(i);
             }
@@ -284,7 +327,7 @@ public class DecisaoCaminhaoPatioPosicaoEstacao extends JSimProcess {
     private void criarArquivo() {
         if (_arquivo == null) {
             try {
-                _arquivo = new File("../arquivo" + getName() + ".txt");
+                _arquivo = new File("../DecisaoCaminhoesPatioEstacao/arquivo" + getName() + ".txt");
                 _fw = new FileWriter(_arquivo, false);
                 _bw = new BufferedWriter(_fw);
             } catch (IOException ex) {
@@ -295,7 +338,7 @@ public class DecisaoCaminhaoPatioPosicaoEstacao extends JSimProcess {
 
     public void escreverArquivo(String texto) {
         try {
-            _bw.write("\r\n " + texto);
+            _bw.write("\r\n" + texto);
             _bw.flush();
         } catch (IOException ex) {
             ex.printStackTrace(System.err);

@@ -87,8 +87,8 @@ public class FilaCaminhoesExternosToDecisaoPosicaoRt extends RouteBase {
                         return false;
                     }
                     _caminhoes.add(novoCaminhao);
-                    escreverArquivo("\r\n caminhao " + _caminhoes.get(0).getIdCaminhao() + " entrou no momento " + myParent.getCurrentTime());
-                    _caminhoes.get(0).escreverArquivo("\r\nEntrou na " + this.getName() + " no momento " + myParent.getCurrentTime());
+                    escreverArquivo("\r\n -Caminhao " + _caminhoes.get(0).getIdCaminhao() + " entrou no momento " + myParent.getCurrentTime());
+                    _caminhoes.get(0).escreverArquivo("\r\n -Entrou na " + this.getName() + " no momento " + myParent.getCurrentTime());
                     novoCaminhao.out();
                     super.OcuparRota();
                 } catch (JSimSecurityException ex) {
@@ -106,7 +106,7 @@ public class FilaCaminhoesExternosToDecisaoPosicaoRt extends RouteBase {
         for(int i = 0; i<_rotasEstacaoArmazenamento.size(); i++){
             if(_rotasEstacaoArmazenamento.get(i).addCaminhoes(_caminhoes.get(0))) {
                 super.LiberarRota();
-                escreverArquivo("\r\n caminhao " + _caminhoes.get(0).getIdCaminhao() + " saiu para rota " + _rotasEstacaoArmazenamento.get(i).getName() + " no momento " + myParent.getCurrentTime());
+                escreverArquivo(" -Caminhao " + _caminhoes.get(0).getIdCaminhao() + " saiu para rota " + _rotasEstacaoArmazenamento.get(i).getName() + " no momento " + myParent.getCurrentTime());
                 _caminhoes.remove(0);                
                 return _rotasEstacaoArmazenamento.get(i);
             }            
@@ -121,7 +121,7 @@ public class FilaCaminhoesExternosToDecisaoPosicaoRt extends RouteBase {
     private void criarArquivo() {
         if (_arquivo == null) {
             try {
-                _arquivo = new File("../arquivoRotaEntradaCaminhoes.txt");
+                _arquivo = new File("../Rotas/arquivo" + this.getName() + ".txt");
                 _fw = new FileWriter(_arquivo, false);
                 _bw = new BufferedWriter(_fw);
             } catch (IOException ex) {
@@ -132,7 +132,7 @@ public class FilaCaminhoesExternosToDecisaoPosicaoRt extends RouteBase {
 
     public void escreverArquivo(String texto) {
         try {
-            _bw.write("\r\n " + texto);
+            _bw.write("\r\n" + texto);
             _bw.flush();
         } catch (IOException ex) {
             ex.printStackTrace(System.err);

@@ -11,6 +11,7 @@ import cz.zcu.fav.kiv.jsim.JSimInvalidParametersException;
 import cz.zcu.fav.kiv.jsim.JSimProcess;
 import cz.zcu.fav.kiv.jsim.JSimSimulation;
 import cz.zcu.fav.kiv.jsim.JSimSimulationAlreadyTerminatedException;
+import cz.zcu.fav.kiv.jsim.JSimSystem;
 import cz.zcu.fav.kiv.jsim.JSimTooManyProcessesException;
 import java.io.IOException;
 import shipyard.land.move.CaminhaoExterno;
@@ -31,14 +32,20 @@ public class GeradorCaminhoesExternos extends JSimProcess {
     private JSimSimulation _simulation;
     private Container _container;
     private FilaCaminhoesExternosToDecisaoPosicaoRt _rotaEntradaCaminhoes;
+    private int _percentualCaminhoesDescarregar;
+    private int _percentualCaminhoesCarregar;
+    private double _random;
 
-    public GeradorCaminhoesExternos(String name, JSimSimulation sim, DistributionFunctionStream stream, FilaCaminhoesExternos q)
+    public GeradorCaminhoesExternos(String name, JSimSimulation sim, DistributionFunctionStream stream, FilaCaminhoesExternos q,
+            int percentualCaminhoesDescarregar, int percentualCaminhoesCarregar)
             throws JSimSimulationAlreadyTerminatedException, JSimInvalidParametersException, JSimTooManyProcessesException, IOException {
         super(name, sim);
         _tempoEntreCaminhoes = stream;
         _queue = q;
         _simulation = sim;
         _numeroCaminhao = 1;
+        _percentualCaminhoesDescarregar = percentualCaminhoesDescarregar;
+        _percentualCaminhoesCarregar = percentualCaminhoesCarregar;        
     } // constructor  
     
     @Override
@@ -48,10 +55,25 @@ public class GeradorCaminhoesExternos extends JSimProcess {
                 // Periodically creating new navios and putting them into the queue.
                 CaminhaoExterno novo = new CaminhaoExterno(myParent.getCurrentTime(), String.valueOf(_numeroCaminhao), _simulation);
                 
-                _container = new Container(myParent.getCurrentTime(), "Container do Caminhão Externo " + _numeroCaminhao, ContainerTipos.CaminhaoExterno, ContainerTipos.Navio);                
-                novo.setContainer(_container);
-                novo.setCarregado(true);
-                novo.setOperacao(CaminhaoOperacao.DescarregarCarregar);
+                _random = JSimSystem.uniform(0.0, 1.0);
+               
+                if(_random > (_percentualCaminhoesDescarregar*0.01)){
+                    _container = new Container(myParent.getCurrentTime(), "Container do Caminhão Externo " + _numeroCaminhao, ContainerTipos.CaminhaoExterno, ContainerTipos.Navio);
+                    novo.setContainer(_container);
+                    novo.setCarregado(true);
+                    
+                    if(_random > (_percentualCaminhoesDescarregar*0.01) + (_percentualCaminhoesCarregar*0.01)){
+                        novo.setOperacao(CaminhaoOperacao.DescarregarCarregar);
+                    }
+                    
+                    else{
+                        novo.setOperacao(CaminhaoOperacao.Carregar);
+                    }
+                }
+                else{
+                    novo.setOperacao(CaminhaoOperacao.Descarregar);
+                }
+                
                 novo.into(_queue);
                 
                 if(_rotaEntradaCaminhoes.isIdle()){

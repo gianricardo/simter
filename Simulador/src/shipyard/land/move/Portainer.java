@@ -231,11 +231,10 @@ public class Portainer extends JSimProcess {
         this._container = _container;
     }
     
-    public void setFilas(FilaContainers parQueueIn, FilaContainers parQueueOut) {
+    public void setFilas(FilaContainers parQueueIn) {
         _queueIn = parQueueIn;
         _queueIn.setHoraInicioAtendimento(myParent.getCurrentTime());
         _filasContainers.add(_queueIn);
-        _queueOut = parQueueOut;
     }
 
     public int getNumeroContainersDescarregar() {

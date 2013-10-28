@@ -67,7 +67,7 @@ public class PosicaoCargaDescargaEstacaoArmazenamentoCaminhaoInterno extends JSi
 
                     while (true) {
                         try {
-                            if (_caminhao.isFinalizado()) {   
+                            if (_caminhao.isFinalizado()) {
                                 
                                 if (_caminhao.getRotaPosicaoBercoAposDecisao() == null) {
                                     _caminhao.into(_filaCaminhoesVazios);
@@ -85,7 +85,7 @@ public class PosicaoCargaDescargaEstacaoArmazenamentoCaminhaoInterno extends JSi
                                 }
                                 
                                 else if (!liberarCaminhao(_caminhao)) {
-                                    passivate();
+                                    passivate();                                    
                                 }
                                 
                                 else {                                    

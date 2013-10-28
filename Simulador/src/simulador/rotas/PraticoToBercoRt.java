@@ -10,6 +10,10 @@ import cz.zcu.fav.kiv.jsim.JSimSecurityException;
 import cz.zcu.fav.kiv.jsim.JSimSimulation;
 import cz.zcu.fav.kiv.jsim.JSimSimulationAlreadyTerminatedException;
 import cz.zcu.fav.kiv.jsim.JSimTooManyProcessesException;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -28,12 +32,18 @@ public class PraticoToBercoRt extends RouteBase {
     private List<Navio> _navios = new ArrayList();
     private Berco _berco;
     private Pratico _pratico;
+    
+    private File _arquivo;
+    private FileWriter _fw;
+    private BufferedWriter _bw;
 
     public PraticoToBercoRt(String idRoute, JSimSimulation simulation, int capacidade, Berco berco, Pratico pratico, DistributionFunctionStream stream)
             throws JSimSimulationAlreadyTerminatedException, JSimInvalidParametersException, JSimTooManyProcessesException {
         super(idRoute, simulation, capacidade, stream);
         _berco = berco;
         _pratico = pratico;
+        
+        criarArquivo();
     }
 
     @Override
@@ -65,8 +75,9 @@ public class PraticoToBercoRt extends RouteBase {
             if (elemento instanceof Navio) {
                 Navio novonavio = (Navio) elemento;
                 _navios.add(novonavio);
-                _navios.get(0).escreverArquivo("\r\n colocado na " + this.getName() + " no momento " + myParent.getCurrentTime() +
+                _navios.get(0).escreverArquivo(" -Colocado na " + this.getName() + " no momento " + myParent.getCurrentTime() +
                         " pelo prático " + _pratico.getName());
+                escreverArquivo("\r\n -Navio " + _navios.get(0).getIdNavio() + " entrou na rota no momento " + myParent.getCurrentTime());
                 _berco.setOcupado(true);
             } else {
                 System.out.println(elemento.getClass());
@@ -79,6 +90,7 @@ public class PraticoToBercoRt extends RouteBase {
         try {
             _berco.setShip(_navios.get(0));            
             super.LiberarRota();
+            escreverArquivo(" -Navio " + _navios.get(0).getIdNavio() + " saiu da rota no momento " + myParent.getCurrentTime());
             _navios.remove(0);    
             _pratico.setOcupado(false);
             _pratico.activate(myParent.getCurrentTime());
@@ -96,5 +108,26 @@ public class PraticoToBercoRt extends RouteBase {
 
     public Berco getBerco() {
         return _berco;
+    }
+    
+    private void criarArquivo() {
+        if (_arquivo == null) {
+            try {
+                _arquivo = new File("../Rotas/arquivo" + this.getName() + ".txt");
+                _fw = new FileWriter(_arquivo, false);
+                _bw = new BufferedWriter(_fw);
+            } catch (IOException ex) {
+                ex.printStackTrace(System.err);
+            }
+        }
+    }
+
+    public void escreverArquivo(String texto) {
+        try {
+            _bw.write("\r\n" + texto);
+            _bw.flush();
+        } catch (IOException ex) {
+            ex.printStackTrace(System.err);
+        }
     }
 }

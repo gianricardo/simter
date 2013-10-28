@@ -56,7 +56,7 @@ public class PosicaoCargaDescargaEstacaoArmazenamentoCaminhaoExterno extends JSi
                     // If we have nothing to do, we sleep.
                     passivate();
                 } else {
-                    escreverArquivo(" Iniciando Movimentação do Transtainer para caminhao no momento " + myParent.getCurrentTime());
+                    escreverArquivo("\r\n -Iniciando Movimentação do Transtainer para caminhao "+ _caminhao.getIdCaminhao()+" no momento " + myParent.getCurrentTime());
                     if (_transtainer.isIdle()) {
                         _transtainer.activate(myParent.getCurrentTime());
                     }
@@ -66,7 +66,7 @@ public class PosicaoCargaDescargaEstacaoArmazenamentoCaminhaoExterno extends JSi
                             if (!liberarCaminhao(_caminhao)) {
                                 passivate();
                             } else {
-                                escreverArquivo(" Liberando caminhao no momento " + myParent.getCurrentTime());
+                                escreverArquivo(" -Liberando caminhao no momento " + myParent.getCurrentTime());
                                 if (_rotaSaidaCaminhoes.isIdle()) {
                                     _rotaSaidaCaminhoes.activate(myParent.getCurrentTime());
                                 }
@@ -100,7 +100,7 @@ public class PosicaoCargaDescargaEstacaoArmazenamentoCaminhaoExterno extends JSi
                 return false;
             }
             if (novoCaminhao.isFinalizado()) {
-                novoCaminhao.escreverArquivo("\r\nCarregou " + novoCaminhao.getContainer().getId());
+                novoCaminhao.escreverArquivo(" -Carregou " + novoCaminhao.getContainer().getId());
                 if (_rotaSaidaCaminhoes.addCaminhoes(novoCaminhao)) {                    
                     _caminhao = null;
                     return true;
@@ -129,7 +129,7 @@ public class PosicaoCargaDescargaEstacaoArmazenamentoCaminhaoExterno extends JSi
     private void criarArquivo() {
         if (_arquivo == null) {
             try {
-                _arquivo = new File("../arquivo" + getName() + ".txt");
+                _arquivo = new File("../PosicoesEstacaoCaminhoesExternos/arquivo" + getName() + ".txt");
                 _fw = new FileWriter(_arquivo, false);
                 _bw = new BufferedWriter(_fw);
             } catch (IOException ex) {

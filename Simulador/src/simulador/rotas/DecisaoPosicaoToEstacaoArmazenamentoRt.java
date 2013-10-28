@@ -82,7 +82,7 @@ public class DecisaoPosicaoToEstacaoArmazenamentoRt extends RouteBase {
         if (_posicao.getCaminhao() == null) {
             _posicao.setCaminhao(_caminhoes.get(0));
             super.LiberarRota();
-            escreverArquivo("\r\n caminhao " + _caminhoes.get(0).getIdCaminhao() + " saiu no momento " + myParent.getCurrentTime() + " para posicao " + _posicao.getName());
+            escreverArquivo(" -Caminhao " + _caminhoes.get(0).getIdCaminhao() + " saiu no momento " + myParent.getCurrentTime() + " para posicao " + _posicao.getName());
             _caminhoes.remove(0);            
 
             return true;
@@ -95,9 +95,9 @@ public class DecisaoPosicaoToEstacaoArmazenamentoRt extends RouteBase {
             return false;
         }
         else{
-            escreverArquivo("\r\n caminhao " + _caminhao.getIdCaminhao() + " entrou no momento " + myParent.getCurrentTime());
+            escreverArquivo("\r\n -Caminhao " + _caminhao.getIdCaminhao() + " entrou no momento " + myParent.getCurrentTime());
             this._caminhoes.add(_caminhao);
-            _caminhoes.get(0).escreverArquivo("\r\nEntrou na " + this.getName() + " no momento " + myParent.getCurrentTime());            
+            _caminhoes.get(0).escreverArquivo(" -Entrou na " + this.getName() + " no momento " + myParent.getCurrentTime());            
             super.OcuparRota();
             return true;
         }        
@@ -110,7 +110,7 @@ public class DecisaoPosicaoToEstacaoArmazenamentoRt extends RouteBase {
     private void criarArquivo() {
         if (_arquivo == null) {
             try {
-                _arquivo = new File("../arquivo" + idRota + ".txt");
+                _arquivo = new File("../Rotas/arquivo" + this.getName() + ".txt");
                 _fw = new FileWriter(_arquivo, false);
                 _bw = new BufferedWriter(_fw);
             } catch (IOException ex) {
@@ -121,7 +121,7 @@ public class DecisaoPosicaoToEstacaoArmazenamentoRt extends RouteBase {
 
     public void escreverArquivo(String texto) {
         try {
-            _bw.write("\r\n " + texto);
+            _bw.write("\r\n" + texto);
             _bw.flush();
         } catch (IOException ex) {
             ex.printStackTrace(System.err);

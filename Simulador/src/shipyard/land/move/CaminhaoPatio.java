@@ -86,7 +86,7 @@ public class CaminhaoPatio extends JSimLink{
     private void criarArquivo() {
         if (_arquivo == null) {
             try {
-                _arquivo = new File("../arquivoCaminhaoPatio" + _idCaminhao + ".txt");
+                _arquivo = new File("../CaminhoesPatio/arquivoCaminhaoPatio" + _idCaminhao + ".txt");
                 _fw = new FileWriter(_arquivo, false);
                 _bw = new BufferedWriter(_fw);
             } catch (IOException ex) {

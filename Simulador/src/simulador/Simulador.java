@@ -66,9 +66,6 @@ public class Simulador {
                 BufferedWriter bw = new BufferedWriter(fw);
 
                 JSimSimulation simulation;
-                double mu1 = 1.0/*, mu2 = 1.0*/;
-                double lambda1 = 0.4/*, lambda2 = 0.4*/;
-                double p1 = 0.5/*, p2 = 0.5*/;
 
                 /*Objetos do pátio*/
                 GeradorCaminhoesExternos geradorCaminhoes;
@@ -133,7 +130,7 @@ public class Simulador {
                 filaCaminhoes1 = new FilaCaminhoesExternos("Fila de Entrada de Caminhões Externos no Porto", simulation);
 
                 geradorCaminhoes = new GeradorCaminhoesExternos("Gerador de Caminhões Externos", simulation,
-                        new UniformDistributionStream(new JSimUniformStream(50, 50.1)), filaCaminhoes1);
+                        new UniformDistributionStream(new JSimUniformStream(50, 50.1)), filaCaminhoes1, 0, 0);
 
                 rotaEntradaCaminhoes = new FilaCaminhoesExternosToDecisaoPosicaoRt("Rota de Entrada de Caminhões Externos no Porto", simulation,
                         1, filaCaminhoes1, new UniformDistributionStream(new JSimUniformStream(50, 50.1)));
@@ -143,14 +140,14 @@ public class Simulador {
                 rotaSaidaCaminhoes = new RotaSaidaCaminhoesRt("Rota de Saída de Caminhões Externos do Porto", simulation, 1/*capacidade*/,
                         new UniformDistributionStream(new JSimUniformStream(50, 50.1)));
 
-                estacaoArmazenamentoContainers = new EstacaoArmazenamento(simulation, "Estação de Armazenamento", 10);
+                estacaoArmazenamentoContainers = new EstacaoArmazenamento(simulation, "Estação de Armazenamento", 30);
 
                 for (int i = 0; i < numeroTranstainers; i++) {
-                    posicaoCargaDescargaEstacaoExterna = new PosicaoCargaDescargaEstacaoArmazenamentoCaminhaoExterno("Posição de Carga e Descarga Externa " + i + " da Estação de Armazenamento", simulation);
+                    posicaoCargaDescargaEstacaoExterna = new PosicaoCargaDescargaEstacaoArmazenamentoCaminhaoExterno("Posição de Carga e Descarga Externa " + (i+1) + " da Estação de Armazenamento", simulation);
 
-                    posicaoCargaDescargaEstacaoInterna = new PosicaoCargaDescargaEstacaoArmazenamentoCaminhaoInterno("Posição de Carga e Descarga Interna " + i + " da Estação de Armazenamento", simulation);
+                    posicaoCargaDescargaEstacaoInterna = new PosicaoCargaDescargaEstacaoArmazenamentoCaminhaoInterno("Posição de Carga e Descarga Interna " + (i+1) + " da Estação de Armazenamento", simulation);
 
-                    transtainer = new Transtainer("Transtainer " + i, simulation, estacaoArmazenamentoContainers, posicaoCargaDescargaEstacaoExterna, posicaoCargaDescargaEstacaoInterna);
+                    transtainer = new Transtainer("Transtainer " + (i+1), simulation, estacaoArmazenamentoContainers, posicaoCargaDescargaEstacaoExterna, posicaoCargaDescargaEstacaoInterna);
 
                     posicaoCargaDescargaEstacaoExterna.setTranstainer(transtainer);
 
@@ -159,12 +156,12 @@ public class Simulador {
                     posicaoCargaDescargaEstacaoInterna.setFilaCaminhoesVazios(_filaCaminhoesPatioVazios);
 
                     rotaDecisaoPosicaoEstacaoArmazenamentoExt = new DecisaoPosicaoToEstacaoArmazenamentoRt
-                            ("Rota da Decisão de Caminhões Externos para Posição Carga Descarga " + i, simulation,
+                            ("Rota da Decisão de Caminhões Externos para Posição Carga Descarga " + (i+1), simulation,
                             1/*capacidade*/, new UniformDistributionStream(new JSimUniformStream(50, 50.1)));
                     
                     rotaDecisaoPosicaoEstacaoArmazenamentoInt = new DecisaoPosicaoToEstacaoArmazenamentoIntRt
-                            ("Rota da Decisão de Caminhões Internos para Posição Carga Descarga " + i, simulation,
-                            1/*capacidade*/, new UniformDistributionStream(new JSimUniformStream(50, 50.1)));
+                            ("Rota da Decisão de Caminhões Internos para Posição Carga Descarga " + (i+1), simulation,
+                            1/*capacidade*/, new UniformDistributionStream(new JSimUniformStream(25, 25.1)));
 
                     rotaEntradaCaminhoes.addRotasEstacaoArmazenamento(rotaDecisaoPosicaoEstacaoArmazenamentoExt);
 
@@ -183,8 +180,8 @@ public class Simulador {
                     posicaoCargaDescargaEstacaoInterna.setRotaAtePosicao(rotaDecisaoPosicaoEstacaoArmazenamentoInt);
 
                     rotaPosicaoEstacaoInternaToDecisaoBerco = new PosicaoEstacaoToDecisaoPosicaoBercoRt
-                            ("Rota da Posicao Interna " + i + " da Estação até Decisão de Posções do Berço", simulation,
-                            1/*capacidade*/, new UniformDistributionStream(new JSimUniformStream(50, 50.1)));
+                            ("Rota da Posicao Interna " + (i+1) + " da Estação até Decisão de Posções do Berço", simulation,
+                            1/*capacidade*/, new UniformDistributionStream(new JSimUniformStream(25, 25.1)));
                     
                     posicaoCargaDescargaEstacaoInterna.setRotaAteDecisaoBerco(rotaPosicaoEstacaoInternaToDecisaoBerco);
                     
@@ -242,11 +239,11 @@ public class Simulador {
 
                         DecisaoPosicaoToPosicaoBercoRt rotaDecisaoToPosBerco = new DecisaoPosicaoToPosicaoBercoRt
                                 ("Rota da Decisão de Caminhões do Pátio para Posicão de Carga e Descarga " + j + " do Berço " + berco.getName(), simulation, 1,
-                                new UniformDistributionStream(new JSimUniformStream(50, 50.1)));
+                                new UniformDistributionStream(new JSimUniformStream(25, 25.1)));
 
                         PosicaoBercoToDecisaoPosicaoEstacaoRt rotaPosicaoBercoToDecisaoPosicaoEstacao = new PosicaoBercoToDecisaoPosicaoEstacaoRt
                                 ("Rota da Posicão de Carga e Descarga " + j + " do Berço " + berco.getName() + " para Decisão de Posições da Estação", simulation, 1,
-                                new UniformDistributionStream(new JSimUniformStream(50, 50.1)));
+                                new UniformDistributionStream(new JSimUniformStream(25, 25.1)));
 
                         posicaoCargaDescarga.setRotaDecisaoPosicaoCargaDescargaBerco(rotaDecisaoToPosBerco);
 
@@ -278,13 +275,13 @@ public class Simulador {
                 simulation.message("Ativando os Geradores");
                 bw.write("Ativando os Geradores\r\n");
 
-                //geradorCaminhoes.activate(0.0);
+                geradorCaminhoes.activate(0.0);
                 geradorNavios.activate(0.0);
 
                 simulation.message("Executando a simulação.");
                 bw.write("Executando a simulação.\r\n");
 
-                while ((simulation.getCurrentTime() < 5000.0) && (simulation.step() == true)) {
+                while ((simulation.getCurrentTime() < 10000.0) && (simulation.step() == true)) {
                     continue;
                 }
 
