@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import negocio.PortainerBusiness;
+import shipyard.land.staticplace.Berco;
 import shipyard.land.staticplace.DecisaoCaminhaoPatioPosicaoEstacao;
 import shipyard.land.staticplace.PosicaoCargaDescargaBerco;
 import shipyard.load.Container;
@@ -51,7 +52,7 @@ public class Portainer extends JSimProcess {
     private FilaContainers _queueIn;
     private FilaContainers _queueOut;
     private String _nomePortainer;
-    private JSimProcess _berco;
+    private Berco _berco;
     private JSimSimulation _simulation;
     private int _numeroContainersDescarregar;
     private int _numeroContainersCarregar;
@@ -67,7 +68,7 @@ public class Portainer extends JSimProcess {
     //CaminhoesPatio
     //BercosAtende
     //IdentificadoresNavios
-    public Portainer(String name, JSimSimulation sim, JSimProcess berco, PosicaoCargaDescargaBerco posicao)
+    public Portainer(String name, JSimSimulation sim, Berco berco, PosicaoCargaDescargaBerco posicao)
             throws JSimSimulationAlreadyTerminatedException, JSimInvalidParametersException, JSimTooManyProcessesException, IOException {
         super(name, sim);
         this._nomePortainer = name;
@@ -186,7 +187,7 @@ public class Portainer extends JSimProcess {
         return _nomePortainer;
     }
 
-    public JSimProcess getBerco() {
+    public Berco getBerco() {
         return _berco;
     }
     

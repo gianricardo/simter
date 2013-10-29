@@ -10,6 +10,7 @@ import cz.zcu.fav.kiv.jsim.JSimSecurityException;
 import cz.zcu.fav.kiv.jsim.JSimSimulation;
 import cz.zcu.fav.kiv.jsim.JSimSimulationAlreadyTerminatedException;
 import cz.zcu.fav.kiv.jsim.JSimTooManyProcessesException;
+import estatisticas.EstatisticasPorto;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -55,17 +56,21 @@ public class Berco extends JSimProcess {
     private DecisaoCaminhaoPatioPosicaoEstacao _decisaoCaminhoesPatioEstacao;
     private DecisaoCaminhaoPatioPosicaoBerco _decisaoCaminhoesPatioBerco;
     
+    private EstatisticasPorto _estatisticas;
+    
     private File _arquivo;
     private FileWriter _fw;
-    private BufferedWriter _bw;
+    private BufferedWriter _bw;    
     
-    public Berco(JSimSimulation simulation, int idBerco, DecisaoCaminhaoPatioPosicaoEstacao decisaoCaminhoesPatio, DecisaoCaminhaoPatioPosicaoBerco decisaoCaminhoesPatioPosicaoBerco)
+    public Berco(JSimSimulation simulation, int idBerco, DecisaoCaminhaoPatioPosicaoEstacao decisaoCaminhoesPatio, 
+            DecisaoCaminhaoPatioPosicaoBerco decisaoCaminhoesPatioPosicaoBerco, EstatisticasPorto estatisticas)
             throws JSimSimulationAlreadyTerminatedException, JSimInvalidParametersException, JSimTooManyProcessesException {
         super(Integer.toString(idBerco), simulation);
         this._simulation = simulation;
         this._idBerco = idBerco;
         this._decisaoCaminhoesPatioEstacao = decisaoCaminhoesPatio;
         this._decisaoCaminhoesPatioBerco = decisaoCaminhoesPatioPosicaoBerco;
+        this._estatisticas = estatisticas;
         this._bercoNegocio = new BercoBusiness(this);        
     }    
     
@@ -258,5 +263,9 @@ public class Berco extends JSimProcess {
 
     public DecisaoCaminhaoPatioPosicaoBerco getDecisaoCaminhoesPatioBerco() {
         return _decisaoCaminhoesPatioBerco;
+    }
+
+    public EstatisticasPorto getEstatisticas() {
+        return _estatisticas;
     }
 }

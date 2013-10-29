@@ -25,6 +25,7 @@ public class CaminhaoExterno extends JSimLink{
     private boolean _carregado;
     public boolean _finalizado;
     private double _horaRecebimentoContainer;
+    private double _horaSaidaPorto;
     
     private File _arquivo;
     private FileWriter _fw;
@@ -98,5 +99,17 @@ public class CaminhaoExterno extends JSimLink{
 
     public String getIdCaminhao() {
         return _idCaminhao;
+    }
+
+    public void setHoraSaidaPorto(double _horaSaidaPorto) {
+        this._horaSaidaPorto = _horaSaidaPorto;
+    }
+
+    public double getTimeOfCreation() {
+        return _timeOfCreation;
+    }
+
+    public double getHoraSaidaPorto() {
+        return _horaSaidaPorto;
     }
 }

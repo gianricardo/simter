@@ -12,6 +12,7 @@ import cz.zcu.fav.kiv.jsim.JSimSimulation;
 import cz.zcu.fav.kiv.jsim.JSimSimulationAlreadyTerminatedException;
 import cz.zcu.fav.kiv.jsim.JSimTooManyHeadsException;
 import cz.zcu.fav.kiv.jsim.JSimTooManyProcessesException;
+import estatisticas.EstatisticasPorto;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -41,8 +42,10 @@ public class EstacaoArmazenamento extends JSimProcess {
     private File _arquivo;
     private FileWriter _fw;
     private BufferedWriter _bw;
+    
+    private EstatisticasPorto _estatisticas;
 
-    public EstacaoArmazenamento(JSimSimulation simulation, String idEstacaoArmazenamento, int numeroContainersInicial)
+    public EstacaoArmazenamento(JSimSimulation simulation, String idEstacaoArmazenamento, int numeroContainersInicial, EstatisticasPorto estatisticas)
             throws JSimSimulationAlreadyTerminatedException, JSimInvalidParametersException, JSimTooManyProcessesException {
         super(idEstacaoArmazenamento, simulation);
         
@@ -70,6 +73,8 @@ public class EstacaoArmazenamento extends JSimProcess {
                 Logger.getLogger(EstacaoArmazenamento.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
+        
+        _estatisticas = estatisticas;
     }
     
     public File getArquivo() {
@@ -120,5 +125,9 @@ public class EstacaoArmazenamento extends JSimProcess {
 
     public FilaContainers getFilaContainersParaNavio() {
         return _filaContainersParaNavio;
+    }
+
+    public EstatisticasPorto getEstatisticas() {
+        return _estatisticas;
     }
 }

@@ -50,6 +50,7 @@ public class TranstainerBusiness {
     public void atenderPosicaoExterna() {
         if (caminhaoOcupado(_transtainer.getPosicaoCargaDescarga().getCaminhao())) {
             descarregarCaminhao();
+            _transtainer.getEstacaoArmazenamento().getEstatisticas().incrementarQtdeContainersMovimentadaEstacao();
             if (caminhaoFinalizado()) {
                 if (_transtainer.getPosicaoCargaDescarga().isIdle()) {
                     try {
@@ -60,6 +61,7 @@ public class TranstainerBusiness {
                 }
             } else {
                 carregarCaminhao();
+                _transtainer.getEstacaoArmazenamento().getEstatisticas().incrementarQtdeContainersMovimentadaEstacao();
                 if (_transtainer.getPosicaoCargaDescarga().isIdle()) {
                     try {
                         _transtainer.getPosicaoCargaDescarga().activate(_transtainer.getSimulation().getCurrentTime());
@@ -70,6 +72,7 @@ public class TranstainerBusiness {
             }
         } else {
             carregarCaminhao();
+            _transtainer.getEstacaoArmazenamento().getEstatisticas().incrementarQtdeContainersMovimentadaEstacao();
             if (_transtainer.getPosicaoCargaDescarga().isIdle()) {
                 try {
                     _transtainer.getPosicaoCargaDescarga().activate(_transtainer.getSimulation().getCurrentTime());
@@ -83,6 +86,7 @@ public class TranstainerBusiness {
     public void atenderPosicaoInterna() {
         if (caminhaoOcupado(_transtainer.getPosicaoCargaDescargaInterna().getCaminhao())) {
             descarregarCaminhao();
+            _transtainer.getEstacaoArmazenamento().getEstatisticas().incrementarQtdeContainersMovimentadaEstacao();
             if (caminhaoFinalizado()) {
                 if (_transtainer.getPosicaoCargaDescargaInterna().isIdle()) {
                     try {
@@ -93,6 +97,7 @@ public class TranstainerBusiness {
                 }
             } else {
                 carregarCaminhao();
+                _transtainer.getEstacaoArmazenamento().getEstatisticas().incrementarQtdeContainersMovimentadaEstacao();
                 if (_transtainer.getPosicaoCargaDescargaInterna().isIdle()) {
                     try {
                         _transtainer.getPosicaoCargaDescargaInterna().activate(_transtainer.getSimulation().getCurrentTime());
@@ -103,6 +108,7 @@ public class TranstainerBusiness {
             }
         } else {
             carregarCaminhao();
+            _transtainer.getEstacaoArmazenamento().getEstatisticas().incrementarQtdeContainersMovimentadaEstacao();
             if (_transtainer.getPosicaoCargaDescargaInterna().isIdle()) {
                 try {
                     _transtainer.getPosicaoCargaDescargaInterna().activate(_transtainer.getSimulation().getCurrentTime());
@@ -166,6 +172,7 @@ public class TranstainerBusiness {
         } else if (_caminhaoPatio != null) {
             try {
                 _transtainer.segurar(JSimSystem.uniform(10, 10));
+                
                 if (_caminhaoPatio.getContainer().getDestinoContainer() == ContainerTipos.CaminhaoExterno) {
                     try {
                         JSimLink _container = _caminhaoPatio.getContainer();

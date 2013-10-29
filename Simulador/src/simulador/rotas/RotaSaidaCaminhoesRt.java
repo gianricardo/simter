@@ -9,6 +9,7 @@ import cz.zcu.fav.kiv.jsim.JSimSecurityException;
 import cz.zcu.fav.kiv.jsim.JSimSimulation;
 import cz.zcu.fav.kiv.jsim.JSimSimulationAlreadyTerminatedException;
 import cz.zcu.fav.kiv.jsim.JSimTooManyProcessesException;
+import estatisticas.EstatisticasPorto;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -30,13 +31,16 @@ public class RotaSaidaCaminhoesRt extends RouteBase {
     private List<CaminhaoExterno> _caminhoes = new ArrayList();
     private List<PosicaoCargaDescargaEstacaoArmazenamentoCaminhaoExterno> _posicoesCargaDescargaEstacaoArmazenamentos = new ArrayList();
     
+    private EstatisticasPorto _estatisticas;
+    
     private File _arquivo;
     private FileWriter _fw;
     private BufferedWriter _bw;
 
-    public RotaSaidaCaminhoesRt(String idRoute, JSimSimulation simulation, int capacidade, DistributionFunctionStream stream)
+    public RotaSaidaCaminhoesRt(String idRoute, JSimSimulation simulation, int capacidade, DistributionFunctionStream stream, EstatisticasPorto estatisticas)
             throws JSimSimulationAlreadyTerminatedException, JSimInvalidParametersException, JSimTooManyProcessesException {
         super(idRoute, simulation, capacidade, stream);
+        _estatisticas = estatisticas;
         
         criarArquivo();
     }
@@ -73,8 +77,11 @@ public class RotaSaidaCaminhoesRt extends RouteBase {
     }
 
     public boolean ElementOut() {
-        if (!_caminhoes.isEmpty()) {
+        if (!_caminhoes.isEmpty()) {            
             super.LiberarRota();
+            _caminhoes.get(0).setHoraSaidaPorto(myParent.getCurrentTime());
+            _caminhoes.get(0).escreverArquivo(" -Deixou o porto no momento " + myParent.getCurrentTime() + " ficando no porto por " + (_caminhoes.get(0).getHoraSaidaPorto() - _caminhoes.get(0).getTimeOfCreation()));
+            _estatisticas.atualizarEstatisticasCaminhoes((_caminhoes.get(0).getHoraSaidaPorto() - _caminhoes.get(0).getTimeOfCreation()));
             escreverArquivo(" -Caminhao " + _caminhoes.get(0).getIdCaminhao() + " saiu da rota no momento " + myParent.getCurrentTime());
             _caminhoes.remove(0);
             return true;

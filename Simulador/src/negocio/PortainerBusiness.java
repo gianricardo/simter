@@ -23,7 +23,6 @@ import utils.SolicitacaoCaminhoesPatio;
 public class PortainerBusiness {
 
     private Portainer _portainer;
-    private SolicitacaoCaminhoesPatio _solicitacao;
 
     public PortainerBusiness(Portainer portainer) {
         this._portainer = portainer;
@@ -180,6 +179,7 @@ public class PortainerBusiness {
 
                         _portainer.segurar(JSimSystem.uniform(10, 10));
 
+                        _portainer.getBerco().getEstatisticas().incrementarQtdeContainersMovimentadaBerco();
                         _portainer.getPosicaoCargaDescarga().getCaminhao().setContainer(_portainer.getContainer());
                         _portainer.getPosicaoCargaDescarga().getCaminhao().setHoraRecebimentoContainer(_portainer.getSimulation().getCurrentTime());
                         _portainer.getPosicaoCargaDescarga().getCaminhao().setFinalizado(true);

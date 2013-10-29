@@ -9,6 +9,7 @@ import cz.zcu.fav.kiv.jsim.JSimInvalidParametersException;
 import cz.zcu.fav.kiv.jsim.JSimMethodNotSupportedException;
 import cz.zcu.fav.kiv.jsim.JSimSimulation;
 import cz.zcu.fav.kiv.jsim.random.JSimUniformStream;
+import estatisticas.EstatisticasPorto;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -41,6 +42,7 @@ import simulador.rotas.PosicaoEstacaoToDecisaoPosicaoBercoRt;
 import simulador.rotas.PraticoToBercoRt;
 import simulador.rotas.RotaSaidaCaminhoesRt;
 import simulador.rotas.RotaSaidaNaviosRt;
+import utils.Formatters;
 
 /**
  *
@@ -53,10 +55,10 @@ public class Simulador {
      */
     public static void main(String[] args) throws JSimInvalidParametersException, JSimMethodNotSupportedException {
         try {
-            File arquivo = new File("../arquivo.txt");
+            File arquivo = new File("../arquivoEstatisticas.txt");
 
             if (arquivo.delete() == true) {
-                arquivo = new File("../arquivo.txt");
+                arquivo = new File("../arquivoEstatisticas.txt");
             }
 
             if (!arquivo.exists()) {
@@ -66,6 +68,8 @@ public class Simulador {
                 BufferedWriter bw = new BufferedWriter(fw);
 
                 JSimSimulation simulation;
+                
+                EstatisticasPorto estatisticas = new EstatisticasPorto();
 
                 /*Objetos do pátio*/
                 GeradorCaminhoesExternos geradorCaminhoes;
@@ -138,9 +142,9 @@ public class Simulador {
                 geradorCaminhoes.setRotaEntradaCaminhoes(rotaEntradaCaminhoes);
 
                 rotaSaidaCaminhoes = new RotaSaidaCaminhoesRt("Rota de Saída de Caminhões Externos do Porto", simulation, 1/*capacidade*/,
-                        new UniformDistributionStream(new JSimUniformStream(50, 50.1)));
+                        new UniformDistributionStream(new JSimUniformStream(50, 50.1)), estatisticas);
 
-                estacaoArmazenamentoContainers = new EstacaoArmazenamento(simulation, "Estação de Armazenamento", 30);
+                estacaoArmazenamentoContainers = new EstacaoArmazenamento(simulation, "Estação de Armazenamento", 30, estatisticas);
 
                 for (int i = 0; i < numeroTranstainers; i++) {
                     posicaoCargaDescargaEstacaoExterna = new PosicaoCargaDescargaEstacaoArmazenamentoCaminhaoExterno("Posição de Carga e Descarga Externa " + (i+1) + " da Estação de Armazenamento", simulation);
@@ -201,7 +205,7 @@ public class Simulador {
                 filaNavios1 = new FilaNavios("Fila de Entrada de Navios no Porto", simulation);
 
                 geradorNavios = new GeradorNavios("Gerador de Navios 1", simulation,
-                        new UniformDistributionStream(new JSimUniformStream(250, 250.1)), filaNavios1);
+                        new UniformDistributionStream(new JSimUniformStream(1000, 1000.1)), filaNavios1);
 
                 pratico = new Pratico("Pratico", simulation);
 
@@ -210,14 +214,14 @@ public class Simulador {
                         1, filaNavios1, pratico, new UniformDistributionStream(new JSimUniformStream(50, 50.1)));
 
                 rotaSaidaNavios = new RotaSaidaNaviosRt("Rota de Saída de Navios do Porto", simulation, 1,
-                        new UniformDistributionStream(new JSimUniformStream(50, 50.1)));
+                        new UniformDistributionStream(new JSimUniformStream(50, 50.1)), estatisticas);
 
                 pratico.setRotaNavioPratico(rotaEntradaToPratico);
 
                 filaNavios1.setRotaEntradaPratico(rotaEntradaToPratico);
 
                 for (int i = 0; i < numeroBercos; i++) {
-                    berco = new Berco(simulation, i + 1, _decisaoCaminhoesEstacaoArmazenamento, _decisaoCaminhoesBerco);
+                    berco = new Berco(simulation, i + 1, _decisaoCaminhoesEstacaoArmazenamento, _decisaoCaminhoesBerco, estatisticas);
 
                     rotaPraticoBerco = new PraticoToBercoRt("Rota do Prático até o Berco " + berco.getName(), simulation, 1, berco, pratico,
                             new UniformDistributionStream(new JSimUniformStream(50, 50.1)));
@@ -288,12 +292,13 @@ public class Simulador {
                 // Now, some boring numbers.
                 simulation.message("Simulação interrompida no momento " + simulation.getCurrentTime());
                 bw.write("\r\nSimulação interrompida no momento " + simulation.getCurrentTime() + "\r\n");
-                simulation.message("Estatísticas das Filas:");
-                bw.write("\r\nEstatísticas das Filas: ");
-                simulation.message("Fila 1: Tamanho médio da fila = " + filaNavios1.getLw() + ", Tempo médio de espera na fila dos navios que já deixaram o porto = " + filaNavios1.getTw() + ", Tempo médio de espera na fila dos navios = " + filaNavios1.getTwForAllLinks());
-                bw.write("\r\nFila 1: Tamanho médio da fila = " + filaNavios1.getLw() + ", \r\nTempo médio de espera na fila dos navios que já deixaram o porto = " + filaNavios1.getTw() + ", \r\nTempo médio de espera na fila dos navios = " + filaNavios1.getTwForAllLinks() + "\r\n");
-                simulation.message("Estatísticas dos Berços:");
-                bw.write("\r\nEstatísticas dos Berços: ");
+                bw.write("\r\nNúmero de caminhões externos que já deixaram o porto: " + estatisticas.getQtdeCaminhoesExternosDeixaramPorto());
+                bw.write("\r\nTempo médio de permanência de caminhões externos que já deixaram o porto: " + Formatters.df.format(estatisticas.calcularTempoMedioCaminhoes()));
+                bw.write("\r\nNúmero de navios que já deixaram o porto: " + estatisticas.getQtdeNaviosDeixaramPorto());
+                bw.write("\r\nTempo médio de permanência de navios que já deixaram o porto: " + Formatters.df.format(estatisticas.calcularTempoMedioNavios()));
+                bw.write("\r\nNúmero movimentações de containers no berço: " + estatisticas.getQtdeContainersMovimentadaBerco());
+                bw.write("\r\nNúmero movimentações de containers na estação: " + estatisticas.getQtdeContainersMovimentadaEstacao());
+                bw.write("\r\nTaxa de ocupação do berço: " + Formatters.df.format((estatisticas.calcularTaxaOcupacaoBerco(simulation.getCurrentTime()))*100) + "%");
 
                 simulation.shutdown();
                 bw.close();

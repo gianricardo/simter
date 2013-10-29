@@ -31,10 +31,7 @@ public class Navio extends JSimLink {
     private JSimSimulation _simulation;
     private String _idNavio;
     private double _timeOfCreation;
-    private Date _horaChegadaPorto;
-    private Date _horaAtracacao;
-    private Date _horaSaidaBerco;
-    private Date _horaSaidaPorto;
+    private double _horaSaidaPorto;
     private float _tempoAtendimento;
     private int _numeroRegioesNavio;
     private int _numeroContainersDescarregar = 0;
@@ -133,24 +130,16 @@ public class Navio extends JSimLink {
         return _timeOfCreation;
     }
 
-    public int getNumeroContainersDescarregar() {
-        return _numeroContainersDescarregar;
-    }
-
-    public Date getHoraChegadaPorto() {
-        return _horaChegadaPorto;
-    }
-
-    public Date getHoraSaidaPorto() {
+    public double getHoraSaidaPorto() {
         return _horaSaidaPorto;
     }
 
-    public Date getHoraAtracacao() {
-        return _horaAtracacao;
-    }
+    public void setHoraSaidaPorto(double _horaSaidaPorto) {
+        this._horaSaidaPorto = _horaSaidaPorto;
+    }    
 
-    public Date getHoraSaidaBerco() {
-        return _horaSaidaBerco;
+    public int getNumeroContainersDescarregar() {
+        return _numeroContainersDescarregar;
     }
 
     public int getNumeroRegioesNavio() {

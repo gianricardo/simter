@@ -97,7 +97,7 @@ public class PosicaoBercoToDecisaoPosicaoEstacaoRt extends RouteBase {
         if (!_caminhoes.isEmpty() && _caminhoes.get(0).isMovimentacaoFinalizada()) {
             CaminhaoPatio caminhaoRetornado = _caminhoes.get(0);
             super.LiberarRota();
-            escreverArquivo("\r\n -Caminhao " + _caminhoes.get(0).getIdCaminhao() + " saiu da rota no momento " + myParent.getCurrentTime());
+            escreverArquivo(" -Caminhao " + _caminhoes.get(0).getIdCaminhao() + " saiu da rota no momento " + myParent.getCurrentTime());
             _caminhoes.remove(0);            
             if (_posicaoBerco.isIdle()) {
                 try {

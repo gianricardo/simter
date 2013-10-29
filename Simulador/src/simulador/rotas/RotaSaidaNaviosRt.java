@@ -9,6 +9,7 @@ import cz.zcu.fav.kiv.jsim.JSimSecurityException;
 import cz.zcu.fav.kiv.jsim.JSimSimulation;
 import cz.zcu.fav.kiv.jsim.JSimSimulationAlreadyTerminatedException;
 import cz.zcu.fav.kiv.jsim.JSimTooManyProcessesException;
+import estatisticas.EstatisticasPorto;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -27,15 +28,18 @@ import simulador.random.DistributionFunctionStream;
 public class RotaSaidaNaviosRt extends RouteBase {
     
     private List<Navio> _navios = new ArrayList();
-    private List<BercoToRotaSaidaRt> _rotasBercoToRotaSaida = new ArrayList();    
+    private List<BercoToRotaSaidaRt> _rotasBercoToRotaSaida = new ArrayList(); 
+    
+    private EstatisticasPorto _estatisticas;
     
     private File _arquivo;
     private FileWriter _fw;
     private BufferedWriter _bw;
 
-    public RotaSaidaNaviosRt(String idRoute, JSimSimulation simulation, int capacidade, DistributionFunctionStream stream)
+    public RotaSaidaNaviosRt(String idRoute, JSimSimulation simulation, int capacidade, DistributionFunctionStream stream, EstatisticasPorto estatisticas)
             throws JSimSimulationAlreadyTerminatedException, JSimInvalidParametersException, JSimTooManyProcessesException {
         super(idRoute, simulation, capacidade, stream);
+        _estatisticas = estatisticas;
         
         criarArquivo();
     }
@@ -79,7 +83,9 @@ public class RotaSaidaNaviosRt extends RouteBase {
     }
 
     public boolean ElementOut() {
-        _navios.get(0).escreverArquivo(" -Deixando o porto no momento " + myParent.getCurrentTime());
+        _navios.get(0).escreverArquivo(" -Deixando o porto no momento " + myParent.getCurrentTime() + " ficando no porto por " + (myParent.getCurrentTime() - _navios.get(0).getCreationTime())  );
+        _navios.get(0).setHoraSaidaPorto(myParent.getCurrentTime());
+        _estatisticas.atualizarEstatisticasNavios(_navios.get(0).getHoraSaidaPorto() - _navios.get(0).getCreationTime());
         escreverArquivo(" -Navio " + _navios.get(0).getIdNavio() + " saiu da rota no momento " + myParent.getCurrentTime());
         super.LiberarRota();
         _navios.remove(0);

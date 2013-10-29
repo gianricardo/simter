@@ -55,8 +55,11 @@ public class BercoBusiness {
                     verificaFinalizacaoAtendimentoNavio();
 
                     // Now we must decide whether to throw the transaction away or to insert it into another queue.
-                    if (JSimSystem.uniform(0.0, 1.0) > _berco.getP() || _berco.getQueueOut() == null) {                       
+                    if (JSimSystem.uniform(0.0, 1.0) > _berco.getP() || _berco.getQueueOut() == null) { 
                         escreverArquivo();
+                        
+                        _berco.getEstatisticas().atualizarTempoBercoOcupado( _berco.getSimulation().getCurrentTime() - _berco.getHoraAtracacao());
+                        
                         while(true)
                         {
                             if(!finalizarAtendimentoNavio()){
