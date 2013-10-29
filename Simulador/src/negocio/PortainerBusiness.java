@@ -70,17 +70,6 @@ public class PortainerBusiness {
                             _portainer.getBerco().activate(_portainer.getSimulation().getCurrentTime());
                         }
                     } else {
-                        /*_portainer.setQueueIn(_portainer.getFilasContainers().get(0));                    
-                    
-                         _solicitacao = new SolicitacaoCaminhoesPatio();
-                         _solicitacao.setNumeroCaminhoesDescarregar(_portainer.getQueueIn().getNumeroContainers());
-                         _solicitacao.setNumeroCaminhoesCarregar(_portainer.getQueueIn().getNumeroContainersCarregar());
-                         _solicitacao.setRotaDecisaoPosicaoBerco(_portainer.getPosicaoCargaDescarga().getRotaDecisaoPosicaoCargaDescargaBerco());
-
-                         _portainer.getDecisaoSolicitacoes().AdicionarSolicitacao(_solicitacao);                    
-                    
-                         _portainer.setNumeroContainersDescarregar(_portainer.getQueueIn().getNumeroContainers());*/
-
                         CriarSolicitacao();
                         if (_portainer.getDecisaoSolicitacoes().isIdle()) {
                             _portainer.getDecisaoSolicitacoes().activate(_portainer.getSimulation().getCurrentTime());

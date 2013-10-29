@@ -10,15 +10,11 @@ import cz.zcu.fav.kiv.jsim.JSimProcess;
 import cz.zcu.fav.kiv.jsim.JSimSimulation;
 import cz.zcu.fav.kiv.jsim.JSimSimulationAlreadyTerminatedException;
 import cz.zcu.fav.kiv.jsim.JSimTooManyProcessesException;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import shipyard.land.move.CaminhaoPatio;
 import shipyard.land.move.Portainer;
-import simulador.queues.FilaCaminhoesInternos;
 import simulador.rotas.DecisaoPosicaoToPosicaoBercoRt;
 import simulador.rotas.PosicaoBercoToDecisaoPosicaoEstacaoRt;
 
@@ -30,12 +26,7 @@ public class PosicaoCargaDescargaBerco extends JSimProcess {
 
     private CaminhaoPatio _caminhao;
     private boolean _posicaoOcupada;
-    private JSimSimulation _simulation;
     private Portainer _portainer;
-    private String _nome;
-    private File _arquivo;
-    private FileWriter _fw;
-    private BufferedWriter _bw;
     private boolean _navioOcupandoPosicao;
     private int _numeroContainersDescarregarNavio;
     private int _numeroContainersCarregarNavio;
@@ -45,9 +36,7 @@ public class PosicaoCargaDescargaBerco extends JSimProcess {
     public PosicaoCargaDescargaBerco(String name, JSimSimulation sim, Portainer p)
             throws JSimSimulationAlreadyTerminatedException, JSimInvalidParametersException, JSimTooManyProcessesException, IOException {
         super(name, sim);
-        _simulation = sim;
         _portainer = p;
-        _nome = name;
     } // constructor
 
     @Override
@@ -122,34 +111,6 @@ public class PosicaoCargaDescargaBerco extends JSimProcess {
 
     public void setCaminhao(CaminhaoPatio _caminhao) {
         this._caminhao = _caminhao;
-    }
-
-    private void criarArquivo() {
-        if (_arquivo == null) {
-            try {
-                _arquivo = new File("../ArquivoPosicaoCargaDescargaBerco" + _nome + ".txt");
-                _fw = new FileWriter(_arquivo, false);
-                _bw = new BufferedWriter(_fw);
-            } catch (IOException ex) {
-                ex.printStackTrace(System.err);
-            }
-        }
-    }
-
-    private void escreverArquivo(FilaCaminhoesInternos fila) {
-        try {
-            _bw.write("\r\nCaminhao " + _caminhao.getIdCaminhao()
-                    + "\r\n colocado na posicao " + _nome
-                    + "\r\n -Colocado na fila " + fila.getHeadName()
-                    + " \r\n");
-            _bw.flush();
-        } catch (IOException ex) {
-            ex.printStackTrace(System.err);
-        }
-    }
-
-    public void closeBw() throws IOException {
-        _bw.close();
     }
 
     public boolean isNavioOcupandoPosicao() {

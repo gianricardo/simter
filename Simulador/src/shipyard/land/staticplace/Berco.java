@@ -41,10 +41,6 @@ public class Berco extends JSimProcess {
     private List<Portainer> _listaPortainers = new ArrayList<>();
     private List<PosicaoCargaDescargaBerco> _listaPosicoes = new ArrayList<>();
     private JSimSimulation _simulation;
-    private double _mu;
-    private double _p;
-    private int _counter;
-    private double _transTq;
     private FilaNavios _queueOut;
     private int _idBerco;    
     private BercoBusiness _bercoNegocio;
@@ -132,39 +128,7 @@ public class Berco extends JSimProcess {
     
     public JSimSimulation getSimulation() {
         return _simulation;
-    }
-    
-    public double getMu() {
-        return _mu;
-    }
-    
-    public void setMu(double mu) {
-        this._mu = mu;
-    }
-    
-    public double getP() {
-        return _p;
-    }
-    
-    public void setP(double p) {
-        this._p = p;
-    }
-    
-    public int getCounter() {
-        return _counter;
-    }
-    
-    public void setCounter(int counter) {
-        this._counter = counter;
-    }
-    
-    public double getTransTq() {
-        return _transTq;
-    }
-    
-    public void setTransTq(double transTq) {
-        this._transTq = transTq;
-    }
+    }    
     
     public FilaNavios getQueueOut() {
         return _queueOut;

@@ -29,19 +29,14 @@ import simulador.rotas.PosicaoEstacaoToDecisaoPosicaoBercoRt;
 public class PosicaoCargaDescargaEstacaoArmazenamentoCaminhaoInterno extends JSimProcess {
 
     private CaminhaoPatio _caminhao;
-    private JSimSimulation _simulation;
     private Transtainer _transtainer;
     private DecisaoPosicaoToEstacaoArmazenamentoIntRt _rotaAtePosicao;
     private PosicaoEstacaoToDecisaoPosicaoBercoRt _rotaAteDecisaoBerco;
     private FilaCaminhoesInternos _filaCaminhoesVazios;
-    private File _arquivo;
-    private FileWriter _fw;
-    private BufferedWriter _bw;
 
     public PosicaoCargaDescargaEstacaoArmazenamentoCaminhaoInterno(String name, JSimSimulation sim)
             throws JSimSimulationAlreadyTerminatedException, JSimInvalidParametersException, JSimTooManyProcessesException, IOException {
         super(name, sim);
-        _simulation = sim;
     } // constructor
 
     @Override

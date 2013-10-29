@@ -30,10 +30,8 @@ import simulador.queues.FilaContainers;
  */
 public class EstacaoArmazenamento extends JSimProcess {
 
-    private JSimSimulation _simulation;
-    private int _idEstacaoArmazenamento;
+    private JSimSimulation _simulation;    
     private int _quantidadeCargaMomento;
-    private int _capacidadeTotalCarga;
     
     private FilaContainers _filaContainersParaCaminhoesExternos;
     private FilaContainers _filaContainersParaNavio;

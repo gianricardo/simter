@@ -28,10 +28,7 @@ import simulador.rotas.RotaSaidaCaminhoesRt;
  */
 public class PosicaoCargaDescargaEstacaoArmazenamentoCaminhaoExterno extends JSimProcess {
 
-    private double _lambda;
     private CaminhaoExterno _caminhao;
-    private JSimSimulation _simulation;
-    private String _nome;
     private Transtainer _transtainer;
     private DecisaoPosicaoToEstacaoArmazenamentoRt _rotaAtePosicao;
     private RotaSaidaCaminhoesRt _rotaSaidaCaminhoes;
@@ -42,9 +39,7 @@ public class PosicaoCargaDescargaEstacaoArmazenamentoCaminhaoExterno extends JSi
     public PosicaoCargaDescargaEstacaoArmazenamentoCaminhaoExterno(String name, JSimSimulation sim)
             throws JSimSimulationAlreadyTerminatedException, JSimInvalidParametersException, JSimTooManyProcessesException, IOException {
         super(name, sim);
-        _simulation = sim;
-        _nome = name;
-
+        
         criarArquivo();
     } // constructor
 

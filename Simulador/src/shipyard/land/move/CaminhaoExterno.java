@@ -24,7 +24,6 @@ public class CaminhaoExterno extends JSimLink{
     private Container _container;
     private boolean _carregado;
     public boolean _finalizado;
-    private double _horaRecebimentoContainer;
     private double _horaSaidaPorto;
     
     private File _arquivo;
